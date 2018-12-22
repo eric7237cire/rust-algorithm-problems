@@ -10,16 +10,19 @@ impl Solution {
         
         assert!(k>0);
 
+        /*
+        sum_before[i] means sum of all elements in a strictly before that index
+        This is why the len is 1 more than a and the first element is 0.
+        */
         let mut sum_before : Vec<i32> = Vec::new();
         sum_before.push(0);
         for x in a.iter()
         {
-            let last_val : i32 = *sum_before.last_mut().unwrap() ;
+            let last_val : i32 = *sum_before.last().unwrap() ;
             sum_before.push(*x + last_val );
         }
 
-        let mut best_start = 0;
-        let mut best_end = a.len()+1;
+        let mut best_len = a.len()+1;
         let mut start_points: VecDeque<usize> = VecDeque::new();
         
         //sum is start <= index < stop
@@ -28,7 +31,7 @@ impl Solution {
         let debug = false;
         let n:usize = a.len() ;
 
-        //sum is from start <= index <= stop
+        //Code adapted from https://stackoverflow.com/questions/17391025/finding-a-minimal-subarray-of-n-integers-of-sum-k-in-linear-time
         for end in 0..n {
             
             let total_to_end = sum_before[end+1];
@@ -37,25 +40,49 @@ impl Solution {
                 println!("Starting loop.  End is {}, total is {}", end, total_to_end);
             }
 
-            while start_points.len() > 0 && total_to_end - sum_before[start_points[0]] >= k // adjust start
+            //This means can we move start to the right while still having a sum >= k?
+            while !start_points.is_empty() && total_to_end - sum_before[start_points[0]] >= k 
             {
-                start = start_points.pop_front().unwrap();
-                assert!(3>4);
+                start = start_points.pop_front().unwrap();                
+                //This start means (sum of a from start <= i <= end ) >= k
+                debug_assert!( sum_before[end+1] - sum_before[start] >= k );                
             }
 
             if debug {
                 println!("Start = {} End is {}, total is {}.  start_points={:?}", start, end, total_to_end, start_points);
             }
          
-            if total_to_end - sum_before[start] >= k && end-start < best_end-best_start
+            if total_to_end - sum_before[start] >= k && end-start+1 < best_len
             {
-                best_start = start;
-                best_end = end;
+                best_len = end - start + 1
             }
             
-            while start_points.len() > 0 && total_to_end <= sum_before[*start_points.back().unwrap()] // remove bad candidates
+            /*
+            This is the crux of this algorithm.  Lets say we have some starting candidates:
+
+            [2, 3, 5]<--back
+            and we are currently looking at end == 5
+
+            if sum from index 0 to 5 (==total_to_end) is less than
+            the sum from index 0 to 4, then
+            starting at index==5 would never be optimal (this happens when a[5] is negative)
+
+            if sum from index 0 to 5 (==total_to_end) is less than
+            the sum from index 0 to 2, then
+            this means that the sum of 3 to 5 is negative, so we would never want to start from index==3
+
+            Said another way, the property being maintained in this start_points candidate DEQ is to have
+            strictly increasing cumulative sums.
+
+            So this is very clevery removing sub arrays whose sum is 0
+
+            */
+            while !start_points.is_empty() && total_to_end <= sum_before[*start_points.back().unwrap()] // remove bad candidates
             {
                 start_points.pop_back();
+                if debug {
+                    println!("\n!! Removed a bad candidates.  start_points={:?}", start_points);
+                }
             }
 
             if debug {
@@ -64,10 +91,10 @@ impl Solution {
 
             start_points.push_back(end+1) // end+1 is a new candidate
         }
-        if best_end == a.len() + 1 {
+        if best_len > a.len() {
             return -1;
         } else {
-            return (best_end - best_start + 1) as i32;
+            return best_len as i32;
         }
 
     }
@@ -77,10 +104,13 @@ impl Solution {
 fn main() {
     
     let checks = [
-        ( (vec![1,2], 4), -1),
+       
       ( (vec![39353,64606,-23508,5678,-17612,40217,15351,-12613,-37037,64183,68965,-19778,-41764,-21512,17700,-23100,77370,64076,53385,30915,18025,17577,10658,77805,56466,-2947,29423,50001,31803,9888,71251,-6466,77254,-30515,2903,76974,-49661,-10089,66626,-7065,-46652,84755,-37843,-5067,67963,92475,15340,15212,54320,-5286],
 
 207007), 4),
+
+ ( (vec![1,2], 4), -1),
+
 ( (vec![
     12,17,26,72,93,
     95,-46,66,-38,-18,
@@ -114,6 +144,6 @@ fn main() {
             println!("OK {} == {}", actual_ans, expected_ans);
         
         }
-       // break;
+        //break;
     }
 }
