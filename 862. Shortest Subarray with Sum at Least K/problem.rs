@@ -2,100 +2,74 @@ pub struct Solution {
 
 }
 
+use std::collections::VecDeque;
+
 impl Solution {
     
     pub fn shortest_subarray(a: Vec<i32>, k: i32) -> i32 {
         
+        assert!(k>0);
+
+        let mut sum_before : Vec<i32> = Vec::new();
+        sum_before.push(0);
+        for x in a.iter()
+        {
+            let last_val : i32 = *sum_before.last_mut().unwrap() ;
+            sum_before.push(*x + last_val );
+        }
+
+        let mut best_start = 0;
+        let mut best_end = a.len()+1;
+        let mut start_points: VecDeque<usize> = VecDeque::new();
+        
         //sum is start <= index < stop
-        let mut current_sum = 0;
+        
         let mut start : usize = 0;
-        let mut stop : usize = 0;
-        let mut min_len : usize = a.len() + 2;
-        let debug = true;
+        let debug = false;
         let n:usize = a.len() ;
 
-        for( stop=0; stop < n; ++stop) {
+        //sum is from start <= index <= stop
+        for end in 0..n {
             
+            let total_to_end = sum_before[end+1];
+
             if debug {
-                println!("\nStarting loop sum {}, k={} Index {} to {}",
-                    current_sum,
-                    k, start, stop);
+                println!("Starting loop.  End is {}, total is {}", end, total_to_end);
             }
 
-            //Do we need to extend to the right
-            while current_sum < k && stop < n 
+            while start_points.len() > 0 && total_to_end - sum_before[start_points[0]] >= k // adjust start
             {
-                if current_sum < 0 {
-                    current_sum = 0;
-                    start = stop;
-                    continue;
-                }
-
-                current_sum += a[stop];
-                stop += 1;
-            }
-
-            
-
-            if debug {
-                println!("\nMid loop sum {}, k={} Index {} to {}",
-                    current_sum,
-                    k, start, stop);
-            } 
-
-            if current_sum >= k {
-                /* To find the start, since we can have negative numbers, count
-                from stop - 1 until we get at least k*/
-                //let mut sub_sum = 0;
-                current_sum = 0;
-                start = stop;
-
-                //starting from stop-1, find greatest start where we have 
-                //the sub array total >= k
-                while current_sum < k
-                {
-                    start-=1;
-                    current_sum += a[start];
-                }
-            
-                if stop - start < min_len {
-                    min_len = stop - start ; 
-                }
-            
-                if debug {
-                    println!("Mid ++ sum {}, k={} Index {} to {}",
-                        current_sum,
-                        k, start, stop);
-                }
-
-                //Now we move left up until we no longer have a solution
-                while current_sum >= k && start < stop && start < n-1
-                {
-                    current_sum -= a[start];
-                    start += 1;                    
-                }
-                
-                assert!(start <= stop);
-                
-                if current_sum >= k {
-                    break;
-                }
+                start = start_points.pop_front().unwrap();
+                assert!(3>4);
             }
 
             if debug {
-                println!("Current sum {}, k={} Index {} to {}",
-                    current_sum,
-                    k, start, stop);
+                println!("Start = {} End is {}, total is {}.  start_points={:?}", start, end, total_to_end, start_points);
+            }
+         
+            if total_to_end - sum_before[start] >= k && end-start < best_end-best_start
+            {
+                best_start = start;
+                best_end = end;
+            }
+            
+            while start_points.len() > 0 && total_to_end <= sum_before[*start_points.back().unwrap()] // remove bad candidates
+            {
+                start_points.pop_back();
             }
 
-           
+            if debug {
+                println!("After removing bad candidates.  Start = {} End is {}, total is {}.  start_points={:?}", start, end, total_to_end, start_points);
+            }
+
+            start_points.push_back(end+1) // end+1 is a new candidate
         }
-        
-        if min_len > n {
-            return -1
+        if best_end == a.len() + 1 {
+            return -1;
         } else {
-            return min_len as i32;
+            return (best_end - best_start + 1) as i32;
         }
+
     }
 }
 
@@ -103,6 +77,7 @@ impl Solution {
 fn main() {
     
     let checks = [
+        ( (vec![1,2], 4), -1),
       ( (vec![39353,64606,-23508,5678,-17612,40217,15351,-12613,-37037,64183,68965,-19778,-41764,-21512,17700,-23100,77370,64076,53385,30915,18025,17577,10658,77805,56466,-2947,29423,50001,31803,9888,71251,-6466,77254,-30515,2903,76974,-49661,-10089,66626,-7065,-46652,84755,-37843,-5067,67963,92475,15340,15212,54320,-5286],
 
 207007), 4),
@@ -139,6 +114,6 @@ fn main() {
             println!("OK {} == {}", actual_ans, expected_ans);
         
         }
-        break;
+       // break;
     }
 }
