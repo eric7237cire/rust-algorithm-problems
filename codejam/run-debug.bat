@@ -28,6 +28,15 @@ rem cargo build && cat .\src\y2017round1B\B-small-practice.in | .\target\debug\c
 rem cargo build && cat .\src\y2017round1B\B-large-practice.in | .\target\debug\codejam.exe > .\src\y2017round1B\B-large-practice.out
 
 rem cargo build && cat .\src\y2017round1B\C-test.in | .\target\debug\codejam.exe > .\src\y2017round1B\C-small-practice.out
-cargo build && cat .\src\y2017round1B\C-small-practice.in | .\target\debug\codejam.exe > .\src\y2017round1B\C-small-practice.out
-cargo build && cat .\src\y2017round1B\C-large-practice.in | .\target\debug\codejam.exe > .\src\y2017round1B\C-large-practice.out
+rem cargo build && cat .\src\y2017round1B\C-small-practice.in | .\target\debug\codejam.exe > .\src\y2017round1B\C-small-practice.out
+rem cargo build && cat .\src\y2017round1B\C-large-practice.in | .\target\debug\codejam.exe > .\src\y2017round1B\C-large-practice.out
 
+rem cargo build && cat .\src\y2017round1C\A-small-practice.in | .\target\debug\codejam.exe > .\src\y2017round1C\A-small-practice.out
+rem cargo build && cat .\src\y2017round1C\A-large-practice.in | .\target\debug\codejam.exe > .\src\y2017round1C\A-large-practice.out
+
+rem cargo build && cat .\src\y2017round1C\B-small-practice.in | .\target\debug\codejam.exe > .\src\y2017round1C\B-small-practice.out
+rem cargo build && cat .\src\y2017round1C\B-large-practice.in | .\target\debug\codejam.exe > .\src\y2017round1C\B-large-practice.out
+
+cargo build && cat .\src\y2017round1C\C-test.in | .\target\debug\codejam.exe > .\src\y2017round1C\C-test.out
+cargo build && cat .\src\y2017round1C\C-small-practice-1.in | .\target\debug\codejam.exe > .\src\y2017round1C\C-small-practice-1.out
+cargo build && cat .\src\y2017round1C\C-small-practice-2.in | .\target\debug\codejam.exe > .\src\y2017round1C\C-small-practice-2.out
