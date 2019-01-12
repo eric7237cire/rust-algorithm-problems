@@ -2,6 +2,11 @@ use super::super::util::input::*;
 //use std::cmp::min;
 use std::cmp::Ordering::*;
 
+/*
+hard custom algorithm / proof
+dynamic programming
+probability of success of at least K independent events
+*/
 pub fn solve_all_cases()
 {
     let mut reader = InputReader::new();
@@ -10,7 +15,7 @@ pub fn solve_all_cases()
     for case in 1..=t {
         let (_, K) = reader.read_tuple_2::<u8, u8>();
         let U = reader.read_int::<f64>();
-        let mut P = reader.read_int_line::<f64>();
+        let mut P = reader.read_num_line::<f64>();
 
         debug!("P: {:?}", P);
 
@@ -63,7 +68,6 @@ fn prob1()
     let P = [0.5; 18];
     let p = prob_at_least_k(&P, 12);
     println!("Prob 12 heads of 18 coins: {:.5}", p);
-    assert!(false);
 }
 
 fn solve(case_no: u32, prob: &mut Vec<f64>, U: f64, K: u8) -> String
@@ -106,12 +110,10 @@ fn solve(case_no: u32, prob: &mut Vec<f64>, U: f64, K: u8) -> String
 
         //now distribute to i-1 if we have any left
         if i > 0 {
-            let possible_improvement_to_i_minus_1 =
-                fmin(u_remaining, 1f64 - p_improved[i - 1]);
+            let possible_improvement_to_i_minus_1 = fmin(u_remaining, 1f64 - p_improved[i - 1]);
 
             p_improved[i - 1] += possible_improvement_to_i_minus_1;
             u_remaining -= possible_improvement_to_i_minus_1;
-
 
             //we should have found the optimal answer
             if u_remaining > 0f64 {

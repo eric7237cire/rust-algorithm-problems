@@ -37,6 +37,18 @@ rem cargo build && cat .\src\y2017round1C\A-large-practice.in | .\target\debug\c
 rem cargo build && cat .\src\y2017round1C\B-small-practice.in | .\target\debug\codejam.exe > .\src\y2017round1C\B-small-practice.out
 rem cargo build && cat .\src\y2017round1C\B-large-practice.in | .\target\debug\codejam.exe > .\src\y2017round1C\B-large-practice.out
 
-cargo build && cat .\src\y2017round1C\C-test.in | .\target\debug\codejam.exe > .\src\y2017round1C\C-test.out
-cargo build && cat .\src\y2017round1C\C-small-practice-1.in | .\target\debug\codejam.exe > .\src\y2017round1C\C-small-practice-1.out
-cargo build && cat .\src\y2017round1C\C-small-practice-2.in | .\target\debug\codejam.exe > .\src\y2017round1C\C-small-practice-2.out
+rem cargo build && cat .\src\y2017round1C\C-test.in | .\target\debug\codejam.exe > .\src\y2017round1C\C-test.out
+rem cargo build && cat .\src\y2017round1C\C-small-practice-1.in | .\target\debug\codejam.exe > .\src\y2017round1C\C-small-practice-1.out
+rem cargo build && cat .\src\y2017round1C\C-small-practice-2.in | .\target\debug\codejam.exe > .\src\y2017round1C\C-small-practice-2.out
+
+rem cargo build && cat .\src\y2017round2\A-small-practice.in | .\target\debug\codejam.exe > .\src\y2017round2\A-small-practice.out
+rem cargo build && cat .\src\y2017round2\A-large-practice.in | .\target\debug\codejam.exe > .\src\y2017round2\A-large-practice.out
+
+rem cargo build && cat .\src\y2017round2\B-small-practice.in | .\target\debug\codejam.exe > .\src\y2017round2\B-small-practice.out
+rem cargo build && cat .\src\y2017round2\B-large-practice.in | .\target\debug\codejam.exe > .\src\y2017round2\B-large-practice.out
+
+rem cargo build && cat .\src\y2017round2\C-small-practice.in | .\target\debug\codejam.exe > .\src\y2017round2\C-small-practice.out
+rem cargo build && cat .\src\y2017round2\C-large-practice.in | .\target\debug\codejam.exe > .\src\y2017round2\C-large-practice.out
+
+cargo build && cat .\src\y2017round2\D-small-practice.in | .\target\debug\codejam.exe > .\src\y2017round2\D-small-practice.out
+rem cargo build && cat .\src\y2017round2\D-large-practice.in | .\target\debug\codejam.exe > .\src\y2017round2\D-large-practice.out

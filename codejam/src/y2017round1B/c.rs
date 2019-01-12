@@ -4,6 +4,9 @@ use std::collections::BinaryHeap;
 use std::f64;
 use std::u16;
 
+/*
+dijkstras ; creating nodes based on other state
+*/
 struct Horse
 {
     E: u32, //the maximum total distance, in kilometers, the horse in the i-th city can go and
@@ -27,7 +30,7 @@ pub fn solve_all_cases()
         let city_dist: Vec<_> = (0..N)
             .map(|_| {
                 reader
-                    .read_int_line::<i32>()
+                    .read_num_line::<i32>()
                     .iter()
                     .map(|&d| if d < 0 { None } else { Some(d as Distance) })
                     .collect()

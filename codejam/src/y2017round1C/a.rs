@@ -3,6 +3,11 @@ use super::super::util::input::*;
 use std::f64;
 //use std::cmp::max;
 
+/*
+geometry,
+brute force search
+*/
+
 #[derive(Debug)] //,PartialEq,Eq,PartialOrd,Ord)]
 struct Pancake
 {
@@ -11,9 +16,6 @@ struct Pancake
     area_top: f64,
     area_sides: f64,
 }
-
-type Distance = u32;
-type CityIndex = usize;
 
 pub fn solve_all_cases()
 {
