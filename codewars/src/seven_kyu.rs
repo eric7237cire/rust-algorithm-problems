@@ -213,3 +213,49 @@ mod moves_in_squared_strings_2 {
         );
     }
 }
+
+mod string_ends_with {
+    fn solution(word: &str, ending: &str) -> bool {
+        return word.ends_with(ending);
+    }
+
+    // Rust test example:
+    // TODO: replace with your own tests (TDD), these are just how-to examples.
+    // See: https://doc.rust-lang.org/book/testing.html
+
+    #[test]
+    fn returns_expected() {
+        assert_eq!(true, solution("abc", "c"));
+        assert_eq!(false, solution("strawberry", "banana"));
+    }
+
+}
+
+mod remove_dup_words {
+fn remove_duplicate_words(s: &str) -> String {
+    s.split_whitespace()
+        .fold(Vec::new(), |mut acc:Vec<String>, w| {
+            if !acc.contains(&w.to_string()) {
+                acc.push(w.to_string())
+            }
+            acc
+        })
+        .join(" ")
+}
+
+    // Rust test example:
+    #[test]
+    fn sample_test_cases() {
+        assert_eq!(
+            remove_duplicate_words(
+                "alpha beta beta gamma gamma gamma delta alpha beta beta gamma gamma gamma delta"
+            ),
+            "alpha beta gamma delta"
+        );
+        assert_eq!(
+            remove_duplicate_words("my cat is my cat fat"),
+            "my cat is fat"
+        );
+    }
+
+}
