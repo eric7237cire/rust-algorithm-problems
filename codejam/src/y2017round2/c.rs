@@ -8,34 +8,41 @@ Simulation, grid, backtracking
 2-satisfiability / 2SAT
 
 */
-use super::super::algo_ebtech::graph::connectivity::ConnectivityGraph;
-use super::super::algo_ebtech::graph::Graph;
-use super::super::util::grid::constants::*;
-use super::super::util::grid::{Grid, GridCoord, GridRowColVec, IntCoord2d};
-use super::super::util::input::*;
+use crate::algo::graph::connectivity::ConnectivityGraph;
+use crate::algo::graph::Graph;
+use crate::util::grid::constants::*;
+use crate::util::grid::{Grid, GridCoord, GridRowColVec, IntCoord2d};
+
+use crate::util::codejam::run_cases;
 use bimap::BiMap;
 use std::default::Default;
 use std::fmt;
 use std::fmt::{Display, Formatter};
+use std::io::Write;
 
 pub fn solve_all_cases()
 {
-    let mut reader = InputReader::new();
-    let t = reader.read_int();
+    run_cases(
+        &["C-small-practice", "C-large-practice"],
+        "y2017round2",
+        |reader, buffer| {
+            let t = reader.read_int();
 
-    for case in 1..=t {
-        let (R, C) = reader.read_tuple_2::<usize, usize>();
-        let mut grid: Grid<Tile> = Grid::new(R, C);
-        for r in 0..R {
-            let row = reader.read_chars(C);
-            for (c, t) in row.iter().enumerate() {
-                grid[(r, c)] = Tile::from(*t);
+            for case in 1..=t {
+                let (R, C) = reader.read_tuple_2::<usize>();
+                let mut grid: Grid<Tile> = Grid::new(R, C);
+                for r in 0..R {
+                    let row = reader.read_chars(C);
+                    for (c, t) in row.iter().enumerate() {
+                        grid[(r, c)] = Tile::from(*t);
+                    }
+                }
+
+                //if case != 31 {continue;}
+                write!(buffer, "{}", solve(case, &mut grid)).unwrap();
             }
-        }
-
-        //if case != 31 {continue;}
-        print!("{}", solve(case, &mut grid));
-    }
+        },
+    );
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -311,7 +318,7 @@ fn helper(
     }
 
     //short circuit; check lasers less than index
-    for lc in square_choices {
+    /*for lc in square_choices {
         if lc
             .iter()
             .filter(|&c| {
@@ -323,7 +330,7 @@ fn helper(
         {
             return false;
         }
-    }
+    }*/
 
     let laser_data = &laser_traces[current_laser_index];
     //try vertical
