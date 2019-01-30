@@ -10,7 +10,7 @@ where
 {
     let now = Instant::now();
 
-    let sol_path = Path::new(r"D:\git\rust-algorithm-problems\codejam\src");
+    let sol_path = Path::new(r".\src");
     let round_path = sol_path.join(package_name);
 
     for file_base_name in file_base_names {
@@ -20,7 +20,7 @@ where
                 round_path
                     .join(format!("{}.in", file_base_name))
                     .to_str()
-                    .unwrap(),
+                    .expect(&format!("Cannot find {:?}", round_path)),
             )
             .unwrap(),
         };

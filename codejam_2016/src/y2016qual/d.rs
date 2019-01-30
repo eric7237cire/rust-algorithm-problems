@@ -1,21 +1,8 @@
-use crate::algo::graph::flow2::Flow;
-use crate::algo::prime::sieve::SieveOfAtkin;
+use codejam::util::codejam::run_cases;
 
-use crate::util::codejam::run_cases;
-use bit_set::BitSet;
-use bit_vec::BitVec;
-use byteorder::{BigEndian, ByteOrder, LittleEndian, NativeEndian, WriteBytesExt};
-use num_bigint::BigUint;
-use num_traits::*;
-use rand::{thread_rng, Rng};
-use std::cmp::max;
-use std::collections::HashSet;
-use std::collections::VecDeque;
 use std::io::Write;
-use std::mem;
-use std::usize;
 
-use std::thread;
+use std::usize;
 
 /*
 Greedy alogrithm
@@ -53,13 +40,17 @@ fn solve(K: u16, C: u16, S: u16) -> Option<Vec<u64>>
         return None;
     }
 
-    //we just need positions whose digits in base K match
+    /*
+    we just need positions whose digits in base K match
+    The strategy is we only care about initial sequences with 1  G
+    A G at pos P will have a G in any position who has a digit P in base K
+    */
     Some((0..K).collect::<Vec<_>>().chunks(C as usize).map( |digits| {
         let mut pos = 0u64;
         let mut base = 1u64;
         for d in digits {
-            pos += *d as u64 * base;
-            base *= K as u64;
+            pos += u64::from(*d) * base;
+            base *= u64::from(K);
         }
         pos + 1
     }).collect())
@@ -70,6 +61,7 @@ fn solve(K: u16, C: u16, S: u16) -> Option<Vec<u64>>
 mod test_2016_qual_d
 {
     use super::*;
+    use std::mem;
 
     fn generate_sequence(C: u8, initial_seq: &[char]) -> Vec<char>
     {
@@ -83,7 +75,7 @@ mod test_2016_qual_d
             for ch in seq_old.iter() 
             {
                 if *ch == 'G' {
-                    seq_new.extend( "G".repeat( initial_seq.len() ).chars() );
+                    seq_new.extend( "G".repeat( K ).chars() );
                 } else {
                     seq_new.extend( initial_seq.iter() );
                 }
@@ -95,7 +87,7 @@ mod test_2016_qual_d
             mem::swap(&mut seq_old, &mut seq_new);
         }
 
-        return seq_old;
+        seq_old
     }
 
     fn convert_to_base(num: u64, base: u64) -> Vec<u8> {
@@ -116,8 +108,8 @@ mod test_2016_qual_d
         let C = 4;
         let test_seq = generate_sequence(C, &init_seq);
 
-        assert_eq!(test_seq.len(), init_seq.len().pow(C as u32));
-        for pos in 0..625usize {
+        assert_eq!(test_seq.len(), init_seq.len().pow(u32::from(C)));
+        for (pos, seq_char) in test_seq.iter().enumerate() {
             //convert pos to base 5
             let mut digits = convert_to_base(pos as u64, 5);
             if digits.len() < C as usize {
@@ -129,7 +121,7 @@ mod test_2016_qual_d
                 'L'
             };
 
-            assert_eq!(test_seq[pos], expected_char, "Pos = {} Digits = {:?}", pos, digits);
+            assert_eq!(*seq_char, expected_char, "Pos = {} Digits = {:?}", pos, digits);
         }
     }
 
@@ -140,9 +132,9 @@ mod test_2016_qual_d
         let C = 5;
         let test_seq = generate_sequence(C, &init_seq);
 
-        assert_eq!(test_seq.len(), init_seq.len().pow(C as u32));
-        for pos in 0..test_seq.len() {
-            //convert pos to base 5
+        assert_eq!(test_seq.len(), init_seq.len().pow(u32::from(C)));
+        for (pos, seq_char) in test_seq.iter().enumerate() {
+            //convert pos to base K
             let mut digits = convert_to_base(pos as u64, init_seq.len() as u64);
             if digits.len() < C as usize {
                 digits.push(0);
@@ -153,7 +145,7 @@ mod test_2016_qual_d
                 'L'
             };
 
-            assert_eq!(test_seq[pos], expected_char, "Pos = {} Digits = {:?}", pos, digits);
+            assert_eq!(*seq_char, expected_char, "Pos = {} Digits = {:?}", pos, digits);
         }
     }
 }

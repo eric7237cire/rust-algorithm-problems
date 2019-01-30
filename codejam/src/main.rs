@@ -17,7 +17,7 @@ mod algo;
 mod y2017round1A;
 mod y2017round1B;
 mod y2017round1C;*/
-mod y2016qual;
+
 mod y2017round2;
 mod y2017round3;
 mod y2017round4;
@@ -46,5 +46,5 @@ fn main()
 
     //y2017round4::f::solve_all_cases();
 
-    y2016qual::d::solve_all_cases();
+    //y2016qual::d::solve_all_cases();
 }

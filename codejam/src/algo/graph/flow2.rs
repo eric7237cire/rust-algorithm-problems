@@ -156,7 +156,7 @@ impl Flow
 
         //			printf("Finding maximum flow through augmenting path. Sink=%d\n", sink);
 
-        while (prev[nodeIdx] != PREV_SOURCE)
+        while prev[nodeIdx] != PREV_SOURCE
         //nodeIdx is not the source
         {
             let prev_edge_idx = prev[nodeIdx];
@@ -178,7 +178,7 @@ impl Flow
             //	printf("Can push %d.  Next node in aug path %d\n", canPush, nodeIdx);
         }
 
-        return canPush;
+        canPush
     }
 
     fn updateViaAugPath(&mut self, flowAdded: u64)
@@ -186,7 +186,7 @@ impl Flow
         let prev = &self.prev;
         let mut nodeIdx = self.sink;
 
-        while (prev[nodeIdx] != PREV_SOURCE)
+        while prev[nodeIdx] != PREV_SOURCE
         //nodeIdx is not the source
         {
             //assert!(prev[nodeIdx] >= 0);
@@ -219,7 +219,7 @@ impl Flow
     pub fn augment(&mut self) -> u64
     {
         let nNodes = self.V.len();
-        let mut prev = &mut self.prev;
+        let prev = &mut self.prev;
         prev.resize(nNodes, PREV_NONE);
         let mut seen: BitVec = BitVec::from_elem(nNodes, false);
 
@@ -257,14 +257,14 @@ impl Flow
                                     seen[trgNodeIdx]
                                 );
                 */
-                if (anEdge.residue == 0) {
+                if anEdge.residue == 0 {
                     continue;
                 }
 
                 //if (anEdge.ignore)
                 //	continue;
 
-                if (!seen[trgNodeIdx]) {
+                if !seen[trgNodeIdx] {
                     prev[trgNodeIdx] = edgeIdx;
                     seen.set(trgNodeIdx, true);
                     q.push_back(trgNodeIdx);
@@ -277,7 +277,7 @@ impl Flow
             //println!("Iteration count {}", iteration_count);
         }
 
-        if (seen[self.sink]) {
+        if seen[self.sink] {
             debug!("reached sink\n");
 
             let canPush = self.findAugPathMaxFlow();
@@ -289,7 +289,7 @@ impl Flow
         }
 
         //printf("Return 0\n");
-        return 0;
+        0
     }
 }
 

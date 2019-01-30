@@ -1,0 +1,12 @@
+[package]
+name = "codejam_2016"
+version = "0.1.0"
+authors = ["eric7237cire <eric7237cire@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+rust-algorithm-problems = { path = "../codejam" }
+bit-set = "*"
+bit-vec = "*"
+num-traits = "*"
+num-bigint = "*"

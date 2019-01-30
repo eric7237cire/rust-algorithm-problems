@@ -4,6 +4,14 @@ version = "0.1.0"
 authors = ["eric7237cire <eric7237cire@hotmail.fr>"]
 edition = "2018"
 
+[lib]
+name = "codejam"
+path = "src/lib.rs"
+
+[[bin]]
+name = "rust-algorithm-problems"
+path = "src/main.rs"
+
 # See https://github.com/alexcrichton/cargo-vendor if overrides are wanted
 [dependencies]
 #log4rs ="*"
