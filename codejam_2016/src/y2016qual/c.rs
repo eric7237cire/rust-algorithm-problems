@@ -8,9 +8,8 @@ use num_traits::*;
 use std::io::Write;
 use std::usize;
 
-
 /*
-Primes 
+Primes
 Byte manipulation
 Change of base
 */
@@ -52,7 +51,7 @@ fn solve(N: u16, J: u16) -> String
         .collect();
 
     //brute force
-    'jamcoin: for jamcoin in (1 + (1 << (N - 1))..(1u64 << N) ).step_by(2) {
+    'jamcoin: for jamcoin in (1 + (1 << (N - 1))..(1u64 << N)).step_by(2) {
         //println!("{:b}  N={}", jamcoin, N);
 
         let mut num_ks: Vec<BigUint> = Vec::new();

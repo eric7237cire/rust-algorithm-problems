@@ -1,9 +1,7 @@
-
-use codejam::util::codejam::run_cases;
 use bit_set::BitSet;
+use codejam::util::codejam::run_cases;
 use std::io::Write;
 use std::usize;
-
 
 /*
 Simulation

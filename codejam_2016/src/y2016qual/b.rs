@@ -1,5 +1,5 @@
-use codejam::util::codejam::run_cases;
 use bit_vec::BitVec;
+use codejam::util::codejam::run_cases;
 use std::io::Write;
 use std::usize;
 

@@ -10,9 +10,7 @@ Greedy alogrithm
 pub fn solve_all_cases()
 {
     run_cases(
-        &["D-small-practice", 
-        "D-large-practice"
-        ],
+        &["D-small-practice", "D-large-practice"],
         "y2016qual",
         |reader, buffer| {
             let t = reader.read_int();
@@ -21,14 +19,25 @@ pub fn solve_all_cases()
                 let (K, C, S) = reader.read_tuple_3();
 
                 if case_no != 1 {
-                   // continue;
+                    // continue;
                 }
 
                 println!("Solving case {}", case_no);
 
-                writeln!(buffer, "Case #{}: {}", case_no, 
-                if let Some(ans) =solve(K, C, S) {
-                    ans.iter().map(|n| n.to_string()).collect::<Vec<_>>().join(" ") } else { "IMPOSSIBLE".to_string()}  ).unwrap();
+                writeln!(
+                    buffer,
+                    "Case #{}: {}",
+                    case_no,
+                    if let Some(ans) = solve(K, C, S) {
+                        ans.iter()
+                            .map(|n| n.to_string())
+                            .collect::<Vec<_>>()
+                            .join(" ")
+                    } else {
+                        "IMPOSSIBLE".to_string()
+                    }
+                )
+                .unwrap();
             }
         },
     );
@@ -45,17 +54,22 @@ fn solve(K: u16, C: u16, S: u16) -> Option<Vec<u64>>
     The strategy is we only care about initial sequences with 1  G
     A G at pos P will have a G in any position who has a digit P in base K
     */
-    Some((0..K).collect::<Vec<_>>().chunks(C as usize).map( |digits| {
-        let mut pos = 0u64;
-        let mut base = 1u64;
-        for d in digits {
-            pos += u64::from(*d) * base;
-            base *= u64::from(K);
-        }
-        pos + 1
-    }).collect())
+    Some(
+        (0..K)
+            .collect::<Vec<_>>()
+            .chunks(C as usize)
+            .map(|digits| {
+                let mut pos = 0u64;
+                let mut base = 1u64;
+                for d in digits {
+                    pos += u64::from(*d) * base;
+                    base *= u64::from(K);
+                }
+                pos + 1
+            })
+            .collect(),
+    )
 }
-
 
 #[cfg(test)]
 mod test_2016_qual_d
@@ -70,19 +84,23 @@ mod test_2016_qual_d
         seq_old.extend(initial_seq.iter());
 
         let mut seq_new = Vec::new();
-        for c in 0..C-1 {
+        for c in 0..C - 1 {
             seq_new.clear();
-            for ch in seq_old.iter() 
-            {
+            for ch in seq_old.iter() {
                 if *ch == 'G' {
-                    seq_new.extend( "G".repeat( K ).chars() );
+                    seq_new.extend("G".repeat(K).chars());
                 } else {
-                    seq_new.extend( initial_seq.iter() );
+                    seq_new.extend(initial_seq.iter());
                 }
             }
 
             // println!("After {}, seq = {:?}", c, seq_new);
-             println!("After {}, G count = {}, seq len = {}", c, seq_new.iter().filter(|&&c| c == 'G').count(), seq_new.len());
+            println!(
+                "After {}, G count = {}, seq len = {}",
+                c,
+                seq_new.iter().filter(|&&c| c == 'G').count(),
+                seq_new.len()
+            );
 
             mem::swap(&mut seq_old, &mut seq_new);
         }
@@ -90,11 +108,12 @@ mod test_2016_qual_d
         seq_old
     }
 
-    fn convert_to_base(num: u64, base: u64) -> Vec<u8> {
+    fn convert_to_base(num: u64, base: u64) -> Vec<u8>
+    {
         let mut ans = Vec::new();
         let mut num = num;
         while num > 0 {
-            ans.push( (num % base) as u8 );
+            ans.push((num % base) as u8);
             num /= base;
         }
 
@@ -104,7 +123,7 @@ mod test_2016_qual_d
     #[test]
     fn test_det_g()
     {
-        let init_seq = ['G', 'L','L','L','L'];
+        let init_seq = ['G', 'L', 'L', 'L', 'L'];
         let C = 4;
         let test_seq = generate_sequence(C, &init_seq);
 
@@ -115,20 +134,20 @@ mod test_2016_qual_d
             if digits.len() < C as usize {
                 digits.push(0);
             }
-            let expected_char = if digits.contains(&0) {
-                'G'
-            } else {    
-                'L'
-            };
+            let expected_char = if digits.contains(&0) { 'G' } else { 'L' };
 
-            assert_eq!(*seq_char, expected_char, "Pos = {} Digits = {:?}", pos, digits);
+            assert_eq!(
+                *seq_char, expected_char,
+                "Pos = {} Digits = {:?}",
+                pos, digits
+            );
         }
     }
 
-     #[test]
+    #[test]
     fn test_det_g2()
     {
-        let init_seq = ['L', 'L','G',];
+        let init_seq = ['L', 'L', 'G'];
         let C = 5;
         let test_seq = generate_sequence(C, &init_seq);
 
@@ -139,13 +158,13 @@ mod test_2016_qual_d
             if digits.len() < C as usize {
                 digits.push(0);
             }
-            let expected_char = if digits.contains(&2) {
-                'G'
-            } else {    
-                'L'
-            };
+            let expected_char = if digits.contains(&2) { 'G' } else { 'L' };
 
-            assert_eq!(*seq_char, expected_char, "Pos = {} Digits = {:?}", pos, digits);
+            assert_eq!(
+                *seq_char, expected_char,
+                "Pos = {} Digits = {:?}",
+                pos, digits
+            );
         }
     }
 }

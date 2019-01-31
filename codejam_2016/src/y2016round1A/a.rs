@@ -1,9 +1,6 @@
-
 use codejam::util::codejam::run_cases;
 
 use std::io::Write;
-
-
 
 /*
 
@@ -25,13 +22,7 @@ pub fn solve_all_cases()
 
                 println!("Solving case {}", case_no);
 
-                writeln!(
-                    buffer,
-                    "Case #{}: {}",
-                    case_no,
-                    solve(&S)
-                )
-                .unwrap();
+                writeln!(buffer, "Case #{}: {}", case_no, solve(&S)).unwrap();
             }
         },
     );
@@ -49,7 +40,6 @@ fn solve(S: &str) -> String
         } else {
             ans.push(ch);
         }
-
     }
 
     ans
