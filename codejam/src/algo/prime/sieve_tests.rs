@@ -1,6 +1,5 @@
 #[cfg(test)]
-mod sieve_tests
-{
+mod inner_sieve_tests {
     use crate::algo::prime::sieve::*;
 
     //use sieve::SieveOfAtkin;
