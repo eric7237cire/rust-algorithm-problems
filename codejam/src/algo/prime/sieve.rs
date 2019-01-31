@@ -181,19 +181,15 @@ impl SieveOfAtkin
         }
 
         for _ in 0..9 {
-            match rx.recv() {
-                Ok(x) => tests.push(x),
-                _ => (),
+            if let Ok(x) = rx.recv() {
+                tests.push(x);
             }
         }
 
         for i in tests {
-            for j in 0..self.tests.len() - 1 {
-                let current = self.tests.get(j).unwrap().is_prime();
-                self.tests
-                    .get_mut(j)
-                    .unwrap()
-                    .set_prime(current ^ i.get(j).unwrap().is_prime());
+            for (j, test_j) in self.tests.iter_mut().enumerate() {
+                let current = test_j.is_prime();
+                test_j.set_prime(current ^ i[j].is_prime());
             }
         }
 

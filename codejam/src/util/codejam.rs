@@ -20,7 +20,7 @@ where
                 round_path
                     .join(format!("{}.in", file_base_name))
                     .to_str()
-                    .expect(&format!("Cannot find {:?}", round_path)),
+                    .unwrap_or_else(|| panic!("Cannot find {:?}", round_path)),
             )
             .unwrap(),
         };
