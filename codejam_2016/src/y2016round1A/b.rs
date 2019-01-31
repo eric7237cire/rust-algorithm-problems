@@ -13,7 +13,7 @@ pub fn solve_all_cases()
     run_cases(
         &[
             "B-small-practice",
-            //"A-large-practice"
+            "B-large-practice"
         ],
         "y2016round1A",
         |reader, buffer| {
@@ -44,11 +44,10 @@ pub fn solve_all_cases()
     );
 }
 
-fn backtracking( horizonal_choices: &mut Vec<usize>, all_choices: &Vec<Vec<usize>>,
+fn backtracking( horizonal_choices: &mut Vec<usize>, all_choices: &[Vec<usize>],
     papers: &[Vec<u16>]) -> bool 
 {
-    let N = all_choices.len();
-
+   
     //Reject invalid solutions
     for column in 0..horizonal_choices.len()
     {
@@ -60,7 +59,15 @@ fn backtracking( horizonal_choices: &mut Vec<usize>, all_choices: &Vec<Vec<usize
             all_choices[column][1]
         } else { all_choices[column][0] };
 
-        for row in 0..horizonal_choices.len()
+        //only need to verify the new column and new row; everything else
+        //has already been checked
+        let lower_bound = if column == horizonal_choices.len() - 1 {
+            0
+        } else {
+            horizonal_choices.len() - 1
+        };
+
+        for row in lower_bound..horizonal_choices.len()
         {
             if papers[horizonal_choices[row]][column] != 
             papers[other_choice][row] {
@@ -125,7 +132,7 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
         all_choices[pos] = choices;
     }
 
-    //println!("All choices: {:?}", all_choices);
+    println!("All choices: {:?}", all_choices);
 
     let mut horizonal_choices = Vec::new();
     backtracking(&mut horizonal_choices, &all_choices, papers);
