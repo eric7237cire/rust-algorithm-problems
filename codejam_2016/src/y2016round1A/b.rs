@@ -4,9 +4,14 @@ use bit_set::BitSet;
 use itertools::Itertools;
 use std::io::Write;
 use std::{u16,usize};
+use std::collections::HashMap;
+use codejam::util::grid::Grid;
+use codejam::algo::graph::DiGraph;
+use codejam::algo::graph::scc::strongly_connected_components;
 
 /*
-
+I used 2SAT and backtracking though there was also a much easier solution to just count odd counts of the 
+values.  Oh well...
 */
 pub fn solve_all_cases()
 {
@@ -44,6 +49,7 @@ pub fn solve_all_cases()
     );
 }
 
+#[allow(dead_code)]
 fn backtracking( horizonal_choices: &mut Vec<usize>, all_choices: &[Vec<usize>],
     papers: &[Vec<u16>]) -> bool 
 {
@@ -100,7 +106,7 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
     let N = papers[0].len();
     for (i, p) in papers.iter().enumerate()
     {
-        //println!("Paper {}: {:?}", i, p);
+        println!("Paper {}: {:?}", i, p);
     }
     let mut all_choices = vec![vec![usize::MAX; 2]; N];
 
@@ -134,8 +140,93 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
 
     println!("All choices: {:?}", all_choices);
 
+    let mut graph = DiGraph::new();
+
+    //2 * paper index = is horizonal
+    //2 * paper index = !is horizonal == is vertical
+
+    for (pos,choices) in all_choices.iter().enumerate() {
+        if choices.len() == 1 {
+            let choice = 2 * choices[0];
+            graph.add_edge(choice ^ 1, choice);
+
+            add_clauses( choices[0],
+                pos, &all_choices, papers, &mut graph);
+        } else {
+            assert_eq!(2, choices.len());
+            let choice1 = 2 * choices[0];
+            let choice2 = 2 * choices[1];
+            graph.add_edge(choice1 ^ 1, choice2);
+            graph.add_edge(choice2 ^ 1, choice1);
+            graph.add_edge(choice1, choice2^1);
+            graph.add_edge(choice2, choice1^1);
+
+            add_clauses( choices[0],
+                pos, &all_choices, papers, &mut graph);
+            add_clauses( choices[1],
+                pos, &all_choices, papers, &mut graph);
+        }
+    }
+    for (from, to) in graph.edges()
+    {
+        let from_idx = from / 2;
+        let from_is_h = if from % 2 == 0 { "Horizontal" } else {"Vertical"};
+        let to_idx = to / 2;
+        let to_is_h = if to % 2 == 0  { "Horizontal" } else {"Vertical"};
+        println!("From ({}) {} {} implies ({}) {} {}", 
+        from,
+        from_idx, from_is_h, to, to_idx, to_is_h);
+    }
+
+    let sccs = strongly_connected_components(&graph);
+    println!("Sccs: {:?}", sccs);
+
+    
+    let mut node_to_scc_component = HashMap::new();
+    for (idx, scc) in sccs.iter().enumerate() 
+    {
+        for node in scc.iter()
+        {
+            node_to_scc_component.insert(node, idx);
+        }
+    }
+
+    for paper_idx in 0..papers.len() {
+        let scc_true = node_to_scc_component[& (2 * paper_idx)];
+        let scc_false = node_to_scc_component[&(2 * paper_idx + 1)];
+        if scc_true == scc_false {
+            panic!("Not satisfiable");
+        } else {
+            println!("Paper {} is {}", paper_idx, if scc_true < scc_false { "Horizonal"} else {"Vertical"});
+        }
+    }
+
     let mut horizonal_choices = Vec::new();
-    backtracking(&mut horizonal_choices, &all_choices, papers);
+    //backtracking(&mut horizonal_choices, &all_choices, papers);
+
+    for (pos,choices) in all_choices.iter().enumerate() {
+        let paper_idx = choices[0];
+        let scc_true = node_to_scc_component[& (2 * paper_idx)];
+        let scc_false = node_to_scc_component[&(2 * paper_idx + 1)];
+        assert!(scc_true != scc_false);
+        if scc_true < scc_false {
+            horizonal_choices.push(paper_idx);
+        } else {
+            horizonal_choices.push(choices[1]);
+        }
+    }
+
+    let mut g: Grid<u16> = Grid::new(N, N);
+
+    for (h_idx, h) in horizonal_choices.iter().enumerate() 
+    {
+        for (c_idx, c) in papers[*h].iter().enumerate() 
+        {
+            g[ (h_idx, c_idx) ] = *c;
+        }
+    }
+
+    println!("Grid\n{:#.5?}", g);
 
     //println!("Horizonal choices: {:?}", horizonal_choices);
 
@@ -144,4 +235,34 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
 
     horizonal_choices.iter().map( |choice| papers[*choice][column_index] ).collect()
     
+}
+
+
+fn add_clauses( horizonal_choice: usize, 
+    row: usize,
+all_choices: &[Vec<usize>],
+    papers: &[Vec<u16>], graph: &mut DiGraph ) 
+{
+    for (column, choices) in all_choices.iter().enumerate()
+    {
+        for choice in choices.iter() 
+        {
+            if papers[*choice][row] != papers[horizonal_choice][column] {
+                //must be both horizonal or both vertical
+                graph.add_edge(
+                    2 * horizonal_choice   
+                    , 2 * choice);
+                graph.add_edge(
+                    2 * choice   
+                    , 2 * horizonal_choice);
+                graph.add_edge(
+                    2 * horizonal_choice + 1  
+                    , 2 * choice + 1);
+                graph.add_edge(
+                    2 * choice + 1
+                    , 2 * horizonal_choice + 1);
+            }
+        }
+    }
+
 }
