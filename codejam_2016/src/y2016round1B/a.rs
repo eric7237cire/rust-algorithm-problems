@@ -10,7 +10,9 @@ use std::io::Write;
 pub fn solve_all_cases()
 {
     run_cases(
-        &["A-small-practice", "A-large-practice"],
+        &["A-small-practice",
+            "A-large-practice"
+            ],
         "y2016round1B",
         |reader, buffer| {
             let t = reader.read_int();
@@ -22,7 +24,7 @@ pub fn solve_all_cases()
                     // continue;
                 }
 
-                println!("Solving case {}", case_no);
+                //println!("Solving case {}", case_no);
 
                 writeln!(buffer, "Case #{}: {}", case_no, solve(&S)).unwrap();
             }
@@ -38,17 +40,38 @@ fn solve(S: &str) -> String
         *char_counts.entry(ch).or_insert(0) += 1;
     }
 
-    println!("{:?}", char_counts);
+    //println!("{:?}", char_counts);
 
     let mut digits = Vec::new();
 
-    if let Some(&z_count) = char_counts.get(&'Z') {
-        for ch in "ZERO".chars() {
-            *char_counts.entry(ch).or_default() -= z_count;
+    let unique_letters = [
+        ('Z', "ZERO",0), ('W', "TWO",2),
+        ('G', "EIGHT",8), ('U', "FOUR", 4),
+        ('X', "SIX", 6), ('H', "THREE", 3),
+
+        //now unique after remove precedent
+        ('F', "FIVE", 5), ('V', "SEVEN", 7),
+            ('O',"ONE",1), ('I', "NINE",9)
+    ];
+
+    //
+
+    for (ch, word, digit) in unique_letters.iter() {
+        if let Some(&ch_count) = char_counts.get(ch) {
+            for ch in word.chars() {
+                *char_counts.entry(ch).or_default() -= ch_count;
+            }
+            for _ in 0..ch_count {
+                digits.push(*digit);
+            }
         }
-        for _ in 0..z_count {
-            digits.push(0);
-        }
+    }
+
+
+    char_counts.retain(|_, &mut count| count > 0);
+
+    if char_counts.len() > 0 {
+        println!("Remaining {:?}", char_counts);
     }
 
     digits.sort();
