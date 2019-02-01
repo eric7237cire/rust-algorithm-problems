@@ -8,15 +8,14 @@ use std::io::Write;
 use std::{u16, usize};
 
 /*
-
+SCC
+Strongly connected components
+Longest path / chain
 */
 pub fn solve_all_cases()
 {
     run_cases(
-        &[
-            "C-small-practice",
-            "C-large-practice"
-        ],
+        &["C-small-practice", "C-large-practice"],
         "y2016round1A",
         |reader, buffer| {
             let t = reader.read_int();
@@ -38,7 +37,6 @@ pub fn solve_all_cases()
     );
 }
 
-
 fn solve(bff_list: &[u16]) -> usize
 {
     let mut graph = DiGraph::new();
@@ -53,17 +51,20 @@ fn solve(bff_list: &[u16]) -> usize
     let mut in_scc_larger_than_2 = BitSet::new();
 
     //the largest scc can be used for the entire circle
-    let largest_scc_len = sccs.iter().map( |scc| {
-                
-        //A strongly connected component more than 2 must be by itself
-        if scc.len() > 2 {
-            in_scc_larger_than_2.extend(scc.iter().cloned());
-        }
+    let largest_scc_len = sccs
+        .iter()
+        .map(|scc| {
+            //A strongly connected component more than 2 must be by itself
+            if scc.len() > 2 {
+                in_scc_larger_than_2.extend(scc.iter().cloned());
+            }
 
-        scc.len()
-    }).max().unwrap();
+            scc.len()
+        })
+        .max()
+        .unwrap();
 
-    let mut longest_path_ending = vec![0; bff_list.len()+1];
+    let mut longest_path_ending = vec![0; bff_list.len() + 1];
 
     'node_loop: for node in 1..=bff_list.len() {
         if in_scc_larger_than_2.contains(node) {
@@ -92,26 +93,28 @@ fn solve(bff_list: &[u16]) -> usize
         }
 
         //println!("Found path {:?}", path);
-        longest_path_ending[ *path.last().unwrap() ] = max(path.len(),
-        longest_path_ending[ *path.last().unwrap() ]);        
+        longest_path_ending[*path.last().unwrap()] =
+            max(path.len(), longest_path_ending[*path.last().unwrap()]);
     }
 
     //println!("Found path lengths {:?}", longest_path_ending);
 
-    let scc_2_len = sccs.iter().map(|scc| {
+    let scc_2_len = sccs
+        .iter()
+        .map(|scc| {
+            if scc.len() != 2 {
+                return 0;
+            }
+            //println!("Looking at scc of len 2: {:?}", scc);
+            let mut comp_len =
+                max(longest_path_ending[scc[0]] + longest_path_ending[scc[1]], 2) - 2;
+            comp_len = max(comp_len, longest_path_ending[scc[0]]);
+            comp_len = max(comp_len, longest_path_ending[scc[1]]);
+            comp_len = max(comp_len, 2);
 
-        if scc.len() != 2 {
-            return 0;
-        }
-        //println!("Looking at scc of len 2: {:?}", scc);
-        let mut comp_len = max(longest_path_ending[ scc[0] ] +
-            longest_path_ending[ scc[1] ], 2) - 2 ;
-        comp_len = max(comp_len, longest_path_ending[ scc[0] ]);
-        comp_len = max(comp_len, longest_path_ending[ scc[1] ]);
-        comp_len = max(comp_len, 2);
-
-        comp_len
-    }).sum();
+            comp_len
+        })
+        .sum();
 
     max(largest_scc_len, scc_2_len)
 }

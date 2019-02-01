@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 mod y2016qual;
 mod y2016round1A;
+mod y2016round1B;
 
 extern crate codejam;
 
@@ -14,6 +15,13 @@ pub fn run_y2016qual()
     y2016qual::d::solve_all_cases();
 }
 
+pub fn run_y20161A()
+{
+    y2016round1A::a::solve_all_cases();
+    y2016round1A::b::solve_all_cases();
+    y2016round1A::c::solve_all_cases();
+}
+
 fn main()
 {
     init_log();
@@ -22,6 +30,6 @@ fn main()
 
     */
 
-    //y2016round1A::a::solve_all_cases();
-    y2016round1A::c::solve_all_cases();
+    y2016round1B::a::solve_all_cases();
+    //y2016round1A::c::solve_all_cases();
 }

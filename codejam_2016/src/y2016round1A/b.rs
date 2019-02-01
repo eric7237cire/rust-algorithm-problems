@@ -121,7 +121,7 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
         let choices: Vec<_> = papers
             .iter()
             .enumerate()
-            .filter(|(idx, paper)| paper[pos] == least_value)
+            .filter(|(_idx, paper)| paper[pos] == least_value)
             .map(|(idx, _)| idx)
             .collect();
 
