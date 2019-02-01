@@ -3,10 +3,7 @@ use codejam::util::codejam::run_cases;
 use bit_set::BitSet;
 use codejam::algo::graph::scc::strongly_connected_components;
 use codejam::algo::graph::DiGraph;
-use codejam::util::grid::Grid;
-use itertools::Itertools;
 use std::cmp::max;
-use std::collections::HashMap;
 use std::io::Write;
 use std::{u16, usize};
 
@@ -25,7 +22,7 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case_no in 1..=t {
-                let N: u16 = reader.read_int();
+                let _N: u16 = reader.read_int();
 
                 let bff_list = reader.read_num_line();
 
@@ -41,85 +38,35 @@ pub fn solve_all_cases()
     );
 }
 
-/*
-fn solve_brute_force(bff_list: &[u16]) -> u16
-{
-    let indices: Vec<u16> = (0..bff_list.len()).collect();
-
-    let mut current_max = 0;
-    loop
-        {
-            for pos in 0..bff_list.len()
-                {
-                    let before = if pos == 0 { bff_list.len() -1 } else {pos-1};
-                    let after = if pos == bff_list.len() { 0 } else { pos + 1};
-
-                    let bff = bff_list[indices[pos]] - 1;
-
-                    if bff != indices[before] &&
-                }
-        }
-
-
-    if let Some(mut permutation) = permutator.next() {
-        for element in &permutation {
-            println!("{}", element);
-        }
-
-        while permutator.next_with_buffer(&mut permutation) {
-            println!("Next iter");
-            for element in &permutation {
-                println!("{}", element);
-            }
-        }
-    }
-
-}*/
 
 fn solve(bff_list: &[u16]) -> usize
 {
     let mut graph = DiGraph::new();
 
-    //2 * paper index = is horizonal
-    //2 * paper index = !is horizonal == is vertical
-
     for (idx, bff) in bff_list.iter().enumerate() {
         graph.add_edge(idx + 1, usize::from(*bff));
     }
-    /*
-    for (from, to) in graph.edges()
-    {
-        let from_idx = from / 2;
-        let from_is_h = if from % 2 == 0 { "Horizontal" } else {"Vertical"};
-        let to_idx = to / 2;
-        let to_is_h = if to % 2 == 0  { "Horizontal" } else {"Vertical"};
-        println!("From ({}) {} {} implies ({}) {} {}",
-        from,
-        from_idx, from_is_h, to, to_idx, to_is_h);
-    }*/
-
-    let mut max_answer = 0;
 
     let sccs = strongly_connected_components(&graph);
-    println!("Sccs: {:?}", sccs);
+    //println!("Sccs: {:?}", sccs);
 
-    let mut not_in_answer = BitSet::new();
+    let mut in_scc_larger_than_2 = BitSet::new();
 
-    for (idx, scc) in sccs.iter().enumerate() {
-        max_answer = max(max_answer, scc.len());
-
+    //the largest scc can be used for the entire circle
+    let largest_scc_len = sccs.iter().map( |scc| {
+                
         //A strongly connected component more than 2 must be by itself
         if scc.len() > 2 {
-            not_in_answer.extend(scc.iter().cloned());
+            in_scc_larger_than_2.extend(scc.iter().cloned());
         }
-    }
+
+        scc.len()
+    }).max().unwrap();
 
     let mut longest_path_ending = vec![0; bff_list.len()+1];
 
-    //let mut paths = Vec::new();
-
     'node_loop: for node in 1..=bff_list.len() {
-        if not_in_answer.contains(node) {
+        if in_scc_larger_than_2.contains(node) {
             continue;
         }
 
@@ -134,7 +81,7 @@ fn solve(bff_list: &[u16]) -> usize
 
         loop {
             node = graph.edges_from(node).next().unwrap();
-            if not_in_answer.contains(node) {
+            if in_scc_larger_than_2.contains(node) {
                 continue 'node_loop;
             }
             //println!("Node {} Path {:?}", node, path);
@@ -142,36 +89,29 @@ fn solve(bff_list: &[u16]) -> usize
                 break;
             }
             path.push(node);
-            //break;
         }
 
-        println!("Found path {:?}", path);
+        //println!("Found path {:?}", path);
         longest_path_ending[ *path.last().unwrap() ] = max(path.len(),
-        longest_path_ending[ *path.last().unwrap() ])
-        //paths.push(path);
+        longest_path_ending[ *path.last().unwrap() ]);        
     }
 
-    println!("Found path lengths {:?}", longest_path_ending);
+    //println!("Found path lengths {:?}", longest_path_ending);
 
-    let mut scc_2_len = 0;
-    for scc in sccs.iter() {
+    let scc_2_len = sccs.iter().map(|scc| {
 
         if scc.len() != 2 {
-            continue;
+            return 0;
         }
-        println!("Looking at scc of len 2: {:?}", scc);
+        //println!("Looking at scc of len 2: {:?}", scc);
         let mut comp_len = max(longest_path_ending[ scc[0] ] +
             longest_path_ending[ scc[1] ], 2) - 2 ;
         comp_len = max(comp_len, longest_path_ending[ scc[0] ]);
         comp_len = max(comp_len, longest_path_ending[ scc[1] ]);
         comp_len = max(comp_len, 2);
 
-        scc_2_len += comp_len;
-    }
+        comp_len
+    }).sum();
 
-    //can also have all sccs of len 2 side by side
-    max_answer = max(max_answer, scc_2_len);
-
-    max_answer
-    //solve_brute_force(bff_list)
+    max(largest_scc_len, scc_2_len)
 }
