@@ -167,6 +167,7 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
                 pos, &all_choices, papers, &mut graph);
         }
     }
+    /*
     for (from, to) in graph.edges()
     {
         let from_idx = from / 2;
@@ -176,7 +177,7 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
         println!("From ({}) {} {} implies ({}) {} {}", 
         from,
         from_idx, from_is_h, to, to_idx, to_is_h);
-    }
+    }*/
 
     let sccs = strongly_connected_components(&graph);
     println!("Sccs: {:?}", sccs);
@@ -191,16 +192,6 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
         }
     }
 
-    for paper_idx in 0..papers.len() {
-        let scc_true = node_to_scc_component[& (2 * paper_idx)];
-        let scc_false = node_to_scc_component[&(2 * paper_idx + 1)];
-        if scc_true == scc_false {
-            panic!("Not satisfiable");
-        } else {
-            println!("Paper {} is {}", paper_idx, if scc_true < scc_false { "Horizonal"} else {"Vertical"});
-        }
-    }
-
     let mut horizonal_choices = Vec::new();
     //backtracking(&mut horizonal_choices, &all_choices, papers);
 
@@ -208,6 +199,15 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
         let paper_idx = choices[0];
         let scc_true = node_to_scc_component[& (2 * paper_idx)];
         let scc_false = node_to_scc_component[&(2 * paper_idx + 1)];
+
+        if scc_true == scc_false {
+            panic!("Not satisfiable");
+        } else {
+            println!("In choice {:?} for diag pos {},  Paper {} is {}", 
+            choices, pos,
+            paper_idx, if scc_true < scc_false { "Horizonal"} else {"Vertical"});
+        }
+
         assert!(scc_true != scc_false);
         if scc_true < scc_false {
             horizonal_choices.push(paper_idx);
