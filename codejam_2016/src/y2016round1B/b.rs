@@ -1,7 +1,7 @@
 use codejam::util::codejam::run_cases;
 
 use itertools::Itertools;
-use std::cmp::min;
+//use std::cmp::min;
 use std::i64;
 use std::io::Write;
 
@@ -11,10 +11,7 @@ use std::io::Write;
 pub fn solve_all_cases()
 {
     run_cases(
-        &[
-            "B-small-practice",
-            "B-large-practice"
-        ],
+        &["B-small-practice", "B-large-practice"],
         "y2016round1B",
         |reader, buffer| {
             let t = reader.read_int();
@@ -42,6 +39,7 @@ pub fn solve_all_cases()
     );
 }
 
+#[allow(dead_code)]
 fn get_digits(num: i64, len_num: usize) -> Vec<i8>
 {
     let mut digits = Vec::new();
@@ -60,6 +58,7 @@ fn get_digits(num: i64, len_num: usize) -> Vec<i8>
     digits
 }
 
+#[allow(dead_code)]
 fn str_to_digits(digit_string: &str) -> Vec<i8>
 {
     digit_string
@@ -77,10 +76,6 @@ fn str_to_digits(digit_string: &str) -> Vec<i8>
 #[derive(Default, Debug)]
 struct DigitInfo
 {
-    max_c: i8,
-    min_c: i8,
-    max_j: i8,
-    min_j: i8,
     fixed_c: Option<i8>,
     fixed_j: Option<i8>,
 
@@ -136,33 +131,26 @@ fn solve(C: &str, J: &str) -> String
         .map(|(ch_c, ch_j, &pow10)| {
             let mut digit_info: DigitInfo = Default::default();
             if ch_c == '?' {
-                digit_info.max_c = 9;
-                digit_info.min_c = 0;
-
                 digit_info.fixed_c = None;
             } else {
                 let digit = ch_c.to_digit(10).unwrap() as i8;
-                digit_info.max_c = digit;
-                digit_info.min_c = digit;
+
                 digit_info.fixed_c = Some(digit);
             }
 
             if ch_j == '?' {
-                digit_info.max_j = 9;
-                digit_info.min_j = 0;
                 digit_info.fixed_j = None;
             } else {
                 let digit = ch_j.to_digit(10).unwrap() as i8;
-                digit_info.max_j = digit;
-                digit_info.min_j = digit;
+
                 digit_info.fixed_j = Some(digit);
             }
 
             digit_info.mul_base = pow10;
             digit_info.max_diff =
-                i64::from(digit_info.max_c) * pow10 - i64::from(digit_info.min_j) * pow10;
+                i64::from(digit_info.max_c()) * pow10 - i64::from(digit_info.min_j()) * pow10;
             digit_info.min_diff =
-                i64::from(digit_info.min_c) * pow10 - i64::from(digit_info.max_j) * pow10;
+                i64::from(digit_info.min_c()) * pow10 - i64::from(digit_info.max_j()) * pow10;
 
             digit_info
         })
@@ -194,12 +182,17 @@ fn solve(C: &str, J: &str) -> String
             } else {
                 s + last_sm_mag_diff
             }
-
-        } else if last_sm_mag_diff < 0 && pow10 + last_lower_bound < last_sm_mag_diff.abs() && di.max_c() > di.min_j() {
+        } else if last_sm_mag_diff < 0
+            && pow10 + last_lower_bound < last_sm_mag_diff.abs()
+            && di.max_c() > di.min_j()
+        {
             //basically making c greater
             assert!(pow10 + last_lower_bound > 0);
             pow10 + last_lower_bound
-        } else if last_sm_mag_diff > 0 && pow10 - last_upper_bound < last_sm_mag_diff && di.max_j() > di.min_c() {
+        } else if last_sm_mag_diff > 0
+            && pow10 - last_upper_bound < last_sm_mag_diff
+            && di.max_j() > di.min_c()
+        {
             //making j greater
             assert!(last_upper_bound - pow10 < 0);
             last_upper_bound - pow10
@@ -256,11 +249,11 @@ fn solve(C: &str, J: &str) -> String
             continue;
         }
 
-        if di.min_c == di.max_c && di.min_j == di.max_j {
+        if let (Some(c), Some(j)) = (di.fixed_c, di.fixed_j) {
             //no choice
-            c_digits.push(di.max_c);
-            j_digits.push(di.max_j);
-            current_diff = di.max_c as i8 - di.max_j as i8;
+            c_digits.push(c);
+            j_digits.push(j);
+            current_diff = c - j;
             continue;
         }
 
@@ -286,13 +279,17 @@ fn solve(C: &str, J: &str) -> String
                 && c < 9
                 //&& di.mul_base - diff_upper_bound == min_diff
                 //going from neg to pos
-                && prev_min_diff < min_diff 
+                && prev_min_diff < min_diff
             {
                 j_digits.push(c + 1);
                 current_diff = -1;
             }
             //1 lower, if we can do it, since it makes c lower
-            else if pos < C.len() - 1 && c > 0 && (prev_min_diff > min_diff || min_diff == -half || diff_lower_bound + di.mul_base == min_diff )
+            else if pos < C.len() - 1
+                && c > 0
+                && (prev_min_diff > min_diff
+                    || min_diff == -half
+                    || diff_lower_bound + di.mul_base == min_diff)
             {
                 j_digits.push(c - 1);
                 current_diff = 1;
@@ -352,6 +349,7 @@ fn solve(C: &str, J: &str) -> String
     format!("{} {}", c_digits.iter().join(""), j_digits.iter().join(""))
 }
 
+#[allow(dead_code)]
 fn solve_brute_force(C: &str, J: &str) -> String
 {
     let c_digit_mask = str_to_digits(C);
