@@ -12,7 +12,7 @@ pub fn solve_all_cases()
 {
     run_cases(
         &[
-          //  "B-small-practice",
+            "B-small-practice",
             "B-large-practice"
         ],
         "y2016round1B",
@@ -25,7 +25,7 @@ pub fn solve_all_cases()
                 assert_eq!(scores.len(), 2, "{}", scores[0]);
 
                 if case_no != 107 {
-                    continue;
+                    //continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -292,7 +292,7 @@ fn solve(C: &str, J: &str) -> String
                 current_diff = -1;
             }
             //1 lower, if we can do it, since it makes c lower
-            else if pos < C.len() - 1 && c > 0 && (prev_min_diff > min_diff || min_diff == -half)
+            else if pos < C.len() - 1 && c > 0 && (prev_min_diff > min_diff || min_diff == -half || diff_lower_bound + di.mul_base == min_diff )
             {
                 j_digits.push(c - 1);
                 current_diff = 1;
