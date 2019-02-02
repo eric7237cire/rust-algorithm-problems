@@ -13,7 +13,7 @@ pub fn solve_all_cases()
     run_cases(
         &[
             "B-small-practice",
-            //"A-large-practice"
+            "B-large-practice"
         ],
         "y2016round1B",
         |reader, buffer| {
@@ -24,8 +24,8 @@ pub fn solve_all_cases()
 
                 assert_eq!(scores.len(), 2, "{}", scores[0]);
 
-                if case_no != 97 {
-                   // continue;
+                if case_no != 132 {
+                    //continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -195,10 +195,12 @@ fn solve(C: &str, J: &str) -> String
                 s + last_sm_mag_diff
             }
 
-        } else if last_sm_mag_diff < 0 && pow10 + last_lower_bound < last_sm_mag_diff.abs() {
+        } else if last_sm_mag_diff < 0 && pow10 + last_lower_bound < last_sm_mag_diff.abs() && di.max_c() > di.min_j() {
+            //basically making c greater
             assert!(pow10 + last_lower_bound > 0);
             pow10 + last_lower_bound
-        } else if last_sm_mag_diff > 0 && pow10 - last_upper_bound < last_sm_mag_diff {
+        } else if last_sm_mag_diff > 0 && pow10 - last_upper_bound < last_sm_mag_diff && di.max_j() > di.min_c() {
+            //making j greater
             assert!(last_upper_bound - pow10 < 0);
             last_upper_bound - pow10
         } else {
@@ -282,8 +284,9 @@ fn solve(C: &str, J: &str) -> String
             //only do it if its what lowers the diff
             if pos < C.len() - 1
                 && c < 9
-                && di.mul_base - diff_upper_bound == min_diff
-                && min_diff < prev_min_diff
+                //&& di.mul_base - diff_upper_bound == min_diff
+                //going from neg to pos
+                && prev_min_diff < min_diff 
             {
                 j_digits.push(c + 1);
                 current_diff = -1;
