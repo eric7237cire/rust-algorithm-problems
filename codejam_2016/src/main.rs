@@ -5,6 +5,9 @@ mod y2016round1B;
 
 extern crate codejam;
 
+#[macro_use]
+extern crate itertools;
+
 use codejam::util::log::init_log;
 
 pub fn run_y2016qual()
