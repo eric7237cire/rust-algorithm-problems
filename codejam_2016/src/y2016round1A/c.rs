@@ -25,7 +25,7 @@ pub fn solve_all_cases()
 
                 let bff_list = reader.read_num_line();
 
-                if case_no != 16 {
+                if case_no != 4 {
                     //continue;
                 }
 

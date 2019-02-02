@@ -1,9 +1,9 @@
 use codejam::util::codejam::run_cases;
 
 use itertools::Itertools;
-use num_traits::real::Real;
-use std::io::Write;
+use std::cmp::min;
 use std::i64;
+use std::io::Write;
 
 /*
 
@@ -24,8 +24,8 @@ pub fn solve_all_cases()
 
                 assert_eq!(scores.len(), 2, "{}", scores[0]);
 
-                if case_no > 10 {
-                    //continue;
+                if case_no != 18 {
+                    continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -47,7 +47,7 @@ fn get_digits(num: i64, len_num: usize) -> Vec<i8>
     let mut digits = Vec::new();
     let mut num = num;
     while num > 0 {
-        digits.push((num % 10) as i8 );
+        digits.push((num % 10) as i8);
         num /= 10
     }
 
@@ -77,167 +77,228 @@ fn str_to_digits(digit_string: &str) -> Vec<i8>
 #[derive(Default, Debug)]
 struct DigitInfo
 {
-    max_c: u8,
-    min_c: u8,
-    max_j: u8,
-    min_j: u8,
+    max_c: i8,
+    min_c: i8,
+    max_j: i8,
+    min_j: i8,
+    fixed_c: Option<i8>,
+    fixed_j: Option<i8>,
 
     mul_base: i64,
     max_diff: i64,
-    min_diff: i64
+    min_diff: i64,
 }
 
-
-
+#[deny(clippy::collpasable_if, clippy::cyclomatic_complexity)]
 fn solve(C: &str, J: &str) -> String
 {
     assert_eq!(C.len(), J.len());
 
-    let powers_10:Vec<i64> = (0..C.len()).rev().map(|i| 10i64.pow(i as u32)).collect();
+    let powers_10: Vec<i64> = (0..C.len()).rev().map(|i| 10i64.pow(i as u32)).collect();
 
-    let mut info : Vec<DigitInfo> = izip!(C.chars(), J.chars(), powers_10.iter()).map( | (ch_c, ch_j, &pow10) | {
-       let mut digit_info:DigitInfo = Default::default();
-        if ch_c == '?' {
-            digit_info.max_c = 9;
-            digit_info.min_c = 0;
-        } else {
-            let digit = ch_c.to_digit(10).unwrap() as u8;
-            digit_info.max_c = digit;
-            digit_info.min_c = digit;
-        }
+    let mut info: Vec<DigitInfo> = izip!(C.chars(), J.chars(), powers_10.iter())
+        .map(|(ch_c, ch_j, &pow10)| {
+            let mut digit_info: DigitInfo = Default::default();
+            if ch_c == '?' {
+                digit_info.max_c = 9;
+                digit_info.min_c = 0;
 
-        if ch_j == '?' {
-            digit_info.max_j = 9;
-            digit_info.min_j = 0;
-        } else {
-            let digit = ch_j.to_digit(10).unwrap() as u8;
-            digit_info.max_j = digit;
-            digit_info.min_j = digit;
-        }
+                digit_info.fixed_c = None;
+            } else {
+                let digit = ch_c.to_digit(10).unwrap() as i8;
+                digit_info.max_c = digit;
+                digit_info.min_c = digit;
+                digit_info.fixed_c = Some(digit);
+            }
 
-        digit_info.mul_base = pow10;
-        digit_info.max_diff = (i64::from( digit_info.max_c) * pow10)   - (i64::from(digit_info.min_j) * pow10);
-        digit_info.min_diff = (i64::from(digit_info.min_c) * pow10)  - (i64::from(digit_info.max_j) * pow10) ;
+            if ch_j == '?' {
+                digit_info.max_j = 9;
+                digit_info.min_j = 0;
+                digit_info.fixed_j = None;
+            } else {
+                let digit = ch_j.to_digit(10).unwrap() as i8;
+                digit_info.max_j = digit;
+                digit_info.min_j = digit;
+                digit_info.fixed_j = Some(digit);
+            }
 
-        digit_info
-    })  .collect();
+            digit_info.mul_base = pow10;
+            digit_info.max_diff =
+                i64::from(digit_info.max_c) * pow10 - i64::from(digit_info.min_j) * pow10;
+            digit_info.min_diff =
+                i64::from(digit_info.min_c) * pow10 - i64::from(digit_info.max_j) * pow10;
 
-    info.push( Default::default() );
+            
+
+            digit_info
+        })
+        .collect();
+
+    info.push(Default::default());
 
     for di in info.iter() {
         println!("Digit Info: {:?}", di);
     }
 
     let mut cumulative_min_max = Vec::new();
-    cumulative_min_max.push( [0,0] );
+    cumulative_min_max.push([0, 0, 0]);
 
-    for di in info.iter().rev().skip(1) {
+    for (di,&pow10) in info.iter().rev().skip(1).zip(powers_10.iter().rev()) {
         let last = cumulative_min_max.last().unwrap();
-        cumulative_min_max.push( [last[0] + di.max_diff, last[1] + di.min_diff]);
+
+        let min_abs_diff = if let (Some(c), Some(j)) = (di.fixed_c, di.fixed_j) {
+            last[1] + pow10 * i64::from((c-j).abs())
+        } else {
+            min(last[1], pow10 - last[1])
+        };
+        
+        cumulative_min_max.push([
+            last[0] + di.max_diff,
+            min_abs_diff,
+            last[2] + di.min_diff,
+        ]);
     }
 
     cumulative_min_max.reverse();
 
-    let mut c_digits:Vec<u8> = Vec::new();
-    let mut j_digits:Vec<u8> = Vec::new();
+    let mut c_digits: Vec<i8> = Vec::new();
+    let mut j_digits: Vec<i8> = Vec::new();
 
-    for cmm in cumulative_min_max.iter()
-    {
-        println!(" Cumulative max / min {} {}", cmm[0], cmm[1]);
+    for cmm in cumulative_min_max.iter().skip(1) {
+        println!(
+            " Cumulative max {} abs min {} min {}",
+            cmm[0], cmm[1], cmm[2]
+        );
     }
 
-    assert_eq!(cumulative_min_max.len(), C.len()+1);
+    assert_eq!(cumulative_min_max.len(), C.len() + 1);
 
     let mut current_diff = 0;
 
-    for pos in 0..C.len()
-    {
+    for pos in 0..C.len() {
         let di = &info[pos];
-        let cmm = &cumulative_min_max[pos+1];
-
+        
 
         if current_diff > 0 {
             //C is currently greater
-            c_digits.push( di.min_c);
+            c_digits.push(di.min_c);
             j_digits.push(di.max_j);
-        } else if current_diff < 0 {
+            continue;
+        } 
+        
+        if current_diff < 0 {
             //C is currently lesser
-            c_digits.push( di.max_c);
+            c_digits.push(di.max_c);
             j_digits.push(di.min_j);
-        } else {
+            continue;
+        } 
+        
+        if di.min_c == di.max_c && di.min_j == di.max_j {
+            //no choice
+            c_digits.push(di.max_c);
+            j_digits.push(di.max_j);
+            current_diff = di.max_c as i8 - di.max_j as i8;
+            continue;            
+        } 
+    
+        let half = di.mul_base / 2;
 
-            if di.min_c == di.max_c && di.min_j == di.max_j {
-                //no choice
+        let max_diff = cumulative_min_max[pos + 1][0];
+        let min_abs_diff = cumulative_min_max[pos + 1][1];
+        let min_diff = cumulative_min_max[pos + 1][2];
+
+        let c_must_be_greater = min_abs_diff > di.mul_base + min_diff;
+        let j_must_be_greater = min_abs_diff > di.mul_base - max_diff;
+        let cj_must_be_same = min_abs_diff < di.mul_base + min_diff && 
+        min_abs_diff < di.mul_base - max_diff;
+
+        //8?7 ??0
+
+        if cj_must_be_same {
+            if di.min_c == di.max_c {
+                assert_eq!(di.min_j, 0);
+                assert_eq!(di.max_j, 9);
                 c_digits.push(di.max_c);
+                j_digits.push(di.max_c);
+                assert_eq!(0,current_diff);
+            } 
+            else if di.min_j == di.max_j {
+                assert_eq!(di.min_c, 0);
+                assert_eq!(di.max_c, 9);                
+                c_digits.push(di.max_j);
                 j_digits.push(di.max_j);
-                current_diff = di.max_c as i8 - di.max_j as i8;
-            } else if di.min_c == di.max_c {
-                // c is fixed
-                c_digits.push(di.max_c);
-
-                //1 higher, to be avoided since it makes c greater
-                //so max should be < -500
-                if di.max_c < 9 && cmm[0] < -di.mul_base / 2 {
-                    j_digits.push(di.max_c + 1);
-                    current_diff = -1;
-                }
-                //1 lower, if we can do it, since it makes c lower
-                else if di.max_c > 0 && cmm[1] <= -di.mul_base /  2 {
-                    j_digits.push(di.max_c - 1);
-                    current_diff = 1;
-                } else {
-                    j_digits.push(di.max_c);
-                    assert_eq!(0, current_diff);
-                }
-            } else if di.min_j == di.max_j {
-
-                j_digits.push(di.max_j);
-
-                //c 1 lower, if we can do it
-                if di.max_j > 0 && cmm[1] <= -di.mul_base / 2 {
-                    c_digits.push(di.max_j + 1);
-                    current_diff = -1;
-                }
-                //c 1 higher, to be avoided
-                else if di.max_j < 9 && cmm[0] < -di.mul_base /  2 {
-                    c_digits.push(di.max_j - 1);
-                    current_diff = 1;
-                } else {
-                    c_digits.push(di.max_j);
-                    assert_eq!(0, current_diff);
-                }
-
-            } else {
-                //both flexible
-
-                //if j can be 1 higher, do it
-                if cmm[1] <= di.mul_base / 2 {
-                    c_digits.push(0);
-                    j_digits.push(1);
-                    current_diff = -1;
-                }
-                // if c must be 1 higher, to be avoided
-                else if cmm[1] < di.mul_base / 2 {
-                    c_digits.push(1);
-                    j_digits.push(0);
-                    current_diff = 1;
-                } else {
-                    c_digits.push(0);
-                    j_digits.push(0);
-                    assert_eq!(0, current_diff);
-                }
+                assert_eq!(0,current_diff);
             }
-
-
+            else {
+                assert_eq!(di.min_c, 0);
+                assert_eq!(di.max_c, 9);
+                assert_eq!(di.min_j, 0);
+                assert_eq!(di.max_j, 9);                
+                c_digits.push(0);
+                j_digits.push(0);
+                assert_eq!(0,current_diff);
+            }
+            continue;
         }
+
+        if di.min_c == di.max_c {
+            // c is fixed
+            c_digits.push(di.max_c);
+
+            //1 higher, to be avoided since it makes c greater
+            //so max should be < -500
+            if di.max_c < 9 && max_diff < -half {
+                j_digits.push(di.max_c + 1);
+                current_diff = -1;
+            }
+            //1 lower, if we can do it, since it makes c lower
+            else if di.max_c > 0 && min_diff <= -di.mul_base / 2 {
+                j_digits.push(di.max_c - 1);
+                current_diff = 1;
+            } else {
+                j_digits.push(di.max_c);
+                assert_eq!(0, current_diff);
+            }
+        } else if di.min_j == di.max_j {
+            j_digits.push(di.max_j);
+
+            //c 1 lower, if we can do it
+            if pos < C.len() - 1 && di.max_j > 0 && max_diff <= -di.mul_base / 2 {
+                c_digits.push(di.max_j - 1);
+                current_diff = -1;
+            }
+            //c 1 higher, to be avoided
+            else if pos < C.len() - 1 && di.max_j < 9 && min_diff < -di.mul_base / 2 {
+                c_digits.push(di.max_j + 1);
+                current_diff = 1;
+            } else {
+                c_digits.push(di.max_j);
+                assert_eq!(0, current_diff);
+            }
+        } else {
+            //both flexible
+
+            //if j can be 1 higher, do it since this will minimized c
+            if pos < C.len() - 1 && max_diff != min_diff && min_diff >= half {
+                c_digits.push(0);
+                j_digits.push(1);
+                current_diff = -1;
+            }
+            // if c must be 1 higher, to be avoided
+            else if pos < C.len() - 1 && min_diff < -di.mul_base / 2 {
+                c_digits.push(1);
+                j_digits.push(0);
+                current_diff = 1;
+            } else {
+                c_digits.push(0);
+                j_digits.push(0);
+                assert_eq!(0, current_diff);
+            }
+        }
+        
     }
 
-
-    format!(
-        "{} {}",
-        c_digits.iter().join(""),
-        j_digits.iter().join("")
-    )
+    format!("{} {}", c_digits.iter().join(""), j_digits.iter().join(""))
 }
 
 fn solve_brute_force(C: &str, J: &str) -> String
@@ -247,11 +308,11 @@ fn solve_brute_force(C: &str, J: &str) -> String
 
     assert_eq!(C.len(), J.len());
 
-    let upper_limit:i64 = 10i64.pow(C.len() as u32) as i64;
+    let upper_limit: i64 = 10i64.pow(C.len() as u32) as i64;
 
     let mut best_solution = (i64::MAX, i64::MAX, i64::MAX);
-    let mut best_c_digits= c_digit_mask.clone();
-    let mut best_j_digits= j_digit_mask.clone();
+    let mut best_c_digits = c_digit_mask.clone();
+    let mut best_j_digits = j_digit_mask.clone();
 
     for c in 0..upper_limit {
         let c_digits = get_digits(c, C.len());
