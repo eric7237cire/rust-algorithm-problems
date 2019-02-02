@@ -10,9 +10,7 @@ use std::io::Write;
 pub fn solve_all_cases()
 {
     run_cases(
-        &["A-small-practice",
-            "A-large-practice"
-            ],
+        &["A-small-practice", "A-large-practice"],
         "y2016round1B",
         |reader, buffer| {
             let t = reader.read_int();
@@ -45,13 +43,17 @@ fn solve(S: &str) -> String
     let mut digits = Vec::new();
 
     let unique_letters = [
-        ('Z', "ZERO",0), ('W', "TWO",2),
-        ('G', "EIGHT",8), ('U', "FOUR", 4),
-        ('X', "SIX", 6), ('H', "THREE", 3),
-
+        ('Z', "ZERO", 0),
+        ('W', "TWO", 2),
+        ('G', "EIGHT", 8),
+        ('U', "FOUR", 4),
+        ('X', "SIX", 6),
+        ('H', "THREE", 3),
         //now unique after remove precedent
-        ('F', "FIVE", 5), ('V', "SEVEN", 7),
-            ('O',"ONE",1), ('I', "NINE",9)
+        ('F', "FIVE", 5),
+        ('V', "SEVEN", 7),
+        ('O', "ONE", 1),
+        ('I', "NINE", 9),
     ];
 
     //
@@ -66,7 +68,6 @@ fn solve(S: &str) -> String
             }
         }
     }
-
 
     char_counts.retain(|_, &mut count| count > 0);
 
