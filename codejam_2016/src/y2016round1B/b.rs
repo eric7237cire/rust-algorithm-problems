@@ -110,7 +110,7 @@ fn solve(C: &str, J: &str) -> String
                 continue;
             }
 
-            let sol = ((c - j).abs(), -c, -j);
+            let sol = ((c - j).abs(), c, j);
 
             if sol < best_solution {
                 best_solution = sol;
