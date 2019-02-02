@@ -24,8 +24,8 @@ pub fn solve_all_cases()
 
                 assert_eq!(scores.len(), 2, "{}", scores[0]);
 
-                if case_no != 42 {
-                    //continue;
+                if case_no != 97 {
+                   // continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -179,16 +179,28 @@ fn solve(C: &str, J: &str) -> String
 
     for (di, &pow10) in info.iter().rev().zip(powers_10.iter().rev()) {
         let last = cumulative_min_max.last().unwrap();
+
+        let last_upper_bound = last[0];
         let last_sm_mag_diff = last[1];
+        let last_lower_bound = last[2];
 
         let smallest_mag_diff = if let (Some(c), Some(j)) = (di.fixed_c, di.fixed_j) {
-            last_sm_mag_diff + pow10 * i64::from(c - j)
-        } else if last_sm_mag_diff < 0 && pow10 + last_sm_mag_diff < last_sm_mag_diff.abs() {
-            assert!(pow10 + last_sm_mag_diff > 0);
-            pow10 + last_sm_mag_diff
-        } else if last_sm_mag_diff > 0 && pow10 - last_sm_mag_diff < last_sm_mag_diff {
-            assert!(last_sm_mag_diff - pow10 < 0);
-           last_sm_mag_diff - pow10
+            let s = pow10 * i64::from(c - j);
+            if s < 0 {
+                s + last[0]
+            } else if s > 0 {
+                //reduce the pos swing by current min
+                s + last[2]
+            } else {
+                s + last_sm_mag_diff
+            }
+
+        } else if last_sm_mag_diff < 0 && pow10 + last_lower_bound < last_sm_mag_diff.abs() {
+            assert!(pow10 + last_lower_bound > 0);
+            pow10 + last_lower_bound
+        } else if last_sm_mag_diff > 0 && pow10 - last_upper_bound < last_sm_mag_diff {
+            assert!(last_upper_bound - pow10 < 0);
+            last_upper_bound - pow10
         } else {
             last_sm_mag_diff
         };
@@ -277,7 +289,8 @@ fn solve(C: &str, J: &str) -> String
                 current_diff = -1;
             }
             //1 lower, if we can do it, since it makes c lower
-            else if pos < C.len() - 1 && c > 0 && (prev_min_diff > min_diff || min_diff == -half) {
+            else if pos < C.len() - 1 && c > 0 && (prev_min_diff > min_diff || min_diff == -half)
+            {
                 j_digits.push(c - 1);
                 current_diff = 1;
             } else {
@@ -288,8 +301,13 @@ fn solve(C: &str, J: &str) -> String
             j_digits.push(j);
 
             //c 1 lower, if we can do it
-            if pos < C.len() - 1 && di.max_j > 0 && diff_upper_bound <= -di.mul_base / 2 {
-                c_digits.push(di.max_j - 1);
+            if pos < C.len() - 1
+                && j > 0
+                && (prev_min_diff < min_diff
+                    || min_diff == half
+                    || diff_upper_bound - di.mul_base == min_diff)
+            {
+                c_digits.push(j - 1);
                 current_diff = -1;
             }
             //c 1 higher, to be avoided
@@ -297,15 +315,14 @@ fn solve(C: &str, J: &str) -> String
                 c_digits.push(j + 1);
                 current_diff = 1;
             } else {
-                c_digits.push(di.max_j);
+                c_digits.push(j);
                 assert_eq!(0, current_diff);
             }
         } else {
             //both flexible
 
             //if j can be 1 higher, do it since this will minimized c
-            if pos < C.len() - 1 && prev_min_diff < min_diff
-            {
+            if pos < C.len() - 1 && prev_min_diff < min_diff {
                 c_digits.push(0);
                 j_digits.push(1);
                 current_diff = -1;
