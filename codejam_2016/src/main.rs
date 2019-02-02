@@ -30,6 +30,7 @@ fn main()
 
     */
 
-    y2016round1B::a::solve_all_cases();
+    //y2016round1B::a::solve_all_cases();
+    y2016round1B::b::solve_all_cases();
     //y2016round1A::c::solve_all_cases();
 }
