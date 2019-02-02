@@ -12,7 +12,7 @@ pub fn solve_all_cases()
 {
     run_cases(
         &[
-            "B-small-practice",
+          //  "B-small-practice",
             "B-large-practice"
         ],
         "y2016round1B",
@@ -24,8 +24,8 @@ pub fn solve_all_cases()
 
                 assert_eq!(scores.len(), 2, "{}", scores[0]);
 
-                if case_no != 132 {
-                    //continue;
+                if case_no != 107 {
+                    continue;
                 }
 
                 println!("Solving case {}", case_no);
