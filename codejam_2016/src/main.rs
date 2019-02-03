@@ -9,7 +9,8 @@ extern crate codejam;
 #[macro_use]
 extern crate itertools;
 
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
 use codejam::util::log::init_log;
 
@@ -38,7 +39,6 @@ pub fn run_y20161B()
 pub fn run_y20161C()
 {
     y2016round1C::a::solve_all_cases();
-
 }
 
 fn main()
