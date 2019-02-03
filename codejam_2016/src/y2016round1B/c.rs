@@ -15,7 +15,7 @@ pub fn solve_all_cases()
     run_cases(
         &[
             "C-small-practice",
-            //"B-large-practice"
+            "C-large-practice"
         ],
         "y2016round1B",
         |reader, buffer| {
@@ -27,7 +27,7 @@ pub fn solve_all_cases()
                 let topics: Vec<Vec<String>> = (0..N).map(|_| reader.read_string_line()).collect();
 
                 if case_no > 4 {
-                    continue;
+                    //continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -64,10 +64,11 @@ fn solve(topics: &[Vec<String>]) -> usize
             first_words[first_id as usize] = topic_words[0].clone();
             second_words[second_id as usize] = topic_words[1].clone();
 
+            /*
             println!(
                 "Edge from {}/{} to {}/{}",
                 topic_words[0], first_id, topic_words[1], second_id
-            );
+            );*/
 
             [first_id, second_id]
         })
@@ -140,6 +141,7 @@ fn solve(topics: &[Vec<String>]) -> usize
             }
         }
 
+        /*
         println!(
             "After match attempt of first index {}.\nMatch Left:\n{}\nMatch Right:\n{}\n\
 Queue:\n{}\ntail: {}
@@ -180,8 +182,7 @@ Queue:\n{}\ntail: {}
                 )).join("\n"),
             queueTail
         );
-        //			System.err.println(Arrays.toString(matchL));
-        //			System.err.println(Arrays.toString(matchR));
+        */
 
         //Reset all dice values in queue
         for j in 0..queueTail {
