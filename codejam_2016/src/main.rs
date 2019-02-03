@@ -9,6 +9,8 @@ extern crate codejam;
 #[macro_use]
 extern crate itertools;
 
+#[macro_use] extern crate log;
+
 use codejam::util::log::init_log;
 
 pub fn run_y2016qual()

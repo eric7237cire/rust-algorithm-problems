@@ -10,7 +10,7 @@ pub fn solve_all_cases()
 {
     run_cases(
         &["A-small-practice",
-            //"A-large-practice"
+            "A-large-practice"
              ],
         "y2016round1C",
         |reader, buffer| {
@@ -46,7 +46,8 @@ fn solve(P: &[u16]) -> String
 
         let upper_limit = 1 + total / 2;
 
-        println!("Count of {}.  total={} upper limit = {}",
+
+        debug!("Count of {}.  total={} upper limit = {}",
 P.iter().map(| (ch, count)| format!("{} = {}", ch, count)).join("; "), total, upper_limit);
 
 
