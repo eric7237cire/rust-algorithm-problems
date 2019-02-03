@@ -6,6 +6,7 @@ use bit_vec::BitVec;
 
 /*
 Counting paths in a DAG
+Representing number as sum of squares
 */
 pub fn solve_all_cases()
 {
@@ -48,11 +49,12 @@ fn solve(B: usize, M: usize) -> String
     println!("B={} M={} needed nodes={}", B, M, needed_nodes);
 
     let start_node = B - needed_nodes;
-    //fill in everything from
 
     let mut edges: Vec<BitVec> = Vec::new();
     for v in 0..B  {
         let mut adj_list = BitVec::from_elem(B, false);
+
+        //anything before the start node remaings blank
         if v > start_node {
             for adj_v in v + 1..B {
                 adj_list.set(adj_v, true);
@@ -61,20 +63,19 @@ fn solve(B: usize, M: usize) -> String
             for adj_v in v + 1..B {
                 //The path counts from start_node are
                 // ... 16 8 4 2 1 1 B
-                //so we map B-2 to 1
-                // B-2 to 2
-                // B-3 to 4
+                //so we map B-2 to bit index 0
+                // B-3 to bit index 1
+                // etc.
                 let bit_pos = if adj_v <= B-2 { (B-2) - adj_v } else {63};
                 let is_connected =  (M) >> bit_pos & 1 > 0 || 1 << (needed_nodes-2) == M;
                 adj_list.set(adj_v, is_connected);
             }
-
-            //adj_list.set(v+1, true);
         }
 
         edges.push(adj_list);
     }
 
+    //need to make sure start node is reachable from the beginning
     if start_node > 0 {
         edges[0].set(start_node, true);
     }
@@ -85,6 +86,7 @@ fn solve(B: usize, M: usize) -> String
                 bitvec.iter().map( |b| if b {'1'} else {'0'}).join("")).join("\n") );
 
 
+    //check our answer
     let num_paths = count_paths(&edges);
 
     assert_eq!(M, num_paths);
