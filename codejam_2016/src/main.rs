@@ -2,6 +2,7 @@
 mod y2016qual;
 mod y2016round1A;
 mod y2016round1B;
+mod y2016round1C;
 
 extern crate codejam;
 
@@ -29,6 +30,7 @@ pub fn run_y20161B()
 {
     y2016round1B::a::solve_all_cases();
     y2016round1B::b::solve_all_cases();
+    y2016round1B::c::solve_all_cases();
 }
 
 fn main()
@@ -38,7 +40,7 @@ fn main()
     /*
 
     */
+    y2016round1C::a::solve_all_cases();
 
-    y2016round1B::c::solve_all_cases();
     //y2016round1A::c::solve_all_cases();
 }
