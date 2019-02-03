@@ -162,7 +162,7 @@ fn solve(C: &str, J: &str) -> String
 
     // info.push(Default::default());
 
-/*
+    /*
     for di in info.iter() {
         println!("Digit Info: {:?}", di);
     }*/
@@ -217,14 +217,14 @@ fn solve(C: &str, J: &str) -> String
     let mut c_digits: Vec<i8> = Vec::new();
     let mut j_digits: Vec<i8> = Vec::new();
 
-/*
-    for cmm in cumulative_min_max.iter() {
-        println!(
-            " Cumulative max {} abs min {} min {}",
-            cmm[0], cmm[1], cmm[2]
-        );
-    }
-*/
+    /*
+        for cmm in cumulative_min_max.iter() {
+            println!(
+                " Cumulative max {} abs min {} min {}",
+                cmm[0], cmm[1], cmm[2]
+            );
+        }
+    */
     assert_eq!(cumulative_min_max.len(), C.len() + 1);
 
     println!("Determing {} and {}", C, J);
@@ -234,7 +234,7 @@ fn solve(C: &str, J: &str) -> String
     for pos in 0..C.len() {
         let di = &info[pos];
 
-       /* println!(
+        /* println!(
             "C={}... J={}... Digit {}",
             c_digits.iter().join(""),
             j_digits.iter().join(""),
@@ -270,24 +270,20 @@ fn solve(C: &str, J: &str) -> String
         let prev_min_diff = cumulative_min_max[pos][1];
         let diff_lower_bound = cumulative_min_max[pos + 1][2];
 
-/*
-        println!(
-            "diff range is {} to {}.  Signed min mag diff {}, prev {}",
-            diff_lower_bound, diff_upper_bound, min_diff, prev_min_diff
-        );
-*/
+        /*
+                println!(
+                    "diff range is {} to {}.  Signed min mag diff {}, prev {}",
+                    diff_lower_bound, diff_upper_bound, min_diff, prev_min_diff
+                );
+        */
         if let Some(c) = di.fixed_c {
             // c is fixed
             c_digits.push(c);
 
             //1 higher, to be avoided since it makes c greater
             //only do it if its what lowers the diff
-            if pos < C.len() - 1
-                && c < 9
-               
+            if pos < C.len() - 1 && c < 9 && prev_min_diff < min_diff {
                 //going from neg to pos
-                && prev_min_diff < min_diff
-            {
                 j_digits.push(c + 1);
                 current_diff = -1;
             }
@@ -313,15 +309,15 @@ fn solve(C: &str, J: &str) -> String
                 && (
                     //going from a neg diff (j higher) to pos diff (c higher/j lower)
                     prev_min_diff < min_diff
-                    || min_diff == half
-                    || diff_upper_bound - di.mul_base == min_diff
-                    )
+                        || min_diff == half
+                        || diff_upper_bound - di.mul_base == min_diff
+                )
             {
                 c_digits.push(j - 1);
                 current_diff = -1;
             }
             //c 1 higher, to be avoided
-            else if pos < C.len() - 1 && prev_min_diff > min_diff && j < 9  { 
+            else if pos < C.len() - 1 && prev_min_diff > min_diff && j < 9 {
                 c_digits.push(j + 1);
                 current_diff = 1;
             } else {
