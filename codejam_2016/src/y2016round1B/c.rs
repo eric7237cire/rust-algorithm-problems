@@ -6,6 +6,7 @@ use bit_vec::BitVec;
 use std::collections::HashMap;
 use std::i64;
 use std::io::Write;
+use codejam::algo::graph::flow::FlowGraph;
 /*
 
 
@@ -26,7 +27,7 @@ pub fn solve_all_cases()
 
                 let topics: Vec<Vec<String>> = (0..N).map(|_| reader.read_string_line()).collect();
 
-                if case_no > 4 {
+                if case_no != 4 {
                     //continue;
                 }
 
@@ -47,6 +48,8 @@ fn solve(topics: &[Vec<String>]) -> usize
     let mut second_word_ids: HashMap<&str, i16> = HashMap::new();
     let mut first_words = vec![String::new(); MAX_N as usize];
     let mut second_words = vec![String::new(); MAX_N as usize];
+
+
 
     let edges: Vec<[i16; 2]> = topics
         .iter()
@@ -73,6 +76,27 @@ fn solve(topics: &[Vec<String>]) -> usize
             [first_id, second_id]
         })
         .collect();
+
+    let source = first_word_ids.len() + second_word_ids.len();
+    let sink = first_word_ids.len() + second_word_ids.len() + 1;
+    let mut graph = FlowGraph::new(sink+1, 4);
+    let a_start = 0usize;
+    let b_start = first_word_ids.len();
+
+    for a in 0..first_word_ids.len() {
+        graph.add_edge(source, a, 1, 1);
+    }
+
+    //6 nodes in B
+    for b in b_start..b_start + second_word_ids.len() {
+        graph.add_edge(b, sink, 1, 1);
+    }
+
+    for edge in edges.iter() {
+        graph.add_edge(a_start + edge[0] as usize, b_start + edge[1] as usize, 1, 1);
+    }
+
+    let (flow_amt, flow) = graph.dinic(source, sink);
 
     //create edges from first word to second word
 
@@ -119,7 +143,7 @@ fn solve(topics: &[Vec<String>]) -> usize
                         assert!(matchL[top_queue_first_word as usize] >= 0);
                         let prev = back[top_queue_first_word as usize];
                         let pnext = matchL[top_queue_first_word as usize];
-                        matchL[top_queue_first_word as usize] = adj_second_index;
+                        matchL[top_queue_first_word as usize] = next_second_index;
                         matchR[pnext as usize] = prev;
                         top_queue_first_word = prev;
                         next_second_index = pnext;
@@ -128,7 +152,7 @@ fn solve(topics: &[Vec<String>]) -> usize
                     found = true;
                     break 'bfs;
                 } else if !used_first[matchR[adj_second_index as usize] as usize] {
-                    //Need to find a new matching for this value, put its dice value on queue
+                    //Need to find a new matching for this value, put its left index on queue
                     used_first.set(matchR[adj_second_index as usize] as usize, true);
                     queue[queueTail] = matchR[adj_second_index as usize];
                     queueTail += 1;
@@ -181,8 +205,8 @@ Queue:\n{}\ntail: {}
                     first_words[*first_id as usize].clone()
                 )).join("\n"),
             queueTail
-        );
-        */
+        );*/
+        
 
         //Reset all dice values in queue
         for j in 0..queueTail {
@@ -193,5 +217,8 @@ Queue:\n{}\ntail: {}
     }
 
     let match_count = matchL.iter().filter(|&&e| e >= 0).count();
+
+    assert_eq!(flow_amt as usize, match_count);
+
     topics.len() - match_count - (first_word_ids.len() - match_count) - (second_word_ids.len() - match_count)
 }
