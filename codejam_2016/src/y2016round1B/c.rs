@@ -4,7 +4,8 @@ use itertools::Itertools;
 //use std::cmp::min;
 use bit_vec::BitVec;
 use std::collections::HashMap;
-use std::i64;
+use std::{i64,u16};
+
 use std::io::Write;
 use codejam::algo::graph::flow::FlowGraph;
 /*
@@ -39,23 +40,23 @@ pub fn solve_all_cases()
     );
 }
 
-const INVALID: i16 = -1;
+const INVALID: u16 = u16::MAX;
 const MAX_N: i16 = 1000;
 
 fn solve(topics: &[Vec<String>]) -> usize
 {
-    let mut first_word_ids: HashMap<&str, i16> = HashMap::new();
-    let mut second_word_ids: HashMap<&str, i16> = HashMap::new();
+    let mut first_word_ids: HashMap<&str, u16> = HashMap::new();
+    let mut second_word_ids: HashMap<&str, u16> = HashMap::new();
     let mut first_words = vec![String::new(); MAX_N as usize];
     let mut second_words = vec![String::new(); MAX_N as usize];
 
 
 
-    let edges: Vec<[i16; 2]> = topics
+    let edges: Vec<[u16; 2]> = topics
         .iter()
         .map(|topic_words| {
-            let next_first_id = first_word_ids.len() as i16;
-            let next_second_id = second_word_ids.len() as i16;
+            let next_first_id = first_word_ids.len() as u16;
+            let next_second_id = second_word_ids.len() as u16;
 
             let first_id = *first_word_ids
                 .entry(&topic_words[0])
@@ -64,8 +65,8 @@ fn solve(topics: &[Vec<String>]) -> usize
                 .entry(&topic_words[1])
                 .or_insert(next_second_id);
 
-            first_words[first_id as usize] = topic_words[0].clone();
-            second_words[second_id as usize] = topic_words[1].clone();
+            first_words[ usize::from(first_id)] = topic_words[0].clone();
+            second_words[ usize::from(second_id)] = topic_words[1].clone();
 
             /*
             println!(
@@ -77,26 +78,7 @@ fn solve(topics: &[Vec<String>]) -> usize
         })
         .collect();
 
-    let source = first_word_ids.len() + second_word_ids.len();
-    let sink = first_word_ids.len() + second_word_ids.len() + 1;
-    let mut graph = FlowGraph::new(sink+1, 4);
-    let a_start = 0usize;
-    let b_start = first_word_ids.len();
 
-    for a in 0..first_word_ids.len() {
-        graph.add_edge(source, a, 1, 1);
-    }
-
-    //6 nodes in B
-    for b in b_start..b_start + second_word_ids.len() {
-        graph.add_edge(b, sink, 1, 1);
-    }
-
-    for edge in edges.iter() {
-        graph.add_edge(a_start + edge[0] as usize, b_start + edge[1] as usize, 1, 1);
-    }
-
-    let (flow_amt, flow) = graph.dinic(source, sink);
 
     //create edges from first word to second word
 
@@ -106,25 +88,25 @@ fn solve(topics: &[Vec<String>]) -> usize
     let mut matchR = vec![INVALID; second_word_ids.len()];
 
     //Storing values
-    let mut queue: Vec<i16> = vec![0; first_word_ids.len()];
+    let mut queue: Vec<u16> = vec![0; first_word_ids.len()];
     let mut back = vec![0; first_word_ids.len()];
 
     let mut used_first = BitVec::from_elem(first_word_ids.len(), false);
     let mut ans = 0;
-    let mut cur_first_word_id = 0i16;
-    while cur_first_word_id < first_word_ids.len() as i16 {
+    let mut cur_first_word_id = 0u16;
+    while usize::from(cur_first_word_id) < first_word_ids.len() {
         let mut queueHead = 0;
         let mut queueTail = 1;
         queue[0] = cur_first_word_id;
         used_first.set(cur_first_word_id as usize, true);
-        back[cur_first_word_id as usize] = INVALID;
-        let mut found = false;
+        back[usize::from(cur_first_word_id)] = INVALID;
+        //let mut found = false;
         'bfs: loop {
-            assert!(queue[queueHead] >= 0);
-            let mut top_queue_first_word = queue[queueHead];
+            assert!(queue[queueHead] != INVALID);
+            let top_queue_first_word = queue[queueHead];
             queueHead += 1;
 
-            let first_to_second_edges: Vec<[i16; 2]> = edges
+            let first_to_second_edges: Vec<[u16; 2]> = edges
                 .iter()
                 .filter(|edge| edge[0] == top_queue_first_word)
                 .cloned()
@@ -134,22 +116,24 @@ fn solve(topics: &[Vec<String>]) -> usize
 
                 let adj_second_index = adj_second_edge[1];
                 //Found a non matched second index
-                if matchR[adj_second_index as usize] == INVALID {
+                if matchR[usize::from(adj_second_index)] == INVALID {
                     let mut next_second_index = adj_second_index;
-                    matchR[adj_second_index as usize] = top_queue_first_word;
+                    let mut next_first_index = top_queue_first_word as usize;
+
+                    matchR[usize::from(adj_second_index)] = next_first_index as u16;
                     //Applying the augmenting path
-                    while back[top_queue_first_word as usize] >= 0 {
-                        assert!(back[top_queue_first_word as usize] >= 0);
-                        assert!(matchL[top_queue_first_word as usize] >= 0);
-                        let prev = back[top_queue_first_word as usize];
-                        let pnext = matchL[top_queue_first_word as usize];
-                        matchL[top_queue_first_word as usize] = next_second_index;
-                        matchR[pnext as usize] = prev;
-                        top_queue_first_word = prev;
+                    while back[next_first_index] != INVALID {
+                        assert!(back[next_first_index] != INVALID);
+                        assert!(matchL[next_first_index] != INVALID);
+                        let prev = back[next_first_index];
+                        let pnext = matchL[next_first_index];
+                        matchL[next_first_index] = next_second_index;
+                        matchR[usize::from(pnext)] = prev;
+                        next_first_index = usize::from(prev);
                         next_second_index = pnext;
                     }
-                    matchL[top_queue_first_word as usize] = next_second_index;
-                    found = true;
+                    matchL[next_first_index] = next_second_index;
+                   // found = true;
                     break 'bfs;
                 } else if !used_first[matchR[adj_second_index as usize] as usize] {
                     //Need to find a new matching for this value, put its left index on queue
@@ -216,9 +200,7 @@ Queue:\n{}\ntail: {}
         cur_first_word_id += 1;
     }
 
-    let match_count = matchL.iter().filter(|&&e| e >= 0).count();
-
-    assert_eq!(flow_amt as usize, match_count);
+    let match_count = matchL.iter().filter(|&&e| e != INVALID).count();
 
     topics.len() - match_count - (first_word_ids.len() - match_count) - (second_word_ids.len() - match_count)
 }
