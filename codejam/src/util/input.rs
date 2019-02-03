@@ -73,12 +73,12 @@ impl<'a> InputReader<'a>
             .collect()
     }
 
-    pub fn read_string_line(&mut self) -> Vec<&str>
+    pub fn read_string_line(&mut self) -> Vec<String>
     {
         self.s.clear();
         self.i.read_line(&mut self.s).unwrap();
         self.s
-            .split_whitespace()
+            .split_whitespace().map(|s| s.to_string())
             .collect()
     }
 

@@ -13,7 +13,7 @@ use std::usize;
 use std::thread;
 
 /*
-incremental matching
+Fast incremental bipartite matching
 performance intentive
 heavy duty recursion (in slower solutions)
 
@@ -24,6 +24,9 @@ Make flow2 faster (which is also BFS but way slower than the solution used)
 
 Found a fast BFS implementation which is currently used in solve from
 one of the contestents
+
+
+
 */
 pub fn solve_all_cases()
 {

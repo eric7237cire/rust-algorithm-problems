@@ -28,6 +28,7 @@ pub fn run_y20161A()
 pub fn run_y20161B()
 {
     y2016round1B::a::solve_all_cases();
+    y2016round1B::b::solve_all_cases();
 }
 
 fn main()
@@ -38,6 +39,6 @@ fn main()
 
     */
 
-    y2016round1B::b::solve_all_cases();
+    y2016round1B::c::solve_all_cases();
     //y2016round1A::c::solve_all_cases();
 }
