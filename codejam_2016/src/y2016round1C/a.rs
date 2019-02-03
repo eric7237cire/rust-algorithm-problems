@@ -4,7 +4,8 @@ use itertools::Itertools;
 use std::io::Write;
 
 /*
-
+Greedy algorithm
+Maintain constraint
 */
 pub fn solve_all_cases()
 {
@@ -58,11 +59,14 @@ P.iter().map(| (ch, count)| format!("{} = {}", ch, count)).join("; "), total, up
         P.sort();
         P.reverse();
 
+        //2 way tie but not 3 way, then take the top 2
+        //this is to prevent [1,1,1] => [1]
         if P[0].0 == P[1].0 && (P.len() <= 2 || P[2].0 != P[1].0) {
             ans.push(format!("{}{}", P[0].1, P[1].1));
             P[0].0 -= 1;
             P[1].0 -= 1;
         } else {
+            //take one of the majority
             ans.push(P[0].1.to_string());
             P[0].0 -= 1;
         }
