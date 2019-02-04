@@ -22,7 +22,7 @@ pub fn solve_all_cases()
             for case_no in 1..=t {
                 let nums = reader.read_num_line();
 
-                if case_no != 1 {
+                if case_no != 2 {
                     //continue;
                 }
 
@@ -53,7 +53,9 @@ fn solve(J: usize, P: usize, S: usize, K: usize) -> String
 
     assert!(perms.len() <= 27);
 
-    let mut constraint_count : HashMap< [usize;2], usize> = HashMap::new();
+    println!("Starting J={} P={} S={}  K={}", J,P,S,K);
+
+    
 
     let mut best_count = 0;
     let mut best_ans = String::new();
@@ -62,27 +64,57 @@ fn solve(J: usize, P: usize, S: usize, K: usize) -> String
     'perms_loop: for subset in 0..1<<perms.len() 
     {
         let mut count = 0;
+        let mut constraint_jp_count : HashMap< [usize;2], usize> = HashMap::new();
+        let mut constraint_js_count : HashMap< [usize;2], usize> = HashMap::new();
+        let mut constraint_ps_count : HashMap< [usize;2], usize> = HashMap::new();
+
+        debug!("Starting\n{}",
+        perms.iter().enumerate().filter( |(p_idx,_)|
+            subset >> p_idx & 1 > 0).map(| (_, p) | p.iter().join(" ")).join("\n"));
+
         for (p_idx,p) in perms.iter().enumerate()
         {
-            if subset >> p_idx & 1 ==0 {
+            if subset >> p_idx & 1 == 0 {
                 continue;
             }
             count += 1;
 
-            let cons_count = constraint_count.entry( [p[0], p[1]]).or_insert(0);
+            let cons_count = constraint_jp_count.entry( [p[0], p[1]]).or_insert(0);
             *cons_count += 1;
 
             if *cons_count > K {
+            /*    debug!("Constraint count of [{},{}] {} > K {}",
+                p[0], p[1], cons_count, K );*/
+                continue 'perms_loop;
+            }
+
+            let cons_count = constraint_js_count.entry( [p[0], p[2]]).or_insert(0);
+            *cons_count += 1;
+
+            if *cons_count > K {
+            /*    debug!("Constraint count of [{},{}] {} > K {}",
+                p[0], p[1], cons_count, K );*/
+                continue 'perms_loop;
+            }
+
+            let cons_count = constraint_ps_count.entry( [p[1], p[2]]).or_insert(0);
+            *cons_count += 1;
+
+            if *cons_count > K {
+            /*    debug!("Constraint count of [{},{}] {} > K {}",
+                p[0], p[1], cons_count, K );*/
                 continue 'perms_loop;
             }
 
         }
 
         if count > best_count {
+            println!("Found new best {}", count);
             best_count = count;
             best_ans = format!("{}\n{}",
             best_count,
-            perms.iter().map( |p| p.iter().join(" ") ).join("\n"));
+            perms.iter().enumerate().filter( |(p_idx,_)|
+            subset >> p_idx & 1 > 0).map(| (_, p) | p.iter().join(" ")).join("\n"));
         }
     }
 
