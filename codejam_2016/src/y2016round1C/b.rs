@@ -1,8 +1,8 @@
 use codejam::util::codejam::run_cases;
 
+use bit_vec::BitVec;
 use itertools::Itertools;
 use std::io::Write;
-use bit_vec::BitVec;
 
 /*
 Counting paths in a DAG
@@ -11,17 +11,13 @@ Representing number as sum of squares
 pub fn solve_all_cases()
 {
     run_cases(
-        &[
-            "B-small-practice",
-            "B-large-practice"
-        ],
+        &["B-small-practice", "B-large-practice"],
         "y2016round1C",
         |reader, buffer| {
             let t = reader.read_int();
 
             for case_no in 1..=t {
                 let (B, M) = reader.read_tuple_2();
-
 
                 if case_no != 1 {
                     //continue;
@@ -35,15 +31,14 @@ pub fn solve_all_cases()
     );
 }
 
-
 fn solve(B: usize, M: usize) -> String
 {
     //we need the smallest power of 2 >= M
     //this includes B
-    let needed_nodes = 2+(0..63).position( |n| 1 << n >= M).unwrap();
+    let needed_nodes = 2 + (0..63).position(|n| 1 << n >= M).unwrap();
 
     if needed_nodes > B {
-        return format!("IMPOSSIBLE")
+        return format!("IMPOSSIBLE");
     }
 
     println!("B={} M={} needed nodes={}", B, M, needed_nodes);
@@ -51,7 +46,7 @@ fn solve(B: usize, M: usize) -> String
     let start_node = B - needed_nodes;
 
     let mut edges: Vec<BitVec> = Vec::new();
-    for v in 0..B  {
+    for v in 0..B {
         let mut adj_list = BitVec::from_elem(B, false);
 
         //anything before the start node remaings blank
@@ -66,8 +61,8 @@ fn solve(B: usize, M: usize) -> String
                 //so we map B-2 to bit index 0
                 // B-3 to bit index 1
                 // etc.
-                let bit_pos = if adj_v <= B-2 { (B-2) - adj_v } else {63};
-                let is_connected =  (M) >> bit_pos & 1 > 0 || 1 << (needed_nodes-2) == M;
+                let bit_pos = if adj_v <= B - 2 { (B - 2) - adj_v } else { 63 };
+                let is_connected = (M) >> bit_pos & 1 > 0 || 1 << (needed_nodes - 2) == M;
                 adj_list.set(adj_v, is_connected);
             }
         }
@@ -82,21 +77,26 @@ fn solve(B: usize, M: usize) -> String
 
     assert_eq!(B, edges.len());
 
-    debug!("POSSIBLE\n{}", edges.iter().map( |bitvec|
-                bitvec.iter().map( |b| if b {'1'} else {'0'}).join("")).join("\n") );
-
+    debug!(
+        "POSSIBLE\n{}",
+        edges
+            .iter()
+            .map(|bitvec| bitvec.iter().map(|b| if b { '1' } else { '0' }).join(""))
+            .join("\n")
+    );
 
     //check our answer
     let num_paths = count_paths(&edges);
 
     assert_eq!(M, num_paths);
 
-
-    format!("POSSIBLE\n{}", edges.iter().map( |bitvec|
-                bitvec.iter().map( |b| if b {'1'} else {'0'}).join("")).join("\n") )
-
-
-
+    format!(
+        "POSSIBLE\n{}",
+        edges
+            .iter()
+            .map(|bitvec| bitvec.iter().map(|b| if b { '1' } else { '0' }).join(""))
+            .join("\n")
+    )
 }
 
 #[allow(dead_code)]
@@ -116,14 +116,12 @@ fn solve_brute_force(B: usize, M: usize) -> String
         };
 
         let mut edges: Vec<BitVec> = Vec::new();
-        for v in 0..B  {
+        for v in 0..B {
             let mut adj_list = BitVec::from_elem(B, false);
             for adj_v in v + 1..B {
-
                 if get_next_perm() {
                     adj_list.set(adj_v, true);
                 }
-
             }
 
             edges.push(adj_list);
@@ -134,14 +132,23 @@ fn solve_brute_force(B: usize, M: usize) -> String
         let num_paths = count_paths(&edges);
 
         if num_paths == M {
-            return format!("POSSIBLE\n{}", edges.iter().map( |bitvec|
-                bitvec.iter().map( |b| if b {'1'} else {'0'}).join("")).join("\n") )
+            return format!(
+                "POSSIBLE\n{}",
+                edges
+                    .iter()
+                    .map(|bitvec| bitvec.iter().map(|b| if b { '1' } else { '0' }).join(""))
+                    .join("\n")
+            );
         } else {
-
-            debug!("not = target {}.  was {}\n{}",
-                     M, num_paths,
-                     edges.iter().map( |bitvec|
-                bitvec.iter().map( |b| if b {'1'} else {'0'}).join("")).join("\n") )
+            debug!(
+                "not = target {}.  was {}\n{}",
+                M,
+                num_paths,
+                edges
+                    .iter()
+                    .map(|bitvec| bitvec.iter().map(|b| if b { '1' } else { '0' }).join(""))
+                    .join("\n")
+            )
         }
 
         assert_eq!(perm_count, max_connections);

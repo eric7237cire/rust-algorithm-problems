@@ -6,7 +6,6 @@ use bit_vec::BitVec;
 use std::collections::HashMap;
 use std::usize;
 
-
 use std::io::Write;
 /*
 Minimum edge cover
