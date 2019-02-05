@@ -9,7 +9,8 @@ use std::usize;
 
 use permutohedron::LexicalPermutation;
 /*
-
+Modulo arithmetic
+Proofs
 */
 pub fn solve_all_cases()
 {
@@ -25,8 +26,8 @@ pub fn solve_all_cases()
             for case_no in 1..=t {
                 let nums = reader.read_num_line();
 
-                if case_no != 38 {
-                   // continue;
+                if case_no != 9 {
+                    // continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -53,85 +54,36 @@ fn solve(J: usize, P: usize, S: usize, K: usize) -> String
 {
     println!("Starting J={} P={} S={}  K={}", J, P, S, K);
 
-    
-
-    let min_ks = min(K, S);
-
-    let mut s_perm_list: HashSet<Vec<usize>> = HashSet::new();
-    let mut s_perm: Vec<usize> = (1..=S).collect();
-
-    loop {
-        let mut v = s_perm[0..min_ks].to_vec();
-        v.sort();
-        s_perm_list.insert(v);
-
-        if !s_perm.next_permutation() {
-            break;
-        }
-    }
-
-    let mut s_perm_list: Vec<Vec<usize>> = s_perm_list.iter().cloned().collect();
-    s_perm_list.sort();
-    let mut index = 0;
     let mut ans: Vec<[usize; 3]> = Vec::new();
-    //s_perm = (1..=S).collect();
 
-debug!("s_perm_list is {:?}", s_perm_list);
-
-    
-
-        let mut constraint_jp_count: HashMap<[usize; 2], usize> = HashMap::new();
+    let mut constraint_jp_count: HashMap<[usize; 2], usize> = HashMap::new();
     let mut constraint_js_count: HashMap<[usize; 2], usize> = HashMap::new();
     let mut constraint_ps_count: HashMap<[usize; 2], usize> = HashMap::new();
 
     let mut constraint_jps_count: HashSet<[usize; 3]> = HashSet::new();
-ans.clear();
-    
 
-    for j in 1..=J {
-        index = 0;
-        for p in 1..=P {
-            index += 1;
+    let mut ans_list: Vec<[usize; 3]> = Vec::new();
+
+    //Sort by the P
+    /*    ans_list.sort_by(|a, b| a[1].cmp(&b[1]).then(a[0].cmp(&b[0])));
+
+    for a in ans_list.iter() {
+        debug!("A sorted by mid: {:?}", a);
+    }*/
+
+    let min_ks = min(K,S);
+
+    for j in 0..J {
+        for p in 0..P {
             for k in 0..min_ks {
-                /*
-                                let mut lowest_max = usize::MAX;
-                                let mut lowest_min = usize::MAX;
-                                let mut chosen_s = usize::MAX;
-                                for s in 1..=S
-                                {
-                                    let max_cons = max(
-                                    *constraint_js_count.get( &[j, s]).unwrap_or(&0),
-                                    *constraint_ps_count.get( &[p,s] ).unwrap_or(&0));
+                let s = (j + p + k) % S;
 
-                                    let min_cons = min(
-                                    *constraint_js_count.get( &[j, s]).unwrap_or(&0),
-                                    *constraint_ps_count.get( &[p,s] ).unwrap_or(&0));
+                let item = [1+j, 1+p, 1+s];
+                debug!("Looking at {:?} ", item);
 
-                                    if constraint_jps_count.contains(&[j,p,s]) {
-                                        continue;
-                                    }
-
-                                    if max_cons < lowest_max {
-                                        chosen_s = s;
-                                        lowest_max = max_cons;
-                                        lowest_min = min_cons;
-                                    } else if max_cons == lowest_max && min_cons < lowest_min {
-                chosen_s = s;
-                                        lowest_max = max_cons;
-                                        lowest_min = min_cons;
-                                    }
-                                };
-
-                                let item = [j, p, chosen_s];*/
-
-                //let item = [j, p, s_perm[s_perm.len() - 1 -k]];
-                let item = [j, p, s_perm_list[ (p-1) % s_perm_list.len() ][k]];
-                debug!(
-                    "Looking at {:?} index: {} s_perm_list: {:?} ",
-                    item,
-                    index,
-                    s_perm_list[index % s_perm_list.len()]
-                );
+                assert!(item[0] >= 1 && item[0] <= J);
+                assert!(item[1] >= 1 && item[1] <= P);
+                assert!(item[2] >= 1 && item[2] <= S);
 
                 let cons_count_1 = constraint_jp_count.entry([item[0], item[1]]).or_insert(0);
 
@@ -153,8 +105,10 @@ ans.clear();
                 *cons_count_2 += 1;
                 *cons_count_3 += 1;
 
-                if *cons_count_1 > K || *cons_count_2 > K || *cons_count_3 > K || 
-                constraint_jps_count.contains(&item)
+                if *cons_count_1 > K
+                    || *cons_count_2 > K
+                    || *cons_count_3 > K
+                    || constraint_jps_count.contains(&item)
                 {
                     //println!("Try another permutation");
                     //assert!(s_perm_list.next_permutation());
@@ -165,24 +119,12 @@ ans.clear();
 
                 ans.push(item);
             }
-
-            /*
-            if !s_perm.next_permutation() {
-                s_perm = (1..=S).collect();
-            } */
         }
-
-        /*if !s_perm_list.next_permutation() {
-            s_perm_list.sort();
-        }*/
-        let first = s_perm_list.remove(0);
-        s_perm_list.push(first);
     }
-
 
     format!(
         "{}\n{}",
-        J * P * min_ks,
+        ans.len(),
         //ans.len(),
         ans.iter().map(|p| p.iter().join(" ")).join("\n")
     )
