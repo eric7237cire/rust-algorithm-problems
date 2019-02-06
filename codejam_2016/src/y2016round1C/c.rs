@@ -3,11 +3,11 @@ use codejam::util::codejam::run_cases;
 use itertools::Itertools;
 use std::io::Write;
 
-use std::cmp::{max, min};
+use std::cmp::{min};
 use std::collections::{HashMap, HashSet};
 use std::usize;
 
-use permutohedron::LexicalPermutation;
+//use permutohedron::LexicalPermutation;
 /*
 Modulo arithmetic
 Proofs

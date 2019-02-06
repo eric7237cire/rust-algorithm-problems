@@ -1,6 +1,6 @@
 use codejam::util::codejam::run_cases;
-use std::cmp::max;
-use itertools::Itertools;
+//use std::cmp::max;
+//use itertools::Itertools;
 use std::io::Write;
 use std::mem::swap;
 
@@ -13,7 +13,7 @@ pub fn solve_all_cases()
 {
     run_cases(
         &["B-small-practice",
-         //"A-large-practice"
+         "B-large-practice"
         ],
         "y2016round2",
         |reader, buffer| {
@@ -32,11 +32,11 @@ pub fn solve_all_cases()
                     // continue;
                 }
 
-                //debug!("Solving case {}", case_no);
+                println!("Solving case {}", case_no);
 
                 writeln!(buffer, "Case #{}: {}", case_no, 
-                //solve(K, &prob)
-                solve_brute_force(K, &prob)
+                solve(K, &prob)
+                //solve_brute_force(K, &prob)
                 ).unwrap();
             }
         },
@@ -55,6 +55,13 @@ fn f64_max(a: f64, b: f64) -> f64
 
 fn solve_brute_force(K: usize, prob_list: &[f64]) -> f64
 {
+
+    let mut prob_list = prob_list.to_vec();
+    
+    prob_list.sort_by(|a, b| a.partial_cmp(b).unwrap());
+
+    println!("Prob list {:?}", prob_list);
+
     let mut perm : Vec<usize> = (0..prob_list.len()).map( |p| if p < K {1} else {0}).collect();
 
     perm.sort();
@@ -95,12 +102,12 @@ fn solve_brute_force(K: usize, prob_list: &[f64]) -> f64
 
         debug!("For subset, probabilites are: {:?}.  Prob of k/2 {} = {}", dp, K/2, dp[K/2]);
 
-        if dp[K/2] >= best_p {
-            debug!("new best");
+        if dp[K/2] > best_p {
+            println!("new best.  subset: {:?}", perm );
             best_p = dp[K/2];
         }
 
-        if (!perm.next_permutation()) {
+        if !perm.next_permutation() {
             break;
         }
     }
@@ -110,45 +117,56 @@ fn solve_brute_force(K: usize, prob_list: &[f64]) -> f64
 }
 
 
+
 fn solve(K: usize, prob_list: &[f64]) -> f64
 {
-    debug!("Solving K={}  prob={:?} ", K, prob_list);
+   let mut prob_list = prob_list.to_vec();
+    
+    prob_list.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
-    assert!(prob_list.len() <= 200);
+    println!("Prob list {:?}", prob_list);
 
-    let dp_ubound = prob_list.len() + 1;
-
-    let mut dp = vec![ vec![ vec![ 0f64; dp_ubound] ; dp_ubound] ; dp_ubound ];
-
-    dp[0][0][0]  = 1.;
-
-    //dp[ using guys up to][used # of guys] [ # of yes votes ]
-    for (p_idx, prob) in prob_list.iter().enumerate() 
-    {
-        //either guy is not in K
-        for used in 0..dp_ubound {
-            dp [ p_idx + 1 ][used] = dp [p_idx][used].clone();
-        }
-
-        //can anything be improved
-        for used in 1..=1+p_idx {
-            for yes in 1..=1+p_idx {
-                debug!("Calcing {} used {} yes {} prob {} dp {}", p_idx, used, yes, prob, dp[p_idx][used-1][yes-1]);
-                dp[p_idx+1][used][yes] = f64_max( f64_max( dp[p_idx][used][yes], prob * dp[p_idx][used-1][yes-1]), (1.-prob) * dp[p_idx][used-1][yes]);
-
-            }
-        }
+    for k in 0..K {
+        prob_list.push(prob_list[k]);
     }
 
-    for p in 1..dp_ubound {
-        for used in 0..dp_ubound {
-            for yes in 0..dp_ubound {
-                debug!("Using people up to {}, {} people, {} exact yes votes = {}", 
-                p, used, yes, dp[p][used][yes]
-                )
+    let mut best_p = 0.;
+
+    for subset in prob_list.windows(K) {
+
+        debug!("Checking subset {:?}", subset);
+
+        assert_eq!(subset.len(), K);
+
+        let mut dp = vec![0.; 1+K ];
+        let mut next_dp = vec![0.; 1+K ];
+
+        dp[0] = 1.;
+        
+        for (idx, &p) in subset.iter().enumerate()
+        {
+            next_dp[0] = dp[0] * (1.-p);
+
+            for k in 1..=K 
+            {
+                next_dp[k] = dp[k-1] * p + dp[k] * (1.-p);
             }
+
+            debug!("After {} in subset {:?}, probabilites are: {:?}.  Prob of k/2 {} = {}", 
+            idx, subset,
+            dp, K/2, dp[K/2]);
+
+            swap(&mut dp, &mut next_dp);
         }
+
+        debug!("For subset, probabilites are: {:?}.  Prob of k/2 {} = {}", dp, K/2, dp[K/2]);
+
+        if dp[K/2] > best_p {
+            println!("new best.  subset: {:?}", subset );
+            best_p = dp[K/2];
+        }
+
     }
 
-    dp[prob_list.len()][K][K/2]
+    best_p 
 }

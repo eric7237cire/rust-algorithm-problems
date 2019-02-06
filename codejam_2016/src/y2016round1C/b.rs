@@ -38,7 +38,7 @@ fn solve(B: usize, M: usize) -> String
     let needed_nodes = 2 + (0..63).position(|n| 1 << n >= M).unwrap();
 
     if needed_nodes > B {
-        return format!("IMPOSSIBLE");
+        return "IMPOSSIBLE".to_string();
     }
 
     println!("B={} M={} needed nodes={}", B, M, needed_nodes);
@@ -154,7 +154,7 @@ fn solve_brute_force(B: usize, M: usize) -> String
         assert_eq!(perm_count, max_connections);
     }
 
-    format!("IMPOSSIBLE")
+    "IMPOSSIBLE".to_string()
 }
 
 //https://www.geeksforgeeks.org/number-of-paths-from-source-to-destination-in-a-directed-acyclic-graph/
@@ -176,5 +176,5 @@ fn count_paths(edges: &[BitVec]) -> usize
     }
 
     debug!("Paths:\n{:?}", dp);
-    return dp[0];
+    dp[0]
 }
