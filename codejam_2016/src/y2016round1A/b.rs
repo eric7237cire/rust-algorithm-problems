@@ -32,7 +32,7 @@ pub fn solve_all_cases()
                     //continue;
                 }
 
-                println!("Solving case {}", case_no);
+                debug!("Solving case {}", case_no);
 
                 writeln!(
                     buffer,
@@ -101,13 +101,13 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
 {
     let N = papers[0].len();
     for (i, p) in papers.iter().enumerate() {
-        println!("Paper {}: {:?}", i, p);
+        debug!("Paper {}: {:?}", i, p);
     }
     let mut all_choices = vec![vec![usize::MAX; 2]; N];
 
     let mut used = BitSet::new();
     //first find the diagonal values, which must be the least value
-    for pos in 0..N {
+    for (pos, all_choice) in all_choices.iter_mut().enumerate() {
         let least_value = papers
             .iter()
             .enumerate()
@@ -116,7 +116,7 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
             .min()
             .unwrap();
 
-        //println!("Value for diag pos {} = {}", pos, least_value);
+        //debug!("Value for diag pos {} = {}", pos, least_value);
 
         let choices: Vec<_> = papers
             .iter()
@@ -131,10 +131,10 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
             used.insert(*choice);
         }
 
-        all_choices[pos] = choices;
+        *all_choice = choices;
     }
 
-    println!("All choices: {:?}", all_choices);
+    debug!("All choices: {:?}", all_choices);
 
     let mut graph = DiGraph::new();
 
@@ -167,13 +167,13 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
         let from_is_h = if from % 2 == 0 { "Horizontal" } else {"Vertical"};
         let to_idx = to / 2;
         let to_is_h = if to % 2 == 0  { "Horizontal" } else {"Vertical"};
-        println!("From ({}) {} {} implies ({}) {} {}",
+        debug!("From ({}) {} {} implies ({}) {} {}",
         from,
         from_idx, from_is_h, to, to_idx, to_is_h);
     }*/
 
     let sccs = strongly_connected_components(&graph);
-    println!("Sccs: {:?}", sccs);
+    debug!("Sccs: {:?}", sccs);
 
     let mut node_to_scc_component = HashMap::new();
     for (idx, scc) in sccs.iter().enumerate() {
@@ -193,7 +193,7 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
         if scc_true == scc_false {
             panic!("Not satisfiable");
         } else {
-            println!(
+            debug!(
                 "In choice {:?} for diag pos {},  Paper {} is {}",
                 choices,
                 pos,
@@ -222,9 +222,9 @@ fn solve(papers: &[Vec<u16>]) -> Vec<u16>
         }
     }
 
-    println!("Grid\n{:#.5?}", g);
+    debug!("Grid\n{:#.5?}", g);
 
-    //println!("Horizonal choices: {:?}", horizonal_choices);
+    //debug!("Horizonal choices: {:?}", horizonal_choices);
 
     //Which vertical column is missing?
     let column_index = all_choices

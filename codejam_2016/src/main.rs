@@ -54,6 +54,6 @@ fn main()
 {
     init_log();
 
-y2016round1B::b::solve_all_cases();
+ y2016round1A::b::solve_all_cases();
 
 }
