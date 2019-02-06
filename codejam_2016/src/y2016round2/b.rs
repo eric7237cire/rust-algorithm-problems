@@ -34,7 +34,7 @@ pub fn solve_all_cases()
 
                 println!("Solving case {}", case_no);
 
-                writeln!(buffer, "Case #{}: {}", case_no, 
+                writeln!(buffer, "Case #{}: {:.8}", case_no, 
                 solve(K, &prob)
                 //solve_brute_force(K, &prob)
                 ).unwrap();
@@ -43,16 +43,7 @@ pub fn solve_all_cases()
     );
 }
 
-fn f64_max(a: f64, b: f64) -> f64 
-{
-    if a >= b {
-        a
-    } else {
-        b 
-    }
-
-}
-
+#[allow(dead_code)]
 fn solve_brute_force(K: usize, prob_list: &[f64]) -> f64
 {
 
@@ -124,7 +115,7 @@ fn solve(K: usize, prob_list: &[f64]) -> f64
     
     prob_list.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
-    println!("Prob list {:?}", prob_list);
+    debug!("Prob list {:?}", prob_list);
 
     for k in 0..K {
         prob_list.push(prob_list[k]);
@@ -162,7 +153,7 @@ fn solve(K: usize, prob_list: &[f64]) -> f64
         debug!("For subset, probabilites are: {:?}.  Prob of k/2 {} = {}", dp, K/2, dp[K/2]);
 
         if dp[K/2] > best_p {
-            println!("new best.  subset: {:?}", subset );
+            debug!("new best.  subset: {:?}", subset );
             best_p = dp[K/2];
         }
 

@@ -62,15 +62,6 @@ fn solve(J: usize, P: usize, S: usize, K: usize) -> String
 
     let mut constraint_jps_count: HashSet<[usize; 3]> = HashSet::new();
 
-    let mut ans_list: Vec<[usize; 3]> = Vec::new();
-
-    //Sort by the P
-    /*    ans_list.sort_by(|a, b| a[1].cmp(&b[1]).then(a[0].cmp(&b[0])));
-
-    for a in ans_list.iter() {
-        debug!("A sorted by mid: {:?}", a);
-    }*/
-
     let min_ks = min(K,S);
 
     for j in 0..J {

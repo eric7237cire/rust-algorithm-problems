@@ -71,7 +71,7 @@ fn solve(S: &str) -> String
 
     char_counts.retain(|_, &mut count| count > 0);
 
-    if char_counts.len() > 0 {
+    if !char_counts.is_empty() {
         println!("Remaining {:?}", char_counts);
     }
 
