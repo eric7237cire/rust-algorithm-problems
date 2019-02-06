@@ -124,14 +124,10 @@ impl DigitInfo
     }
 }
 
-#[deny(clippy::collpasable_if, clippy::cyclomatic_complexity)]
-fn solve(C: &str, J: &str) -> String
+/// Build up a list of the max / min difference a digit can contibute
+fn get_digit_info(powers_10: &[i64], C: &str, J: &str) -> Vec<DigitInfo>
 {
-    assert_eq!(C.len(), J.len());
-
-    let powers_10: Vec<i64> = (0..C.len()).rev().map(|i| 10i64.pow(i as u32)).collect();
-
-    let info: Vec<DigitInfo> = izip!(C.chars(), J.chars(), powers_10.iter())
+    izip!(C.chars(), J.chars(), powers_10.iter())
         .map(|(ch_c, ch_j, &pow10)| {
             let mut digit_info: DigitInfo = Default::default();
             if ch_c == '?' {
@@ -158,15 +154,12 @@ fn solve(C: &str, J: &str) -> String
 
             digit_info
         })
-        .collect();
+        .collect()
+}
 
-    // info.push(Default::default());
-
-    /*
-    for di in info.iter() {
-        println!("Digit Info: {:?}", di);
-    }*/
-
+/// Find the min/max but cumulatively
+fn calculate_cumul_min_max(info: &[DigitInfo], powers_10: &[i64]) -> Vec<[i64;3]> 
+{
     let mut cumulative_min_max = Vec::new();
     cumulative_min_max.push([0, 0, 0]);
 
@@ -213,6 +206,27 @@ fn solve(C: &str, J: &str) -> String
     }
 
     cumulative_min_max.reverse();
+
+    cumulative_min_max
+}
+
+fn solve(C: &str, J: &str) -> String
+{
+    assert_eq!(C.len(), J.len());
+
+    let powers_10: Vec<i64> = (0..C.len()).rev().map(|i| 10i64.pow(i as u32)).collect();
+
+    let info: Vec<DigitInfo> = get_digit_info(&powers_10[..], C, J);
+
+    // info.push(Default::default());
+
+    /*
+    for di in info.iter() {
+        println!("Digit Info: {:?}", di);
+    }*/
+
+    
+    let cumulative_min_max =calculate_cumul_min_max(&info, &powers_10[..]);
 
     let mut c_digits: Vec<i8> = Vec::new();
     let mut j_digits: Vec<i8> = Vec::new();
