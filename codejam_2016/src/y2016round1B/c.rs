@@ -87,7 +87,7 @@ fn solve(topics: &[Vec<String>]) -> usize
     let mut used_first = BitVec::from_elem(first_word_ids.len(), false);
 
     let mut cur_first_word_id = 0;
-    while usize::from(cur_first_word_id) < first_word_ids.len() {
+    while cur_first_word_id < first_word_ids.len() {
         let mut queueHead = 0;
         let mut queueTail = 1;
         queue[0] = cur_first_word_id;
@@ -102,7 +102,7 @@ fn solve(topics: &[Vec<String>]) -> usize
             for adj_second_edge in edges.iter().filter(|edge| edge[0] == top_queue_first_word) {
                 assert_eq!(top_queue_first_word, adj_second_edge[0]);
 
-                let adj_second_index = usize::from(adj_second_edge[1]);
+                let adj_second_index = adj_second_edge[1];
                 //Found a non matched second index
                 if matchR[adj_second_index] == INVALID {
                     let mut next_second_index = adj_second_index;
@@ -180,8 +180,8 @@ fn solve(topics: &[Vec<String>]) -> usize
                 );*/
 
         //Reset all dice values in queue
-        for j in 0..queueTail {
-            used_first.set(queue[j], false);
+        for qj in queue.iter().take(queueTail) {
+            used_first.set(*qj, false);
         }
 
         cur_first_word_id += 1;

@@ -121,6 +121,7 @@ fn solve(J: usize, P: usize, S: usize, K: usize) -> String
     )
 }
 
+#[allow(dead_code)]
 fn solve_brute_force(J: usize, P: usize, S: usize, K: usize) -> String
 {
     let mut perms: Vec<[usize; 3]> = Vec::new();

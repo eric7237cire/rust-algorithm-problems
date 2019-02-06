@@ -7,7 +7,9 @@ use std::mem::swap;
 use permutohedron::LexicalPermutation;
 
 /*
-
+Probability of exactly K events
+Dynamic Programming
+Maximizing probability
 */
 pub fn solve_all_cases()
 {
@@ -138,7 +140,7 @@ fn solve(K: usize, prob_list: &[f64]) -> f64
         {
             next_dp[0] = dp[0] * (1.-p);
 
-            for k in 1..=K 
+            for k in 1..=idx+1
             {
                 next_dp[k] = dp[k-1] * p + dp[k] * (1.-p);
             }
