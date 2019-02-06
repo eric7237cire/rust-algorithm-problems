@@ -10,7 +10,7 @@ pub fn solve_all_cases()
 {
     run_cases(
         &["A-small-practice",
-        // "A-large-practice"
+         "A-large-practice"
         ],
         "y2016round2",
         |reader, buffer| {
@@ -119,7 +119,7 @@ fn alpha_print( ans: &[char] ) -> String
     let first_half = alpha_print(&ans[0..ans.len()/2]);
     let second_half = alpha_print(&ans[ans.len()/2..ans.len()]);
     
-    if ans[0] < ans[ ans.len() / 2 ] {
+    if first_half < second_half {
         format!( "{}{}", first_half, second_half )
     } else {
         format!( "{}{}", second_half, first_half)
