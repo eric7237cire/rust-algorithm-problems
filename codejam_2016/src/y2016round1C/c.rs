@@ -3,7 +3,7 @@ use codejam::util::codejam::run_cases;
 use itertools::Itertools;
 use std::io::Write;
 
-use std::cmp::{min};
+use std::cmp::min;
 use std::collections::{HashMap, HashSet};
 use std::usize;
 
@@ -15,10 +15,7 @@ Proofs
 pub fn solve_all_cases()
 {
     run_cases(
-        &[
-            "C-small-practice",
-            "C-large-practice"
-        ],
+        &["C-small-practice", "C-large-practice"],
         "y2016round1C",
         |reader, buffer| {
             let t = reader.read_int();
@@ -62,14 +59,14 @@ fn solve(J: usize, P: usize, S: usize, K: usize) -> String
 
     let mut constraint_jps_count: HashSet<[usize; 3]> = HashSet::new();
 
-    let min_ks = min(K,S);
+    let min_ks = min(K, S);
 
     for j in 0..J {
         for p in 0..P {
             for k in 0..min_ks {
                 let s = (j + p + k) % S;
 
-                let item = [1+j, 1+p, 1+s];
+                let item = [1 + j, 1 + p, 1 + s];
                 debug!("Looking at {:?} ", item);
 
                 assert!(item[0] >= 1 && item[0] <= J);

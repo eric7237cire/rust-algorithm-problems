@@ -40,7 +40,7 @@ pub fn run_y2016_round1B()
 pub fn run_y2016_round1C()
 {
     y2016round1C::a::solve_all_cases();
-    y2016round1C::b::solve_all_cases();    
+    y2016round1C::b::solve_all_cases();
     y2016round1C::c::solve_all_cases();
 }
 
@@ -55,5 +55,4 @@ fn main()
     init_log();
 
     y2016round2::c::solve_all_cases();
-
 }

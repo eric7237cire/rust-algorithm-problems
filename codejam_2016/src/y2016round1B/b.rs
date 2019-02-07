@@ -158,7 +158,7 @@ fn get_digit_info(powers_10: &[i64], C: &str, J: &str) -> Vec<DigitInfo>
 }
 
 /// Find the min/max but cumulatively
-fn calculate_cumul_min_max(info: &[DigitInfo], powers_10: &[i64]) -> Vec<[i64;3]> 
+fn calculate_cumul_min_max(info: &[DigitInfo], powers_10: &[i64]) -> Vec<[i64; 3]>
 {
     let mut cumulative_min_max = Vec::new();
     cumulative_min_max.push([0, 0, 0]);
@@ -225,8 +225,7 @@ fn solve(C: &str, J: &str) -> String
         println!("Digit Info: {:?}", di);
     }*/
 
-    
-    let cumulative_min_max =calculate_cumul_min_max(&info, &powers_10[..]);
+    let cumulative_min_max = calculate_cumul_min_max(&info, &powers_10[..]);
 
     let mut c_digits: Vec<i8> = Vec::new();
     let mut j_digits: Vec<i8> = Vec::new();
