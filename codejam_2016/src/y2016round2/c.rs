@@ -37,7 +37,7 @@ pub fn solve_all_cases()
 
                 println!("Solving case {}", case_no);
 
-                writeln!(buffer, "Case #{}: {:.8}", case_no, 
+                writeln!(buffer, "Case #{}: {}", case_no, 
                 solve(R, C, &lovers)
                 //solve_brute_force(K, &prob)
                 ).unwrap();
@@ -56,14 +56,34 @@ fn solve(R: usize, C: usize, lovers: &[usize]) -> String
     assert!(R * C <= 16);
 
    for subset in 0..1 << (R*C) {
-       let mut g: Grid<char> = Grid::new(R, C);
+       let mut grid: Grid<String> = Grid::new(R+2, C+2);
 
-       for index in 0..R*C {
-           let is_forward = (subset >> index) & 1 > 0;
-           g[index] = if is_forward { '/' } else { '\\' };
+        //top
+       for label in 0..C {
+           grid[ (0, 1+label) ] = (label+1).to_string();
+       }
+       //right
+       for label in C..C+R {
+           grid[ (1+label-C, C+1) ] = (label+1).to_string();
+       }
+       //bottom
+       for label in C+R..2*C+R {
+           grid[ (1+R, 2*C+R-label) ] = (label+1).to_string();
+       }
+       //left
+       for label in 2*C+R..2*(R+C) {
+           grid[ (2*(R+C)-label, 0) ] = (label+1).to_string();
        }
 
-       debug!("Subset {:b} Grid\n{:#.4?}\n", subset, g);
+       for row in 0..R {
+           for col in 0..C {
+               let index = row * C + col;
+                let is_forward = (subset >> index) & 1 > 0;
+                grid[ (row+1, col+1) ] = if is_forward { "/".to_string() } else { "\\".to_string() };
+           }
+       }
+
+       debug!("Subset {:b} Grid\n{:#.4?}\n", subset, grid);
    }
    
     
