@@ -14,8 +14,7 @@ use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
 use std::fmt;
-use std::fmt::Display;
-use std::fmt::Formatter;
+
 
 //use permutohedron::LexicalPermutation;
 
@@ -27,7 +26,7 @@ pub fn solve_all_cases()
     run_cases(
         &[
             "C-small-practice",
-            //"B-large-practice"
+            "C-large-practice"
         ],
         "y2016round2",
         |reader, buffer| {
@@ -50,8 +49,8 @@ pub fn solve_all_cases()
                     buffer,
                     "Case #{}:\n{}",
                     case_no,
-                    // solve(R, C, &lovers)
-                    solve_brute_force(R, C, &lovers)
+                    solve(R, C, &lovers)
+                    //solve_brute_force(R, C, &lovers)
                 )
                 .unwrap();
             }
@@ -353,8 +352,6 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
     //need 2 * R * C nodes
     //top is even, bottom is odd
 
-    //Go through every subset
-    assert!(R * C <= 16);
 
     let mut grid: Grid<String> = Grid::new(R + 2, C + 2);
 
@@ -530,32 +527,18 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
     (0..R)
         .map(|r| {
             (0..C)
-                .map(|c| grid[&Vector2d::with_val(r + 1, c + 1)].clone())
+                .map(|c| {
+                    let s = grid[&Vector2d::with_val(r + 1, c + 1)].clone();
+
+                    if s != "\\" && s != "/" {
+                        "/".to_string()
+                    } else {
+                        s
+                    }
+                })
                 .join("")
         })
         .join("\n")
     //+ &"\n".to_string()
 }
 
-struct Gwrapper
-{
-    grid: Grid<char>,
-}
-
-impl Display for Gwrapper
-{
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result
-    {
-        for r in 0..self.grid.R {
-            for c in 0..self.grid.C {
-                if let Err(err) = write!(f, "{}", self.grid[(r, c)]) {
-                    return Err(err);
-                }
-            }
-            if let Err(err) = writeln!(f, "") {
-                return Err(err);
-            }
-        }
-        write!(f, "")
-    }
-}
