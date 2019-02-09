@@ -86,28 +86,29 @@ fn grid_coords_to_lover(r: usize, c: usize, R: usize, C: usize) -> Option<usize>
 fn next_dir_loc_2(loc: &GardenLocation, is_forward_slash: bool) -> GardenLocation
 {
 
-   let new_dir = match loc.entry_dir {
+   let new_dir = match loc.entry_dir
+   {
         NORTH => {
             if is_forward_slash {
                 EAST
             } else {
                 WEST
             }
-        }
+        },
         SOUTH => {
             if is_forward_slash {
                 WEST
             } else {
                 EAST
             }
-        }
+        },
         EAST => {
             if is_forward_slash {
                 NORTH
             } else {
                 SOUTH
             }
-        }
+        },
         WEST => {
             if is_forward_slash {
                 SOUTH
@@ -309,12 +310,11 @@ struct GardenLocation
     entry_dir: Vector2d<i64>
 }
 
-#[derive(Eq, PartialEq)]
+#[derive(Eq, PartialEq, Copy, Clone)]
 struct HeapNode
 {
     distance_to_target: i64,
-    loc: GardenLocation,
-    forward_slash: bool
+    loc: GardenLocation
 }
 
 impl Ord for HeapNode
@@ -400,7 +400,7 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
 
     let mut has_been_matched = BitVec::from_elem(2 * R * C + 1, false);
 
-    for lover_pair in matches.iter()
+    'lover_pair_for: for lover_pair in matches.iter()
     {
         debug!("Matching {} and {}.  Distance={}", lover_pair.L1.number, lover_pair.L2.number, lover_pair.distance);
 
@@ -422,53 +422,77 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
 
         heap.push( HeapNode{
             loc: starting_location,
-            distance_to_target: target_grid_loc.manhat_distance(&starting_location.grid_loc),
-            forward_slash: false
+            distance_to_target: target_grid_loc.manhat_distance(&starting_location.grid_loc)
         });
 
-        while let Some(next_heap_node) = heap.pop() {
+        while let Some(heap_node) = heap.pop() {
 
-            if next_heap_node.loc == target_location {
+            if heap_node.loc == target_location {
                 debug!("Found target!");
-                break;
+
+                let mut prev_loc = heap_node.loc;
+                while prev_loc != starting_location {
+                    let cur_loc = prev_loc;
+                    prev_loc = prev[&cur_loc];
+
+                    if next_dir_loc_2(&prev_loc, true) == cur_loc {
+                        assert_ne!(grid[ &prev_loc.grid_loc ], "\\".to_string());
+                        grid[ &prev_loc.grid_loc ] = "/".to_string();
+                    } else if next_dir_loc_2(&prev_loc, false) == cur_loc {
+                        assert_ne!(grid[ &prev_loc.grid_loc ], "/".to_string());
+                        grid[ &prev_loc.grid_loc ] = "\\".to_string();
+                    } else {
+                        panic!("Inconsistent prev location");
+                    }
+                }
+
+
+                debug!("Grid\n{:#.3?}\n", grid);
+
+                continue 'lover_pair_for;
             }
 
             debug!("Processing heap node row: {} col: {} direction: {:?} dist to target: {}",
-            next_heap_node.loc.grid_loc.r(), next_heap_node.loc.grid_loc.c(),
-                next_heap_node.loc.entry_dir, next_heap_node.distance_to_target);
+            heap_node.loc.grid_loc.r(), heap_node.loc.grid_loc.c(),
+                heap_node.loc.entry_dir, heap_node.distance_to_target);
 
 
-            if next_heap_node.loc.grid_loc.r() == 0 ||
-                next_heap_node.loc.grid_loc.r() == R as i64 + 1 ||
-                next_heap_node.loc.grid_loc.c() == 0 ||
-                next_heap_node.loc.grid_loc.c() == C as i64 + 1 {
+            if heap_node.loc.grid_loc.r() == 0 ||
+                heap_node.loc.grid_loc.r() == R as i64 + 1 ||
+                heap_node.loc.grid_loc.c() == 0 ||
+                heap_node.loc.grid_loc.c() == C as i64 + 1 {
                 //we are out of bounds in the arms of another lover
                 continue;
             }
 
-            let grid_contents = &grid[&next_heap_node.loc.grid_loc];
+            let grid_contents = &grid[&heap_node.loc.grid_loc];
 
             if grid_contents != "\\" {
-                let loc = next_dir_loc_2(&next_heap_node.loc, true);
-                heap.push( HeapNode{
+                let loc = next_dir_loc_2(&heap_node.loc, true);
+                let next_heap_node = HeapNode{
                     loc,
-                    distance_to_target: target_grid_loc.manhat_distance(&loc.grid_loc),
-                    forward_slash: true
-                });
+                    distance_to_target: target_grid_loc.manhat_distance(&loc.grid_loc)
+                };
+                if !prev.contains_key(&next_heap_node.loc) {
+                    heap.push(next_heap_node);
+                    prev.insert(next_heap_node.loc, heap_node.loc);
+                }
             }
 
             if grid_contents != "/" {
-                let loc = next_dir_loc_2(&next_heap_node.loc, false);
-                heap.push( HeapNode{
+                let loc = next_dir_loc_2(&heap_node.loc, false);
+                let next_heap_node = HeapNode{
                     loc,
-                    distance_to_target: target_grid_loc.manhat_distance(&loc.grid_loc),
-                    forward_slash: false
-                });
+                    distance_to_target: target_grid_loc.manhat_distance(&loc.grid_loc)
+                };
+                if !prev.contains_key(&next_heap_node.loc) {
+                    heap.push(next_heap_node);
+                    prev.insert(next_heap_node.loc, heap_node.loc);
+                }
             }
-
-
-
         }
+
+        return "IMPOSSIBLE".to_string();
 
     }
 
