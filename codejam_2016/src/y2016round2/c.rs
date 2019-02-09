@@ -13,7 +13,7 @@ use std::cmp::min;
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
-use std::fmt;
+use std::usize;
 
 
 //use permutohedron::LexicalPermutation;
@@ -39,8 +39,8 @@ pub fn solve_all_cases()
 
                 assert_eq!(2 * (R + C), lovers.len());
 
-                if case_no != 50 {
-                    // continue;
+                if case_no != 51 {
+                     //continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -300,8 +300,7 @@ struct Lover
 {
     number: usize,
     location: Vector2d<i64>,
-    initial_direction: &'static Vector2d<i64>,
-    min_dist_to_corner: usize,
+    initial_direction: &'static Vector2d<i64>
 }
 
 #[derive(Debug)]
@@ -310,6 +309,7 @@ struct LoverPair
     L1: Lover,
     L2: Lover,
     distance: i64,
+    clock_dist: usize
 }
 
 #[derive(Ord, PartialOrd, PartialEq, Eq, Hash, Copy, Clone)]
@@ -323,6 +323,7 @@ struct GardenLocation
 struct HeapNode
 {
     distance_to_target: i64,
+    distance_to_filled_edge: usize,
     loc: GardenLocation,
 }
 
@@ -333,9 +334,11 @@ impl Ord for HeapNode
         // Notice that the we flip the ordering on costs.
         // In case of a tie we compare positions - this step is necessary
         // to make implementations of `PartialEq` and `Ord` consistent.
+        other.distance_to_filled_edge.cmp(&self.distance_to_filled_edge)
+            .then_with(||
         other
             .distance_to_target
-            .cmp(&self.distance_to_target)
+            .cmp(&self.distance_to_target))
             .then_with(|| self.loc.cmp(&other.loc))
     }
 }
@@ -359,15 +362,14 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
 
     let mut lovers: Vec<Lover> = Vec::new();
 
-    let mut add_lover = |r, c, label: usize, initial_dir, min_dist_to_corner: usize| {
+    let mut add_lover = |r, c, label: usize, initial_dir| {
         grid[(r, c)] = (label + 1).to_string();
         assert_eq!(Some(label + 1), grid_coords_to_lover(r, c, R, C));
 
         lovers.push(Lover {
             number: label + 1,
             location: Vector2d::with_val(r as i64, c as i64),
-            initial_direction: initial_dir,
-            min_dist_to_corner,
+            initial_direction: initial_dir
         });
     };
 
@@ -376,25 +378,25 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
         let r = 0;
         let c = 1 + label;
 
-        add_lover(r, c, label, &SOUTH, min(c, C + 1 - c));
+        add_lover(r, c, label, &SOUTH);
     }
     //right
     for label in C..C + R {
         let r = 1 + label - C;
         let c = C + 1;
-        add_lover(r, c, label, &WEST, min(r, R + 1 - r));
+        add_lover(r, c, label, &WEST);
     }
     //bottom
     for label in C + R..2 * C + R {
         let r = 1 + R;
         let c = 2 * C + R - label;
-        add_lover(r, c, label, &NORTH, min(c, C + 1 - c));
+        add_lover(r, c, label, &NORTH);
     }
     //left
     for label in 2 * C + R..2 * (R + C) {
         let r = 2 * (R + C) - label;
         let c = 0;
-        add_lover(r, c, label, &EAST, min(r, R + 1 - r));
+        add_lover(r, c, label, &EAST);
     }
 
     debug!("Grid\n{:#.3?}\n", grid);
@@ -406,24 +408,23 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
         let L1 = lovers.iter().find(|lov| lov.number == L1_num).unwrap();
         let L2 = lovers.iter().find(|lov| lov.number == L2_num).unwrap();
 
+        let diff =(L1_num as i64 - L2_num as i64).abs() as usize;
+
         matches.push(LoverPair {
             L1: L1.clone(),
             L2: L2.clone(),
             distance: (L1.location).manhat_distance(&L2.location),
+            clock_dist: min( diff, 2 * (R+C) - diff)
         });
     }
 
     matches.sort_by(|a, b| {
-        a.distance
-            .cmp(&b.distance)
-            .then(
-                (a.L1.min_dist_to_corner + a.L2.min_dist_to_corner)
-                    .cmp(&(b.L1.min_dist_to_corner + b.L2.min_dist_to_corner)),
-            )
-            .then(a.L1.number.cmp(&b.L1.number))
+        a.clock_dist
+            .cmp(&b.clock_dist)
+            .then(a.distance.cmp(&b.distance))
+            .then(min(a.L1.number, a.L2.number).cmp(&min(b.L1.number,b.L2.number)))
     });
 
-    let mut has_been_matched = BitVec::from_elem(2 * R * C + 1, false);
 
     'lover_pair_for: for lover_pair in matches.iter() {
         debug!(
@@ -443,12 +444,47 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
         //used for distance calculations
         let target_grid_loc = lover_pair.L2.location.clone() + lover_pair.L2.initial_direction;
 
+        let mut grid_edge_dist: Grid<usize> = Grid::new(R+2, C+2);
+        for &r in [0, R+1].iter() {
+            for c in 0..C+2 {
+                grid_edge_dist[ (r, c) ] = 0;
+            }
+        }
+        for &c in [0, C+1].iter() {
+            for r in 0..R+2 {
+                grid_edge_dist[ (r, c) ] = 0;
+            }
+        }
+        for r in 1..R+1 {
+            for c in 1..C + 1 {
+                if grid[ (r,c) ] == "\\" || grid[ (r,c) ] == "/" {
+                    grid_edge_dist[(r, c)] = 0;
+                } else {
+                    let loc = Vector2d::with_val(r as i64, c as i64);
+                    grid_edge_dist[&loc] = usize::MAX;
+                    for dir in DIRECTIONS.iter() {
+                        grid_edge_dist[&loc] = min(grid_edge_dist[&loc], 1+grid_edge_dist[&(loc + dir)]);
+                    }
+                }
+            }
+        }
+        for r in (1..R+1).rev() {
+            for c in (1..C + 1).rev() {
+                let loc = Vector2d::with_val(r as i64, c as i64);
+
+                for dir in DIRECTIONS.iter() {
+                    grid_edge_dist[&loc] = min(grid_edge_dist[&loc], 1+grid_edge_dist[&(loc + dir)]);
+                }
+            }
+        }
+
         let mut prev: HashMap<GardenLocation, GardenLocation> = HashMap::new();
         //Use a binary heap using -manhattan distance from target, GardenLocation
         let mut heap: BinaryHeap<HeapNode> = BinaryHeap::new();
 
         heap.push(HeapNode {
             loc: starting_location,
+            distance_to_filled_edge: grid_edge_dist[&starting_location.grid_loc],
             distance_to_target: target_grid_loc.manhat_distance(&starting_location.grid_loc),
         });
 
@@ -477,14 +513,6 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
                 continue 'lover_pair_for;
             }
 
-            debug!(
-                "Processing heap node row: {} col: {} direction: {:?} dist to target: {}",
-                heap_node.loc.grid_loc.r(),
-                heap_node.loc.grid_loc.c(),
-                heap_node.loc.entry_dir,
-                heap_node.distance_to_target
-            );
-
             if heap_node.loc.grid_loc.r() == 0
                 || heap_node.loc.grid_loc.r() == R as i64 + 1
                 || heap_node.loc.grid_loc.c() == 0
@@ -494,12 +522,22 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
                 continue;
             }
 
+            debug!(
+                "Processing heap node row: {} col: {} direction: {:?} dist to edge: {}, dist to target: {}",
+                heap_node.loc.grid_loc.r(),
+                heap_node.loc.grid_loc.c(),
+                heap_node.loc.entry_dir,
+                heap_node.distance_to_filled_edge,
+                heap_node.distance_to_target
+            );
+
             let grid_contents = &grid[&heap_node.loc.grid_loc];
 
             if grid_contents != "\\" {
                 let loc = next_dir_loc_2(&heap_node.loc, true);
                 let next_heap_node = HeapNode {
                     loc,
+                    distance_to_filled_edge: grid_edge_dist[&loc.grid_loc],
                     distance_to_target: target_grid_loc.manhat_distance(&loc.grid_loc),
                 };
                 if !prev.contains_key(&next_heap_node.loc) {
@@ -512,6 +550,7 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
                 let loc = next_dir_loc_2(&heap_node.loc, false);
                 let next_heap_node = HeapNode {
                     loc,
+                    distance_to_filled_edge: grid_edge_dist[&loc.grid_loc],
                     distance_to_target: target_grid_loc.manhat_distance(&loc.grid_loc),
                 };
                 if !prev.contains_key(&next_heap_node.loc) {
