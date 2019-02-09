@@ -88,8 +88,8 @@ fn solve(
     let mut grid: Grid<usize> = Grid::new(interesting_rows.len(), interesting_cols.len());
 
     grid.transform(|(gc, val)| {
-        let real_row = interesting_rows[gc.0];
-        let real_col = interesting_cols[gc.1];
+        let real_row = interesting_rows[gc.data[0]];
+        let real_col = interesting_cols[gc.data[1]];
         *val = fixed_values
             .iter()
             .map(|&(r, c, v)| v + (abs_diff(r, real_row) + abs_diff(c, real_col)) * D)
@@ -613,6 +613,7 @@ mod test_round3_d
     use rand::SeedableRng;
     use std::ops::Range;
     use std::usize;
+    use crate::util::vector_2d::Vector2d;
 
     ///
     /// Assume inf is in top/left corner.  each grid cell gets D added to it
@@ -626,12 +627,12 @@ mod test_round3_d
     {
         let mut g: Grid<usize> = Grid::new(height, width);
 
-        let corner_coord = IntCoord2d(0, 0);
+        let corner_coord = Vector2d::with_val(0, 0);
 
         g[0] = inf_value;
 
         g.transform(|(coord, val)| {
-            *val = inf_value + corner_coord.distance(&coord) * D;
+            *val = inf_value + corner_coord.manhat_distance(&coord) * D;
 
             //debug!("Set val {} loc {}", val, coord);
         });
@@ -663,7 +664,7 @@ mod test_round3_d
 
         let corner_coords: Vec<_> = (0..=3)
             .map(|i| {
-                IntCoord2d::<usize>(
+                 Vector2d::with_val(
                     if i < 2 { 0 } else { height - 1 },
                     if i == 0 || i == 3 { 0 } else { width - 1 },
                 )
@@ -671,21 +672,21 @@ mod test_round3_d
             .collect();
 
         for (coord, val) in corner_coords.iter().zip(corners.iter()) {
-            g[*coord] = *val;
+            g[coord] = *val;
         }
 
         g.transform(|(coord, val)| {
             let max_values = corner_coords
                 .iter()
                 .zip(corners.iter())
-                .map(|(cc, val)| val + cc.distance(&coord) * D);
+                .map(|(cc, val)| val + cc.manhat_distance(&coord) * D);
             *val = max_values.min().unwrap();
 
             //debug!("Set val {} loc {}", val, coord);
         });
 
         for (coord, val) in corner_coords.iter().zip(corners.iter()) {
-            g[*coord] = *val;
+            g[coord] = *val;
         }
 
         debug!(
@@ -695,9 +696,9 @@ mod test_round3_d
         );
 
         for (loc, v1) in g.iter_loc() {
-            let loc: IntCoord2d<i64> = loc.convert();
+            let loc: Vector2d<i64> = loc.convert();
             for dir in DIRECTIONS.iter() {
-                if let Some(v2) = g.get_value(*dir + loc) {
+                if let Some(v2) = g.get_value(&(dir.clone() + &loc)) {
                     if (*v2 as i64 - *v1 as i64).abs() > D as i64 {
                         return None;
                     }
@@ -708,10 +709,10 @@ mod test_round3_d
         Some(
             g.iter_loc()
                 .filter(|(loc, _value)| {
-                    loc.0 >= height_range.start
-                        && loc.0 < height_range.end
-                        && loc.1 >= width_range.start
-                        && loc.1 < width_range.end
+                    loc.data[0] >= height_range.start
+                        && loc.data[0] < height_range.end
+                        && loc.data[1] >= width_range.start
+                        && loc.data[1] < width_range.end
                 })
                 .map(|lv| lv.1)
                 .sum(),
@@ -731,32 +732,32 @@ mod test_round3_d
 
         let mut g: Grid<usize> = Grid::new(height, width);
 
-        let corner_coords = vec![IntCoord2d(0, 0), IntCoord2d(height - 1, width - 1)];
+        let corner_coords = vec![ Vector2d::with_val(0, 0),  Vector2d::with_val(height - 1, width - 1)];
 
         for (coord, val) in corner_coords.iter().zip(corners.iter()) {
-            g[*coord] = *val;
+            g[coord] = *val;
         }
 
         g.transform(|(coord, val)| {
             let max_values = corner_coords
                 .iter()
                 .zip(corners.iter())
-                .map(|(cc, val)| val + cc.distance(&coord) * D);
+                .map(|(cc, val)| val + cc.manhat_distance(&coord) * D);
             *val = max_values.min().unwrap();
 
             //debug!("Set val {} loc {}", val, coord);
         });
 
         for (coord, val) in corner_coords.iter().zip(corners.iter()) {
-            g[*coord] = *val;
+            g[coord] = *val;
         }
 
         //debug!("Grid\n{:#.6?}\n corners {:?}\nvalues {:?}\nD {:?}", g, corner_coords, corners, D);
 
         for (loc, v1) in g.iter_loc() {
-            let loc: IntCoord2d<i64> = loc.convert();
+            let loc: Vector2d<i64> = loc.convert();
             for dir in DIRECTIONS.iter() {
-                if let Some(v2) = g.get_value(*dir + loc) {
+                if let Some(v2) = g.get_value(&(dir.clone() + &loc)) {
                     if (*v2 as i64 - *v1 as i64).abs() > D as i64 {
                         return None;
                     }

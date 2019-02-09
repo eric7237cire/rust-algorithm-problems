@@ -1,12 +1,11 @@
-use num_integer::Integer;
-use num_traits::{cast, NumCast};
-use std::cmp::PartialEq;
 use std::default::Default;
 use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
-use std::hash::Hash;
-use std::ops::{Add, AddAssign, Mul};
 use std::ops::{Index, IndexMut};
+use crate::util::vector_2d::Vector2d;
+use crate::util::vector_2d::VecCoordIntegerTrait;
+use num_integer::Integer;
+use num_traits::NumCast;
 
 pub struct Grid<T>
 {
@@ -15,19 +14,8 @@ pub struct Grid<T>
     pub C: usize,
 }
 
-pub trait GridCoordTrait: Hash + Integer + Display + NumCast + Copy + Mul + Add
-{
-}
-
-impl<N> GridCoordTrait for N where N: Hash + Integer + Display + NumCast + Copy + Mul + Add {}
-
-#[derive(Copy, Clone, PartialEq, Eq, Hash)]
-pub struct IntCoord2d<T>(pub T, pub T)
-where
-    T: GridCoordTrait;
-
-pub type GridCoord = IntCoord2d<usize>;
-pub type GridRowColVec = IntCoord2d<i64>;
+pub type GridRowColVec = Vector2d<i64>;
+pub type GridCoord = Vector2d<usize>;
 
 //pub struct GridConsts {}
 
@@ -35,12 +23,14 @@ pub mod constants
 {
     use super::*;
 
-    pub const NORTH: GridRowColVec = IntCoord2d(-1, 0);
-    pub const EAST: GridRowColVec = IntCoord2d(0, 1);
-    pub const SOUTH: GridRowColVec = IntCoord2d(1, 0);
-    pub const WEST: GridRowColVec = IntCoord2d::<i64>(0, -1);
+    pub const NORTH: GridRowColVec = Vector2d { data: [-1, 0] };
+    pub const EAST: GridRowColVec = Vector2d { data: [0,1] };
+    pub const SOUTH: GridRowColVec = Vector2d { data: [1, 0] };
+    pub const WEST: GridRowColVec = Vector2d { data: [0, -1] };
 
-    pub const DIRECTIONS: [IntCoord2d<i64>; 4] = [NORTH, EAST, SOUTH, WEST];
+    pub const DIRECTIONS: [Vector2d<i64>; 4] = [NORTH, EAST, SOUTH, WEST];
+
+
 }
 
 impl<T> Grid<T>
@@ -60,19 +50,19 @@ impl<T> Grid<T>
         g
     }
 
-    pub fn get_value<'a, N: GridCoordTrait>(&'a self, row_col_index: IntCoord2d<N>)
+    pub fn get_value<'a, N: Integer+Copy+NumCast>(&'a self, row_col_index: &Vector2d<N>)
         -> Option<&'a T>
     {
-        if row_col_index.0 < N::zero() || row_col_index.1 < N::zero() {
+        if row_col_index.data[0] < N::zero() || row_col_index.data[1] < N::zero() {
             return None;
         }
-        let row_col_index: IntCoord2d<usize> = row_col_index.convert();
+        let row_col_index: Vector2d<usize> = row_col_index.convert();
 
-        if row_col_index.0 >= self.R || row_col_index.1 >= self.C {
+        if row_col_index.data[0] >= self.R || row_col_index.data[1] >= self.C {
             return None;
         }
 
-        Some(&self.data[row_col_index.0 * self.C + row_col_index.1])
+        Some(&self.data[row_col_index.data[0] * self.C + row_col_index.data[1]])
     }
 
     pub fn filter_by_val<'a>(&'a self, val: &'a T) -> impl Iterator<Item = GridCoord> + 'a
@@ -84,7 +74,7 @@ impl<T> Grid<T>
             .iter()
             .enumerate()
             .filter(move |(_index, value)| *value == val)
-            .map(move |(index, _value)| IntCoord2d(index / self.C, index % self.C))
+            .map(move |(index, _value)| Vector2d::with_val(index / self.C, index % self.C))
     }
 
     pub fn filter_by_pred<'a, P>(&'a self, predicate: P) -> impl Iterator<Item = GridCoord> + 'a
@@ -96,7 +86,7 @@ impl<T> Grid<T>
             .iter()
             .enumerate()
             .filter(move |(_index, value)| predicate(*value))
-            .map(move |(index, _value)| IntCoord2d(index / self.C, index % self.C))
+            .map(move |(index, _value)| Vector2d::with_val(index / self.C, index % self.C))
     }
 
     pub fn iter_loc<'a>(&'a self) -> impl Iterator<Item = (GridCoord, &T)> + 'a
@@ -106,7 +96,7 @@ impl<T> Grid<T>
         self.data
             .iter()
             .enumerate()
-            .map(move |(index, value)| (IntCoord2d(index / self.C, index % self.C), value))
+            .map(move |(index, value)| (Vector2d::with_val(index / self.C, index % self.C), value))
     }
 
     pub fn transform<'a, P>(&'a mut self, transformer: P)
@@ -119,7 +109,7 @@ impl<T> Grid<T>
         let C = self.C;
 
         for (index, value) in self.data.iter_mut().enumerate() {
-            transformer((IntCoord2d(index / C, index % C), value));
+            transformer((Vector2d::with_val(index / C, index % C), value));
         }
     }
 }
@@ -146,7 +136,7 @@ impl <'a, T> Iterator for GridMutIterator<'a, T> {
 
         let index = self.cur_index;
         self.cur_index += 1;
-        let coord = IntCoord2d(index / self.grid.C, index % self.grid.C);
+        let coord = Vector2d(index / self.grid.C, index % self.grid.C);
         let v: &'a mut T = self.grid.data.get_mut(index).unwrap();
         Some( (coord, v ) )
 
@@ -165,30 +155,51 @@ impl<T> Index<usize> for Grid<T>
     }
 }
 //get a cell
-impl<T, N: GridCoordTrait> Index<IntCoord2d<N>> for Grid<T>
+impl<T> Index<&Vector2d<usize>> for Grid<T>
 {
     type Output = T;
 
-    fn index<'a>(&'a self, row_col_index: IntCoord2d<N>) -> &'a T
+    fn index<'a>(&'a self, row_col_index: &Vector2d<usize>) -> &'a T
     {
-        let row_col_index: IntCoord2d<usize> = row_col_index.convert();
-        if row_col_index.0 >= self.R || row_col_index.1 >= self.C {
+        /*if row_col_index.0 >= self.R || row_col_index.1 >= self.C {
             panic!(
                 "RowCol {:?} invalid for grid {}, {}",
                 row_col_index, self.R, self.C
             );
-        }
+        }*/
 
-        &self.data[row_col_index.0 * self.C + row_col_index.1]
+        &self.data[ row_col_index.data[0] * self.C + row_col_index.data[1]  ]
+    }
+}
+impl<T> Index<&Vector2d<i64>> for Grid<T>
+{
+    type Output = T;
+
+    fn index<'a>(&'a self, row_col_index: &Vector2d<i64>) -> &'a T
+    {
+        /*if row_col_index.0 >= self.R || row_col_index.1 >= self.C {
+            panic!(
+                "RowCol {:?} invalid for grid {}, {}",
+                row_col_index, self.R, self.C
+            );
+        }*/
+
+        &self.data[ (row_col_index.data[0] * self.C as i64 + row_col_index.data[1] ) as usize ]
     }
 }
 //set a cell
-impl<T, N: GridCoordTrait> IndexMut<IntCoord2d<N>> for Grid<T>
+impl<T> IndexMut<&Vector2d<i64>> for Grid<T>
 {
-    fn index_mut<'a>(&'a mut self, row_col_index: IntCoord2d<N>) -> &'a mut T
+    fn index_mut<'a>(&'a mut self, row_col_index: &Vector2d<i64>) -> &'a mut T
     {
-        let row_col_index: IntCoord2d<usize> = row_col_index.convert();
-        &mut self.data[row_col_index.0 * self.C + row_col_index.1]
+        &mut self.data[ (row_col_index.data[0] * self.C as i64 + row_col_index.data[1] ) as usize ]
+    }
+}
+impl<T> IndexMut<&Vector2d<usize>> for Grid<T>
+{
+    fn index_mut<'a>(&'a mut self, row_col_index: &Vector2d<usize>) -> &'a mut T
+    {
+        &mut self.data[ row_col_index.data[0] * self.C + row_col_index.data[1]  ]
     }
 }
 impl<T> Index<(usize, usize)> for Grid<T>
@@ -274,100 +285,32 @@ where
 /////////////////////////////
 /// Grid coordinate methods & trait implementations
 
-impl<N: GridCoordTrait> IntCoord2d<N>
+impl<N: VecCoordIntegerTrait> Vector2d<N>
 {
-    pub fn convert<M: GridCoordTrait>(&self) -> IntCoord2d<M>
-    {
-        IntCoord2d::<M>(cast::<N, M>(self.0).unwrap(), cast::<N, M>(self.1).unwrap())
-    }
 
-    pub fn distance(&self, rhs: &Self) -> N
-    {
-        let r = if self.0 > rhs.0 {
-            self.0 - rhs.0
-        } else {
-            rhs.0 - self.0
-        };
-        let c = if self.1 > rhs.1 {
-            self.1 - rhs.1
-        } else {
-            rhs.1 - self.1
-        };
-        r + c
-    }
 }
 
-impl From<IntCoord2d<i64>> for GridCoord
-{
-    fn from(coord: IntCoord2d<i64>) -> Self
-    {
-        IntCoord2d::<usize>(coord.0 as usize, coord.1 as usize)
-    }
-}
 
-/// A + B will convert B to A's unit
-impl<N: GridCoordTrait, M: GridCoordTrait> Add<IntCoord2d<M>> for IntCoord2d<N>
-{
-    type Output = Self;
+/*
 
-    fn add(self, rhs: IntCoord2d<M>) -> Self
-    {
-        let lhs: IntCoord2d<M> = self.convert();
-
-        IntCoord2d(
-            cast::<M, N>(lhs.0 + rhs.0).unwrap(),
-            cast::<M, N>(lhs.1 + rhs.1).unwrap(),
-        )
-    }
-}
-impl<N: GridCoordTrait> AddAssign<GridRowColVec> for IntCoord2d<N>
-{
-    fn add_assign(&mut self, other: GridRowColVec)
-    {
-        *self = *self + other
-    }
-}
-
-impl<N: GridCoordTrait, M: GridCoordTrait> Mul<M> for IntCoord2d<N>
-{
-    type Output = Self;
-
-    fn mul(self, rhs: M) -> Self
-    {
-        let rhs: N = cast::<M, N>(rhs).unwrap();
-        IntCoord2d::<N>(self.0 * rhs, self.1 * rhs)
-    }
-}
-
-impl<N: GridCoordTrait> Debug for IntCoord2d<N>
+impl<N: VecCoordIntegerTrait> Display for Vector2d<N>
 {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result
     {
         write!(f, "(R{}, C{})", self.0, self.1)
     }
-}
-impl<N: GridCoordTrait> Display for IntCoord2d<N>
-{
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result
-    {
-        write!(f, "(R{}, C{})", self.0, self.1)
-    }
-}
+}*/
 
 #[cfg(test)]
-mod tests
+mod test_grid
 {
-    use self::super::constants::*;
+
     use self::super::*;
 
     use std::{i64, u64};
 
-    #[test]
-    fn test_add()
-    {
-        assert_eq!(IntCoord2d::<u8>(0, 2), IntCoord2d::<u8>(0, 3) + WEST);
-    }
 
+/*
     #[test]
     fn test_get_value()
     {
@@ -376,24 +319,24 @@ mod tests
         grid[(1, 0)] = 'b';
         grid[(1, 1)] = 'd';
 
-        assert_eq!(Some(&'d'), grid.get_value(IntCoord2d::<i16>(1, 1)));
+        assert_eq!(Some(&'d'), grid.get_value(Vector2d::with_val(1i16, 1)));
     }
-
+*/
     #[test]
     fn test_get_dist()
     {
         assert_eq!(
-            IntCoord2d::<u64>(u64::MAX, 1).distance(&IntCoord2d::<u64>(u64::MAX - 3, 10)),
+            Vector2d::with_val(u64::MAX, 1).manhat_distance(&Vector2d::with_val(u64::MAX - 3, 10)),
             12
         );
         assert_eq!(
-            IntCoord2d::<u64>(u64::MAX - 4, 5).distance(&IntCoord2d::<u64>(u64::MAX, 4)),
+            Vector2d::with_val(u64::MAX - 4, 5).manhat_distance(&Vector2d::with_val(u64::MAX, 4)),
             5
         );
 
         assert_eq!(
-            IntCoord2d::<i64>(i64::MAX - 4, i64::MIN)
-                .distance(&IntCoord2d::<i64>(i64::MAX, i64::MIN + 5)),
+            Vector2d::with_val(i64::MAX - 4, i64::MIN)
+                .manhat_distance(&Vector2d::with_val(i64::MAX, i64::MIN + 5)),
             9
         );
     }

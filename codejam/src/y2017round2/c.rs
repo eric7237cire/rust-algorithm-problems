@@ -11,7 +11,7 @@ Simulation, grid, backtracking
 use crate::algo::graph::connectivity::ConnectivityGraph;
 use crate::algo::graph::Graph;
 use crate::util::grid::constants::*;
-use crate::util::grid::{Grid, GridCoord, GridRowColVec, IntCoord2d};
+use crate::util::grid::{Grid, GridCoord, GridRowColVec};
 
 use crate::util::codejam::run_cases;
 use bimap::BiMap;
@@ -57,6 +57,7 @@ enum Tile
 }
 
 use self::Tile::*;
+use crate::util::vector_2d::Vector2d;
 
 impl Tile
 {
@@ -107,23 +108,23 @@ impl Default for Tile
 //problem specific code
 fn trace_ray(
     grid: &Grid<Tile>,
-    location: GridCoord,
-    direction: GridRowColVec,
-) -> Result<Vec<IntCoord2d<i16>>, Vec<IntCoord2d<i16>>>
+    location: &Vector2d<usize>,
+    direction: &Vector2d<i64>,
+) -> Result<Vec<Vector2d<i64>>, Vec<Vector2d<i64>>>
 {
-    let mut location: IntCoord2d<i16> = location.convert();
-    let mut direction = direction;
+    let mut location: Vector2d<i64> = location.convert();
+    let mut direction = direction.clone();
     let mut r: Vec<_> = Vec::new();
     //debug!("\nTracing {} starting at {}", location, direction);
 
     for i in 0..=grid.R * grid.C * grid.R * grid.C {
-        if let Some(tile) = grid.get_value(location) {
+        if let Some(tile) = grid.get_value(&location) {
             match *tile {
                 Wall => {
                     break;
                 }
                 Empty => {
-                    r.push(location);
+                    r.push(location.clone());
                 }
 
                 ForwardMirror | BackwardMirror => {
@@ -144,7 +145,7 @@ fn trace_ray(
                 _ => {}
             };
 
-            location += direction;
+            location += &direction;
         } else {
             break;
         }
@@ -166,7 +167,7 @@ fn get_graph_vertex_index(lc: &LaserChoice) -> usize
     2 * lc.laser_index + if lc.orientation == VerticalBeam { 0 } else { 1 }
 }
 
-type Trace = Vec<IntCoord2d<i16>>;
+type Trace = Vec<Vector2d<i64>>;
 type OptionTrace = Option<Trace>;
 
 fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>) -> String
@@ -183,8 +184,8 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>) -> String
         .map(|loc| {
             let mut combined_traces: [OptionTrace; 2] = [None, None];
 
-            for (idx, &dir) in DIRECTIONS.iter().enumerate() {
-                let trace_result = trace_ray(grid, *loc, dir);
+            for (idx, dir) in DIRECTIONS.iter().enumerate() {
+                let trace_result = trace_ray(grid, loc, dir);
                 if let Ok(trace) = trace_result {
                     if idx < 2 {
                         combined_traces[idx] = Some(trace);
@@ -206,10 +207,10 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>) -> String
     let empty_squares = grid.filter_by_val(&Empty).collect::<Vec<_>>();
 
     let mut square_choices: Vec<Vec<LaserChoice>> = Vec::new();
-    let mut square_coords: BiMap<usize, IntCoord2d<usize>> = BiMap::new();
+    let mut square_coords: BiMap<usize, Vector2d<usize>> = BiMap::new();
 
     for (empty_square_index, es) in empty_squares.iter().enumerate() {
-        square_coords.insert(empty_square_index, *es);
+        square_coords.insert(empty_square_index, es.clone());
 
         let mut sc = Vec::new();
 
@@ -254,7 +255,7 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>) -> String
             let v2 = get_graph_vertex_index(&sc[1]);
             graph.add_two_sat_clause(v1, v2);
         }
-        debug!("For square {} choices are {:?}", empty_squares[idx], sc);
+        debug!("For square {:?} choices are {:?}", empty_squares[idx], sc);
     }
     for (laser_index, lt) in laser_traces.iter().enumerate() {
         for i in 0..2 {
@@ -278,7 +279,7 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>) -> String
             let tsa = tsa.unwrap();
             debug!("2SAT results {:?}.   laser_coords: {:?}", tsa, laser_coords);
             for (idx, &b) in tsa.iter().enumerate() {
-                grid[laser_coords[idx]] = if b { VerticalBeam } else { HorizonalBeam };
+                grid[&laser_coords[idx]] = if b { VerticalBeam } else { HorizonalBeam };
             }
             format!("Case #{}: POSSIBLE\n{}", case_no, grid)
         }
@@ -305,8 +306,8 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>) -> String
 fn helper(
     grid: &mut Grid<Tile>,
     laser_traces: &Vec<[OptionTrace; 2]>,
-    laser_coords: &Vec<IntCoord2d<usize>>,
-    square_coords: &BiMap<usize, IntCoord2d<usize>>,
+    laser_coords: &Vec<Vector2d<usize>>,
+    square_coords: &BiMap<usize, Vector2d<usize>>,
     square_choices: &Vec<Vec<LaserChoice>>,
     current_laser_index: usize,
     is_covered: &mut Vec<i16>,
@@ -336,7 +337,7 @@ fn helper(
     //try vertical
     for ld_idx in 0..2 {
         if let Some(ns) = &laser_data[ld_idx] {
-            grid[laser_coords[current_laser_index]] = if ld_idx == 0 {
+            grid[&laser_coords[current_laser_index]] = if ld_idx == 0 {
                 VerticalBeam
             } else {
                 HorizonalBeam

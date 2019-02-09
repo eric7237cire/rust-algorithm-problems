@@ -44,7 +44,9 @@ fn main()
     y2017round3::c::solve_all_cases();
     y2017round3::d::solve_all_cases();*/
 
-    //y2017round4::f::solve_all_cases();
+    y2017round2::c::solve_all_cases();
+    y2017round2::d::solve_all_cases();
+    y2017round3::d::solve_all_cases();
 
     //y2016qual::d::solve_all_cases();
 }
