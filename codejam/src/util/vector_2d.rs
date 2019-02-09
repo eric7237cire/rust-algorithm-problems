@@ -149,7 +149,7 @@ mod test_vector2d
     #[test]
     fn test_add()
     {
-        assert_eq!(Vector2d::with_val(0u8, 2),
-                   Vector2d::with_val(0u8, 3) + WEST.convert());
+        assert_eq!(Vector2d::with_val(0i8, 2),
+                   Vector2d::with_val(0i8, 3) + WEST.convert());
     }
 }

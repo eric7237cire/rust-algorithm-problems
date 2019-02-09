@@ -774,7 +774,7 @@ mod test_round3_d
         let D = 5;
         let corner_values = [0, 15, 25, 10];
 
-        let sum = calc_grid_sum_4_influencers(&corner_values[..], 4, 3, D, usize::MAX);
+        let sum = calc_grid_sum_4_influencers(&corner_values[..], 4, 3, D, MODULO);
 
         assert_eq!(
             sum,
@@ -788,17 +788,17 @@ mod test_round3_d
         let D = 5;
         let corner_values = [0, 15];
 
-        let sum = calc_sum_2_influencers(&corner_values[..], 4, 1, D, usize::MAX);
+        let sum = calc_sum_2_influencers(&corner_values[..], 4, 1, D, MODULO);
 
         assert_eq!(sum, Some(5 + 10 + 15));
 
         let corner_values = [0, 14];
-        let sum = calc_sum_2_influencers(&corner_values[..], 7, 1, D, usize::MAX);
+        let sum = calc_sum_2_influencers(&corner_values[..], 7, 1, D, MODULO);
 
         assert_eq!(sum, Some(5 + 10 + 15 + 20 + 19 + 14));
 
         let corner_values = [2, 5];
-        let sum = calc_sum_2_influencers(&corner_values[..], 2, 1, D, usize::MAX);
+        let sum = calc_sum_2_influencers(&corner_values[..], 2, 1, D, MODULO);
 
         assert_eq!(sum, Some(2 + 5));
     }
@@ -830,7 +830,7 @@ mod test_round3_d
                 grid_width,
                 grid_height,
                 D,
-                usize::MAX,
+                MODULO,
             );
 
             debug!("Sum1 {:?} Sum2 {:?}", sum1, sum2);
@@ -858,7 +858,7 @@ mod test_round3_d
                 grid_width,
                 grid_height,
                 D,
-                usize::MAX,
+                MODULO,
             );
 
             debug!("Sum1 {} Sum2 {}", sum1, sum2);
@@ -875,7 +875,7 @@ mod test_round3_d
                 grid_width,
                 grid_height,
                 D,
-                usize::MAX,
+                MODULO,
             );
 
             debug!("Sum3 {:?} Sum4 {:?}", sum3, sum4);
