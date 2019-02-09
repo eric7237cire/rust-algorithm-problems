@@ -3,7 +3,6 @@ use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
 use std::ops::{Index, IndexMut};
 use crate::util::vector_2d::Vector2d;
-use crate::util::vector_2d::VecCoordIntegerTrait;
 use num_integer::Integer;
 use num_traits::NumCast;
 
@@ -285,10 +284,11 @@ where
 /////////////////////////////
 /// Grid coordinate methods & trait implementations
 
+/*
 impl<N: VecCoordIntegerTrait> Vector2d<N>
 {
 
-}
+}*/
 
 
 /*
