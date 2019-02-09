@@ -18,7 +18,9 @@ use std::cmp::max;
 //use permutohedron::LexicalPermutation;
 
 /*
-
+Clock arithmetic
+Mazes
+Grid
 */
 pub fn solve_all_cases()
 {
@@ -322,7 +324,6 @@ struct GardenLocation
 #[derive(Eq, PartialEq, Copy, Clone)]
 struct HeapNode
 {
-    distance_to_target: i64,
     distance_to_filled_edge: usize,
     distance_to_lmid: i64,
     loc: GardenLocation,
@@ -341,10 +342,7 @@ impl Ord for HeapNode
             .distance_to_lmid
             .cmp(&self.distance_to_lmid))
 
-            .then_with(||
-        other
-            .distance_to_target
-            .cmp(&self.distance_to_target))
+
             .then_with(|| self.loc.cmp(&other.loc))
     }
 }
@@ -437,7 +435,7 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
     matches.sort_by(|a, b| {
         a.clock_dist
             .cmp(&b.clock_dist)
-            .then(a.distance.cmp(&b.distance))
+          //  .then(a.distance.cmp(&b.distance))
             .then(min(a.L1.number, a.L2.number).cmp(&min(b.L1.number,b.L2.number)))
     });
 
@@ -501,7 +499,6 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
         heap.push(HeapNode {
             loc: starting_location,
             distance_to_filled_edge: grid_edge_dist[&starting_location.grid_loc],
-            distance_to_target: target_grid_loc.manhat_distance(&starting_location.grid_loc),
             distance_to_lmid: lover_pair.Lmid.location.manhat_distance( &starting_location.grid_loc)
         });
 
@@ -540,12 +537,12 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
             }
 
             debug!(
-                "Processing heap node row: {} col: {} direction: {:?} dist to edge: {}, dist to target: {}",
+                "Processing heap node row: {} col: {} direction: {:?} dist to edge: {}, dist to mid: {}",
                 heap_node.loc.grid_loc.r(),
                 heap_node.loc.grid_loc.c(),
                 heap_node.loc.entry_dir,
                 heap_node.distance_to_filled_edge,
-                heap_node.distance_to_target
+                heap_node.distance_to_lmid
             );
 
             let grid_contents = &grid[&heap_node.loc.grid_loc];
@@ -555,7 +552,6 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
                 let next_heap_node = HeapNode {
                     loc,
                     distance_to_filled_edge: grid_edge_dist[&loc.grid_loc],
-                    distance_to_target: target_grid_loc.manhat_distance(&loc.grid_loc),
                     distance_to_lmid: lover_pair.Lmid.location.manhat_distance(&loc.grid_loc),
                 };
                 if !prev.contains_key(&next_heap_node.loc) {
@@ -569,7 +565,6 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
                 let next_heap_node = HeapNode {
                     loc,
                     distance_to_filled_edge: grid_edge_dist[&loc.grid_loc],
-                    distance_to_target: target_grid_loc.manhat_distance(&loc.grid_loc),
                     distance_to_lmid: lover_pair.Lmid.location.manhat_distance(&loc.grid_loc),
                 };
                 if !prev.contains_key(&next_heap_node.loc) {
