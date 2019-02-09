@@ -4,8 +4,6 @@ use itertools::Itertools;
 use std::io::Write;
 //use std::mem::swap;
 
-//use codejam::util::grid::constants::*;
-use bit_vec::BitVec;
 use codejam::util::grid::constants::*;
 use codejam::util::grid::Grid;
 use codejam::util::vector_2d::Vector2d;
@@ -14,6 +12,7 @@ use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
 use std::usize;
+use std::cmp::max;
 
 
 //use permutohedron::LexicalPermutation;
@@ -39,8 +38,8 @@ pub fn solve_all_cases()
 
                 assert_eq!(2 * (R + C), lovers.len());
 
-                if case_no != 51 {
-                     //continue;
+                if case_no != 102 {
+                    // continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -308,6 +307,7 @@ struct LoverPair
 {
     L1: Lover,
     L2: Lover,
+    Lmid: Lover,
     distance: i64,
     clock_dist: usize
 }
@@ -324,6 +324,7 @@ struct HeapNode
 {
     distance_to_target: i64,
     distance_to_filled_edge: usize,
+    distance_to_lmid: i64,
     loc: GardenLocation,
 }
 
@@ -335,6 +336,11 @@ impl Ord for HeapNode
         // In case of a tie we compare positions - this step is necessary
         // to make implementations of `PartialEq` and `Ord` consistent.
         other.distance_to_filled_edge.cmp(&self.distance_to_filled_edge)
+             .then_with(||
+        other
+            .distance_to_lmid
+            .cmp(&self.distance_to_lmid))
+
             .then_with(||
         other
             .distance_to_target
@@ -399,22 +405,32 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
         add_lover(r, c, label, &EAST);
     }
 
+    assert_eq!(2*(R+C), lovers.len());
+
     debug!("Grid\n{:#.3?}\n", grid);
 
     let mut matches: Vec<LoverPair> = Vec::new();
     for matched in lover_pairings.chunks_exact(2) {
-        let L1_num = matched[0];
-        let L2_num = matched[1];
+        let L1_num = min(matched[0], matched[1]);
+        let L2_num = max(matched[1], matched[0]);
+
         let L1 = lovers.iter().find(|lov| lov.number == L1_num).unwrap();
         let L2 = lovers.iter().find(|lov| lov.number == L2_num).unwrap();
 
         let diff =(L1_num as i64 - L2_num as i64).abs() as usize;
+        let clock_dist = min( diff, 2 * (R+C) - diff);
+
+        let Lmid_num =if clock_dist == diff { L1_num + clock_dist /2 + 1 } else {
+            ((lovers.len() + L1_num - 2 - clock_dist / 2) % lovers.len()) + 1
+        };
+        let Lmid = lovers.iter().find(|lov| lov.number == Lmid_num).unwrap();
 
         matches.push(LoverPair {
             L1: L1.clone(),
             L2: L2.clone(),
+            Lmid: Lmid.clone(),
             distance: (L1.location).manhat_distance(&L2.location),
-            clock_dist: min( diff, 2 * (R+C) - diff)
+            clock_dist
         });
     }
 
@@ -486,6 +502,7 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
             loc: starting_location,
             distance_to_filled_edge: grid_edge_dist[&starting_location.grid_loc],
             distance_to_target: target_grid_loc.manhat_distance(&starting_location.grid_loc),
+            distance_to_lmid: lover_pair.Lmid.location.manhat_distance( &starting_location.grid_loc)
         });
 
         while let Some(heap_node) = heap.pop() {
@@ -539,6 +556,7 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
                     loc,
                     distance_to_filled_edge: grid_edge_dist[&loc.grid_loc],
                     distance_to_target: target_grid_loc.manhat_distance(&loc.grid_loc),
+                    distance_to_lmid: lover_pair.Lmid.location.manhat_distance(&loc.grid_loc),
                 };
                 if !prev.contains_key(&next_heap_node.loc) {
                     heap.push(next_heap_node);
@@ -552,6 +570,7 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
                     loc,
                     distance_to_filled_edge: grid_edge_dist[&loc.grid_loc],
                     distance_to_target: target_grid_loc.manhat_distance(&loc.grid_loc),
+                    distance_to_lmid: lover_pair.Lmid.location.manhat_distance(&loc.grid_loc),
                 };
                 if !prev.contains_key(&next_heap_node.loc) {
                     heap.push(next_heap_node);
