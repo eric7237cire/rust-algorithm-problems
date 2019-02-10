@@ -41,7 +41,7 @@ pub fn solve_all_cases()
                     .map(|_| reader.read_chars(N).into_iter().collect::<BitVec64>())
                     .collect();
 
-                if case_no != 3 {
+                if case_no != 43 {
                    // continue;
                 }
 
@@ -49,7 +49,7 @@ pub fn solve_all_cases()
 
                 writeln!(
                     buffer,
-                    "Case #{}:\n{}",
+                    "Case #{}: {}",
                     case_no,
                     solve(&workers) //solve_brute_force(R, C, &lovers)
                 )
@@ -228,7 +228,7 @@ fn solve(workers: &[BitVec64]) -> i16
                     .sum::<i16>();
             used_node.set(idx, true);
         } else {
-            //find a subset
+            debug!("find a subset for merged node #{}", idx);
 
             //dp[ node_idx ][sum + N] = cheapest that sums to x using nodes up to node_idx
             let NON_INIT = 5000i16;
@@ -239,6 +239,8 @@ fn solve(workers: &[BitVec64]) -> i16
                 
                 dp.push(dp[dp_idx].clone());
 
+                let merged_node_index = dp_idx;
+                //Because we have an initial dp vector with max sizes
                 let dp_idx = dp_idx + 1;
                 
                 assert_eq!(dp_idx+1, dp.len());
@@ -247,11 +249,11 @@ fn solve(workers: &[BitVec64]) -> i16
                     continue;
                 }
 
-                if used_node.get(dp_idx) {
+                if used_node.get(merged_node_index) {
                     continue;
                 }
 
-                if dp_idx - 1 == idx {
+                if merged_node_index == idx {
                     continue;
                 }
 
@@ -303,6 +305,9 @@ fn solve(workers: &[BitVec64]) -> i16
                         optimal_size = optimal_size - node.size();
                         assert!(optimal_size > 0);
                         target_diff = target_diff - node.diff();
+
+                        assert!( dp_idx <= last_element_idx );
+                        last_element_idx = dp_idx;
                         
                         break;
                     }
