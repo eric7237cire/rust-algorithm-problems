@@ -13,3 +13,4 @@ num-bigint = "*"
 itertools = "*"
 log = {version = "*", features = ["max_level_debug", "release_max_level_warn"] }
 permutohedron = "*"
+multiset = "*"
