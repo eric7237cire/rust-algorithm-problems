@@ -1,6 +1,9 @@
 //use std::ops::Index;
 use std::iter::FromIterator;
+use std::fmt;
+use std::ops::BitOrAssign;
 
+#[derive(Default, Copy, Clone)]
 pub struct BitVec64
 {
     pub data: usize
@@ -17,14 +20,19 @@ impl BitVec64
         }
     }
 
-    pub fn getb(&self, index: usize) -> bool
+    pub fn get(&self, index: usize) -> bool
     {
         (self.data >> index) & 1 > 0
     }
 
-    fn new() -> BitVec64
+    pub fn new() -> BitVec64
     {
         BitVec64 { data: 0 }
+    }
+
+    pub fn pop_count(&self) -> u32
+    {
+        self.data.count_ones()
     }
 }
 
@@ -58,5 +66,20 @@ impl FromIterator<bool> for BitVec64 {
         }
 
         c
+    }
+}
+
+
+impl fmt::Binary for BitVec64 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        //todo pass on other width parameters, fill char etc.
+        write!(f, "{:b}", self.data)
+    }
+}
+
+
+impl BitOrAssign for BitVec64 {
+    fn bitor_assign(&mut self, rhs: Self) {
+        self.data |= rhs.data;
     }
 }
