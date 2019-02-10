@@ -25,6 +25,7 @@ Enumerating multisets
 union find / disjoint set
 rust RC/Refcell ; merging nodes from pointers
 Much recursion
+BitVec64 / bit manipulation
 
 Main idea is that workers must enter as a square chunk, where
 each worker knows each machine in the block
@@ -390,7 +391,7 @@ workers = {} diff = {}",
                     }
                 })
                 .sum::<i16>();
-        used_node.set(idx, true);
+
     }
 
     cost
