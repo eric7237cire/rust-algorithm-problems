@@ -28,7 +28,7 @@ pub fn solve_all_cases()
     run_cases(
         &[
             "D-small-practice",
-            //"C-large-practice"
+            "D-large-practice"
         ],
         "y2016round2",
         |reader, buffer| {
