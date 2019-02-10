@@ -13,6 +13,9 @@ use std::usize;
 use codejam::algo::graph::disjointset::DisjointSet;
 use codejam::util::bitvec64::BitVec64;
 use std::cell::RefCell;
+use std::cmp::max;
+use std::cmp::min;
+use std::i16;
 use std::rc::Rc;
 
 //use permutohedron::LexicalPermutation;
@@ -38,8 +41,8 @@ pub fn solve_all_cases()
                     .map(|_| reader.read_chars(N).into_iter().collect::<BitVec64>())
                     .collect();
 
-                if case_no != 6 {
-                    continue;
+                if case_no != 3 {
+                   // continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -76,13 +79,21 @@ impl Drop for Node
 
 impl Node
 {
-    fn num_machines(&self) -> i8
+    fn num_machines(&self) -> i16
     {
-        self.machines.pop_count() as i8
+        self.machines.pop_count() as i16
     }
-    fn num_workers(&self) -> i8
+    fn num_workers(&self) -> i16
     {
-        self.workers.pop_count() as i8
+        self.workers.pop_count() as i16
+    }
+    fn diff(&self) -> i16
+    {
+        self.num_machines() - self.num_workers()
+    }
+    fn size(&self) -> i16
+    {
+        max(self.num_machines(), self.num_workers())
     }
 }
 
@@ -96,9 +107,10 @@ fn merge_nodes(a: &Rc<RefCell<Node>>, b: &Rc<RefCell<Node>>)
     }
 }
 
-fn solve(workers: &[BitVec64]) -> usize
+fn solve(workers: &[BitVec64]) -> i16
 {
     let N = workers.len();
+    let Ni16 = N as i16;
 
     //machines are 0..N, workers N..2*N
     let mut ds = DisjointSet::new(2 * N);
@@ -175,11 +187,16 @@ fn solve(workers: &[BitVec64]) -> usize
         );
     }
 
+    merged_node_list.sort_by(|a, b| {
+        max(b.borrow().num_machines(), b.borrow().num_workers())
+            .cmp(&max(a.borrow().num_machines(), a.borrow().num_workers()))
+    });
+
     for (idx, node) in merged_node_list.iter().enumerate() {
         //let node = node_list[worker + N].borrow();
         let node = node.borrow();
         debug!(
-            "Node  #{:>3}  machines {:0>width$b} / workers {:0>width$b} diff:{} ",
+            "Merged Node  #{:>3}  machines {:0>width$b} / workers {:0>width$b} diff:{} ",
             idx,
             node.machines.data,
             node.workers.data,
@@ -188,5 +205,142 @@ fn solve(workers: &[BitVec64]) -> usize
         );
     }
 
-    3
+    let mut used_node = BitVec64::new();
+
+    let mut cost: i16 = 0;
+
+    for idx in 0..merged_node_list.len() {
+        if used_node.get(idx) {
+            continue;
+        }
+
+        if merged_node_list[idx].borrow().diff() == 0 {
+            let node = merged_node_list[idx].borrow();
+            cost += node.num_machines() * node.num_workers()
+                - (0..N)
+                    .map(|w| {
+                        if node.workers.get(w) {
+                            workers[w].pop_count() as i16
+                        } else {
+                            0
+                        }
+                    })
+                    .sum::<i16>();
+            used_node.set(idx, true);
+        } else {
+            //find a subset
+
+            //dp[ node_idx ][sum + N] = cheapest that sums to x using nodes up to node_idx
+            let NON_INIT = 5000i16;
+            let mut dp = vec![vec![NON_INIT; 2 * N + 2]; 1];
+            for dp_idx in 0..merged_node_list.len() {
+                let dp_node = merged_node_list[dp_idx].borrow();
+
+                
+                dp.push(dp[dp_idx].clone());
+
+                let dp_idx = dp_idx + 1;
+                
+                assert_eq!(dp_idx+1, dp.len());
+
+                if dp_node.diff() == 0 {
+                    continue;
+                }
+
+                if used_node.get(dp_idx) {
+                    continue;
+                }
+
+                if dp_idx - 1 == idx {
+                    continue;
+                }
+
+                debug!("Looping through {} to= {}",
+                max(-Ni16, -Ni16 + dp_node.diff()), min(Ni16, Ni16 + dp_node.diff())
+                );
+
+                for val in max(-Ni16, -Ni16 + dp_node.diff())..=min(Ni16, Ni16 + dp_node.diff()) {
+                    dp[dp_idx][(val + Ni16) as usize] = min(
+                        dp[dp_idx - 1][(val + Ni16) as usize],
+                        dp[dp_idx - 1][(val - dp_node.diff() + Ni16) as usize] + dp_node.size(),
+                    );
+                }
+
+                dp[dp_idx][(dp_node.diff() + Ni16) as usize] =
+                    min(dp[dp_idx][(dp_node.diff() + Ni16) as usize], dp_node.size());
+            }
+
+            let mut chosen_subset = Vec::new();
+            let mut last_element_idx = merged_node_list.len();
+
+            let mut target_diff = {
+                let node = merged_node_list[idx].borrow();
+                 - node.diff()
+            };
+
+            let mut optimal_size = 
+                dp[ last_element_idx ][ (Ni16 + target_diff) as usize ];
+        
+
+            assert_ne!(NON_INIT, optimal_size);
+            
+            'dp_path_loop: loop
+            {
+                //Find first element with the optimal size              
+                for dp_idx in 1..=merged_node_list.len() {
+                    let value = dp[dp_idx][(Ni16 + target_diff) as usize];
+                    debug!("For up to merged node {} for sum of {} smallest size is {}. ",
+                    dp_idx-1, target_diff, value);
+                    
+                    if value == optimal_size {
+                        chosen_subset.push(dp_idx-1);
+
+                        let node =  merged_node_list[dp_idx-1].borrow();
+                        if node.size() == optimal_size {
+                            break 'dp_path_loop; 
+                        }
+
+                        optimal_size = optimal_size - node.size();
+                        assert!(optimal_size > 0);
+                        target_diff = target_diff - node.diff();
+                        
+                        break;
+                    }
+                    
+                }
+            }
+
+            debug!("Merging all the chosen nodes");
+            for chosen in chosen_subset {
+                used_node.set(chosen, true);
+                assert_ne!(chosen, idx);
+                assert!(!Rc::ptr_eq(
+                    &merged_node_list[idx],
+                    &merged_node_list[chosen]
+                ));
+
+                merge_nodes(&merged_node_list[idx], &merged_node_list[chosen]);
+
+                debug!("Chosen node {} to node {}", chosen, idx);
+
+                merged_node_list[chosen] = merged_node_list[idx].clone();
+            }
+
+            let node = merged_node_list[idx].borrow();
+
+            cost += node.num_machines() * node.num_workers()
+                - (0..N)
+                    .map(|w| {
+                        if node.workers.get(w) {
+                            workers[w].pop_count() as i16
+                        } else {
+                            0
+                        }
+                    })
+                    .sum::<i16>();
+            used_node.set(idx, true);
+        }
+    }
+
+    cost
 }
