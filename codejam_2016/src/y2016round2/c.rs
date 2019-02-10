@@ -20,6 +20,9 @@ use std::usize;
 Clock arithmetic
 Mazes
 Grid
+BFS using priority queue / min heap
+
+The BFS was actually not needed at all, but rather staying to the left
 */
 pub fn solve_all_cases()
 {
@@ -93,7 +96,6 @@ fn next_dir_loc(loc: &GardenLocation, is_forward_slash: bool) -> GardenLocation
         entry_dir: new_dir,
     }
 }
-
 
 #[derive(Debug, Clone)]
 struct Lover
@@ -287,13 +289,11 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
         };
         let target_location = GardenLocation {
             grid_loc: lover_pair.L2.location.clone(),
-            entry_dir: lover_pair.L2.initial_direction.clone() * -1,
+            entry_dir: *lover_pair.L2.initial_direction * -1,
         };
 
         //used for distance calculations
-        let target_grid_loc = lover_pair.L2.location.clone() + lover_pair.L2.initial_direction;
-
-        let mut grid_edge_dist: Grid<usize> = compute_distance_grid(R, C, &grid);
+        let grid_edge_dist: Grid<usize> = compute_distance_grid(R, C, &grid);
 
         let mut prev: HashMap<GardenLocation, GardenLocation> = HashMap::new();
         //Use a binary heap using -manhattan distance from target, GardenLocation

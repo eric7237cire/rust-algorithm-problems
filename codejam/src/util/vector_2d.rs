@@ -179,6 +179,6 @@ mod test_vector2d
     fn test_add()
     {
         assert_eq!(Vector2d::with_val(0i8, 2),
-                   Vector2d::with_val(0i8, 3) + WEST.convert());
+                   Vector2d::with_val(0i8, 3) + &WEST.convert());
     }
 }

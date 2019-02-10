@@ -86,7 +86,7 @@ impl DisjointSet
     // (Private) Returns the representative element for the set containing the given element. This method is also
     // known as "find" in the literature. Also performs path compression, which alters the internal state to
     // improve the speed of future queries, but has no externally visible effect on the values returned.
-    fn get_repr(&mut self, mut elemindex: usize) -> usize
+    pub fn get_repr(&mut self, mut elemindex: usize) -> usize
     {
         // Follow parent pointers until we reach a representative
         let mut parent: usize = self.nodes[elemindex].parent;

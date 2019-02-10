@@ -159,7 +159,7 @@ fn solve(case_no: u32, dice: &Vec<Vec<i32>>) -> String
         //			System.err.println(Arrays.toString(matchR));
         if (!found) {
             //				System.err.println(i + " NOFOUND");
-            while (true) {
+            loop {
                 assert_ne!(rangeStart, rangeEnd);
                 //Reset dice index
                 matchR[matchL[rangeStart] as usize] = INVALID_MATCH_i32;

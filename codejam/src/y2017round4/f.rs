@@ -3,7 +3,7 @@ use crate::util::codejam::run_cases;
 use crate::util::grid::Grid;
 use bimap::BiMap;
 use num_bigint::BigInt;
-use num_traits::*;
+//use num_traits::*;
 use rand::distributions::{Distribution, Uniform};
 use rand::prelude::{SliceRandom, StdRng};
 use rand::{Rng, SeedableRng};
