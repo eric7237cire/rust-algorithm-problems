@@ -24,14 +24,15 @@ use std::rc::Rc;
 Enumerating multisets
 union find / disjoint set
 rust RC/Refcell ; merging nodes from pointers
+Much recursion
+
+Main idea is that workers must enter as a square chunk, where
+each worker knows each machine in the block
 */
 pub fn solve_all_cases()
 {
     run_cases(
-        &[
-            //"D-small-practice",
-            "D-large-practice",
-        ],
+        &["D-small-practice", "D-large-practice"],
         "y2016round2",
         |reader, buffer| {
             let t = reader.read_int();
@@ -44,7 +45,7 @@ pub fn solve_all_cases()
                     .collect();
 
                 if case_no != 3 {
-                  //  continue;
+                    //  continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -223,9 +224,11 @@ fn solve(workers: &[BitVec64]) -> i16
         .cloned()
         .collect::<Vec<MultiSetElement>>();
 
-    distinct.sort_by(|a, b| a.diff.cmp(&b.diff)
-        .then_with(|| a.num_workers.cmp(&b.num_workers))
-    );
+    distinct.sort_by(|a, b| {
+        a.diff
+            .cmp(&b.diff)
+            .then_with(|| a.num_workers.cmp(&b.num_workers))
+    });
 
     let elem_counts: Vec<i16> = distinct
         .iter()
@@ -235,12 +238,9 @@ fn solve(workers: &[BitVec64]) -> i16
     let mut cur_elem_counts = vec![0i16; elem_counts.len()];
     let mut ans = Vec::new();
 
-    //
-
     enumerate_subsets(
         &distinct[..],
         &elem_counts[..],
-        0,
         0,
         0,
         &mut cur_elem_counts,
@@ -295,12 +295,14 @@ fn solve(workers: &[BitVec64]) -> i16
         0,
         &mut elem_counts.clone(),
         &mut cur_chosen_zero_subsets,
-        0,
         &mut chosen_zero_subsets,
         &mut min_workers,
     );
 
-    debug!("Best subsets: {:?} counts: {:?}", chosen_zero_subsets, elem_counts);
+    debug!(
+        "Best subsets: {:?} counts: {:?}",
+        chosen_zero_subsets, elem_counts
+    );
 
     let mut used_node = BitVec64::new();
     let mut has_been_chosen = BitVec64::new();
@@ -327,9 +329,11 @@ fn solve(workers: &[BitVec64]) -> i16
                     if node.num_workers() == distinct_node.num_workers
                         && node.diff() == distinct_node.diff
                     {
-                        debug!("Found node #{} matching distinct node #{} count {}
+                        debug!(
+                            "Found node #{} matching distinct node #{} count {}
 workers = {} diff = {}",
-                        idx, distinct_idx, c, distinct_node.num_workers, distinct_node.diff);
+                            idx, distinct_idx, c, distinct_node.num_workers, distinct_node.diff
+                        );
 
                         vec_node_list.push(idx);
                         has_been_chosen.set(idx, true);
@@ -353,7 +357,10 @@ workers = {} diff = {}",
                 &merged_node_list[first_node_idx]
             ));
 
-            merge_nodes(&merged_node_list[first_node_idx], &merged_node_list[node_idx]);
+            merge_nodes(
+                &merged_node_list[first_node_idx],
+                &merged_node_list[node_idx],
+            );
 
             debug!("Merged node {} to node {}", node_idx, first_node_idx);
 
@@ -361,11 +368,6 @@ workers = {} diff = {}",
 
             used_node.set(node_idx, true);
         }
-
-
-        /*
-
-        */
     }
 
     let mut cost: i16 = 0;
@@ -376,7 +378,6 @@ workers = {} diff = {}",
         }
 
         assert_eq!(0, merged_node_list[idx].borrow().diff());
-
 
         let node = merged_node_list[idx].borrow();
         cost += node.num_machines() * node.num_workers()
@@ -390,7 +391,6 @@ workers = {} diff = {}",
                 })
                 .sum::<i16>();
         used_node.set(idx, true);
-
     }
 
     cost
@@ -409,45 +409,28 @@ fn enumerate_subsets(
     elem_counts: &[i16],
     current_index: usize,
     current_diff: i16,
-    current_worker_count: i16,
+
     current_elem_counts: &mut Vec<i16>,
     ans: &mut Vec<Vec<i16>>,
 )
 {
     if current_index == elem_counts.len() {
-        if current_diff == 0 && current_worker_count > 0 {
+        if current_diff == 0 && current_elem_counts.iter().any(|c| c > &0) {
             ans.push(current_elem_counts.clone());
         }
         return;
     }
 
-    /*
-
-    if current_worker_count > 0 && current_diff == 0 {
-        for i in current_index  .. elem_counts.len() {
-            current_elem_counts[i] = 0;
-        }
-        ans.push(current_elem_counts.clone());
-        return;
-    }*/
-
     for count in 0..=elem_counts[current_index] {
         current_elem_counts[current_index] = count;
 
         let next_current_diff = current_diff + count * elements[current_index].diff;
-        let next_worker_count = current_worker_count + count * elements[current_index].num_workers;
-
-        if next_worker_count > 0 && next_current_diff == 0 {
-            //ans.push(current_elem_counts.clone());
-            // continue;
-        }
 
         enumerate_subsets(
             elements,
             elem_counts,
             1 + current_index,
             next_current_diff,
-            next_worker_count,
             current_elem_counts,
             ans,
         );
@@ -463,30 +446,25 @@ fn best_subsets(
     remaining_elements: &mut Vec<i16>,
 
     cur_ans: &mut Vec<usize>,
-    cur_min_sq_worker_count: i16,
+
     ans: &mut Vec<usize>,
     min_sq_worker_count: &mut i16,
 )
 {
     if current_index == subsets.len() {
-        if cur_min_sq_worker_count > *min_sq_worker_count {
-            return;
-        }
         if remaining_elements.iter().all(|re| *re == 0) {
-
-
-            let worker_sq_count: i16 = cur_ans.iter().map(|ss_idx|
-                {
+            let worker_sq_count: i16 = cur_ans
+                .iter()
+                .map(|ss_idx| {
                     let ss_worker_count = subsets[*ss_idx]
                         .iter()
                         .enumerate()
-                        .map(|(idx, count)| count * elements[idx].num_workers).sum::<i16>();
+                        .map(|(idx, count)| count * elements[idx].num_workers)
+                        .sum::<i16>();
 
-                    ss_worker_count*ss_worker_count
-                })            .sum();
-
-
-
+                    ss_worker_count * ss_worker_count
+                })
+                .sum();
 
             if worker_sq_count < *min_sq_worker_count {
                 *min_sq_worker_count = worker_sq_count;
@@ -504,7 +482,6 @@ fn best_subsets(
         1 + current_index,
         remaining_elements,
         cur_ans,
-        cur_min_sq_worker_count,
         ans,
         min_sq_worker_count,
     );
@@ -524,19 +501,13 @@ fn best_subsets(
         }
         cur_ans.push(current_index);
 
-        let ss_sq_worker_count: i16 = subsets[current_index]
-            .iter()
-            .enumerate()
-            .map(|(idx, count)| count * elements[idx].num_workers * elements[idx].num_workers)
-            .sum();
-
+        //We also want to try to take multiple instances
         best_subsets(
             elements,
             subsets,
             current_index,
             remaining_elements,
             cur_ans,
-            cur_min_sq_worker_count + ss_sq_worker_count,
             ans,
             min_sq_worker_count,
         );
