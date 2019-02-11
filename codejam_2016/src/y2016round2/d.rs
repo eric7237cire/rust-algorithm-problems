@@ -107,13 +107,10 @@ fn merge_nodes(a: &Rc<RefCell<Node>>, b: &Rc<RefCell<Node>>)
     }
 }
 
-fn solve(workers: &[BitVec64]) -> i16
+/// Connects a worker node to any machine that the worker is already connected to
+fn create_initial_node_list(workers: &[BitVec64], ds: &mut DisjointSet) -> Vec<Rc<RefCell<Node>>>
 {
     let N = workers.len();
-
-    //machines are 0..N, workers N..2*N
-    let mut ds = DisjointSet::new(2 * N);
-
     for (w_idx, worker) in workers.iter().enumerate() {
         debug!(
             "Worker #{:>3}  machines {:0>width$b}  ",
@@ -131,7 +128,7 @@ fn solve(workers: &[BitVec64]) -> i16
 
     debug!("Num sets: {}", ds.number_of_sets());
 
-    let mut node_list: Vec<Rc<RefCell<Node>>> = (0..2 * N)
+    let node_list: Vec<Rc<RefCell<Node>>> = (0..2 * N)
         .map(|i| {
             let mut node: Node = Default::default();
             if i >= N {
@@ -142,6 +139,19 @@ fn solve(workers: &[BitVec64]) -> i16
             Rc::new(RefCell::new(node))
         })
         .collect();
+
+    assert_eq!(node_list.len(), 2 * N);
+
+    node_list
+}
+
+/// Now extract only the unique merged nodes
+fn create_merged_node_list(workers: &[BitVec64]) -> Vec<Rc<RefCell<Node>>>
+{
+    let N = workers.len();
+    let mut ds = DisjointSet::new(2 * N);
+
+    let mut node_list = create_initial_node_list(workers, &mut ds);    
 
     let mut merged_node_list: Vec<Rc<RefCell<Node>>> = Vec::new();
     let mut in_merged = BitVec64::new();
@@ -165,12 +175,12 @@ fn solve(workers: &[BitVec64]) -> i16
 
     debug!("After merge\n");
 
-    for machine in 0..N {
+    for (machine_idx, node) in node_list.iter().enumerate().take(N) {
         debug!(
             "Machine #{:>3}  machines {:0>width$b} / workers {:0>width$b}  ",
-            machine,
-            node_list[machine].borrow().machines.data,
-            node_list[machine].borrow().workers.data,
+            machine_idx,
+            node.borrow().machines.data,
+            node.borrow().workers.data,
             width = N
         );
     }
@@ -206,6 +216,12 @@ fn solve(workers: &[BitVec64]) -> i16
         );
     }
 
+    merged_node_list
+}
+
+fn get_multiset_elements(merged_node_list: &[Rc<RefCell<Node>>]) -> ( 
+    Vec<i16>, Vec<Vec<i16>>, Vec<MultiSetElement> )
+{
     let mut multiset = HashMultiSet::new();
 
     for node in merged_node_list.iter() {
@@ -256,6 +272,19 @@ fn solve(workers: &[BitVec64]) -> i16
             idx, d.diff, d.num_workers, elem_counts[idx]
         );
     }
+
+    (elem_counts, ans, distinct)
+
+}
+
+fn solve(workers: &[BitVec64]) -> i16
+{
+    let N = workers.len();
+
+    //Find the unique blocks of already connected machines & workers
+    let mut merged_node_list = create_merged_node_list(workers);
+
+    let (elem_counts, ans, distinct) =  get_multiset_elements(&merged_node_list);
 
     //We want to remove subsets that fully contain other subsets
     let mut filtered_subsets = Vec::new();
@@ -320,12 +349,12 @@ fn solve(workers: &[BitVec64]) -> i16
             let distinct_node = &distinct[distinct_idx];
 
             for c in 0..*count {
-                for idx in 0..merged_node_list.len() {
+                for (idx, merged_node) in merged_node_list.iter().enumerate() {
                     if has_been_chosen.get(idx) {
                         continue;
                     }
 
-                    let node = merged_node_list[idx].borrow();
+                    let node = merged_node.borrow();
 
                     if node.num_workers() == distinct_node.num_workers
                         && node.diff() == distinct_node.diff
@@ -373,14 +402,14 @@ workers = {} diff = {}",
 
     let mut cost: i16 = 0;
 
-    for idx in 0..merged_node_list.len() {
+    for (idx, merged_node) in merged_node_list.iter().enumerate() {
         if used_node.get(idx) {
             continue;
         }
 
-        assert_eq!(0, merged_node_list[idx].borrow().diff());
+        assert_eq!(0, merged_node.borrow().diff());
 
-        let node = merged_node_list[idx].borrow();
+        let node = merged_node.borrow();
         cost += node.num_machines() * node.num_workers()
             - (0..N)
                 .map(|w| {
@@ -416,7 +445,7 @@ fn enumerate_subsets(
 )
 {
     if current_index == elem_counts.len() {
-        if current_diff == 0 && current_elem_counts.iter().any(|c| c > &0) {
+        if current_diff == 0 && current_elem_counts.iter().any(|c| *c > 0) {
             ans.push(current_elem_counts.clone());
         }
         return;

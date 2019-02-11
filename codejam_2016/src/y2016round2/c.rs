@@ -166,8 +166,8 @@ fn compute_distance_grid(R: usize, C: usize, grid: &Grid<String>) -> Grid<usize>
             grid_edge_dist[(r, c)] = 0;
         }
     }
-    for r in 1..R + 1 {
-        for c in 1..C + 1 {
+    for r in 1..=R  {
+        for c in 1..=C {
             if grid[(r, c)] == "\\" || grid[(r, c)] == "/" {
                 grid_edge_dist[(r, c)] = 0;
             } else {
@@ -180,8 +180,8 @@ fn compute_distance_grid(R: usize, C: usize, grid: &Grid<String>) -> Grid<usize>
             }
         }
     }
-    for r in (1..R + 1).rev() {
-        for c in (1..C + 1).rev() {
+    for r in (1..=R ).rev() {
+        for c in (1..=C ).rev() {
             let loc = Vector2d::with_val(r as i64, c as i64);
 
             for dir in DIRECTIONS.iter() {
@@ -193,12 +193,9 @@ fn compute_distance_grid(R: usize, C: usize, grid: &Grid<String>) -> Grid<usize>
     grid_edge_dist
 }
 
-fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
+fn get_lovers(R: usize, C: usize, grid: &mut Grid<String> ) -> Vec<Lover>
 {
-    //grid including lovers
-    let mut grid: Grid<String> = Grid::new(R + 2, C + 2);
-
-    let mut lovers: Vec<Lover> = Vec::new();
+     let mut lovers: Vec<Lover> = Vec::new();
 
     //Add lovers
     let mut add_lover = |r, c, label: usize, initial_dir| {
@@ -239,6 +236,16 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
     }
 
     assert_eq!(2 * (R + C), lovers.len());
+
+    lovers
+}
+
+fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
+{
+    //grid including lovers
+    let mut grid: Grid<String> = Grid::new(R + 2, C + 2);
+
+    let lovers: Vec<Lover> = get_lovers(R, C, &mut grid);
 
     debug!("Grid\n{:#.3?}\n", grid);
 
@@ -284,11 +291,11 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
         );
 
         let starting_location = GardenLocation {
-            grid_loc: lover_pair.L1.location.clone() + lover_pair.L1.initial_direction,
-            entry_dir: lover_pair.L1.initial_direction.clone(),
+            grid_loc: lover_pair.L1.location + lover_pair.L1.initial_direction,
+            entry_dir: *lover_pair.L1.initial_direction,
         };
         let target_location = GardenLocation {
-            grid_loc: lover_pair.L2.location.clone(),
+            grid_loc: lover_pair.L2.location,
             entry_dir: *lover_pair.L2.initial_direction * -1,
         };
 
@@ -360,10 +367,10 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
                     distance_to_filled_edge: grid_edge_dist[&loc.grid_loc],
                     distance_to_lmid: lover_pair.Lmid.location.manhat_distance(&loc.grid_loc),
                 };
-                if !prev.contains_key(&next_heap_node.loc) {
+                prev.entry(next_heap_node.loc).or_insert_with(|| {                
                     heap.push(next_heap_node);
-                    prev.insert(next_heap_node.loc, heap_node.loc);
-                }
+                    heap_node.loc
+                });
             }
 
             if grid_contents != "/" {
@@ -373,10 +380,11 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
                     distance_to_filled_edge: grid_edge_dist[&loc.grid_loc],
                     distance_to_lmid: lover_pair.Lmid.location.manhat_distance(&loc.grid_loc),
                 };
-                if !prev.contains_key(&next_heap_node.loc) {
+
+                prev.entry(next_heap_node.loc).or_insert_with(|| {
                     heap.push(next_heap_node);
-                    prev.insert(next_heap_node.loc, heap_node.loc);
-                }
+                    heap_node.loc
+                });
             }
         }
 

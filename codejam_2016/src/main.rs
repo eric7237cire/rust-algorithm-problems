@@ -49,6 +49,7 @@ pub fn run_y2016_round2()
     y2016round2::a::solve_all_cases();
     y2016round2::b::solve_all_cases();
     y2016round2::c::solve_all_cases();
+    y2016round2::d::solve_all_cases();
 }
 
 fn main()
