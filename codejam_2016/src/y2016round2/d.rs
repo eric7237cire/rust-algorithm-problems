@@ -284,24 +284,26 @@ fn solve(workers: &[BitVec64]) -> i16
     //Find the unique blocks of already connected machines & workers
     let mut merged_node_list = create_merged_node_list(workers);
 
-    let (elem_counts, ans, distinct) =  get_multiset_elements(&merged_node_list);
+    //Find subsets of blocks that either need workers or need machines to become square
+    //the sum of these sumsets will be 0 (so each makes 1 square)
+    let (elem_counts, zero_sum_subsets, distinct) =  get_multiset_elements(&merged_node_list);
 
     //We want to remove subsets that fully contain other subsets
     let mut filtered_subsets = Vec::new();
-    for idx1 in 0..ans.len() {
+    for idx1 in 0..zero_sum_subsets.len() {
         let mut ok = true;
-        for idx2 in 0..ans.len() {
+        for idx2 in 0..zero_sum_subsets.len() {
             if idx2 == idx1 {
                 continue;
             }
-            if ans[idx2].iter().zip(ans[idx1].iter()).all(|(b, a)| b <= a) {
+            if zero_sum_subsets[idx2].iter().zip(zero_sum_subsets[idx1].iter()).all(|(b, a)| b <= a) {
                 ok = false;
                 break;
             }
         }
 
         if ok {
-            filtered_subsets.push(ans[idx1].clone());
+            filtered_subsets.push(zero_sum_subsets[idx1].clone());
         }
     }
 
