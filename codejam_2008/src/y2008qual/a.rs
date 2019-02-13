@@ -49,6 +49,8 @@ fn solve(search_engines: &[String], queries: &[String]) -> usize
 
 	while cur_q != queries.len() {
 
+        //given 1 switch, how many queries can we get through by choosing the search engine that occurs the latest in the next
+        //batch of queries
         let s_potential_progress = search_engines.iter().map( |search| {
             let idx = queries[cur_q..queries.len()].iter().position( |q| q == search);
             if let Some(idx) = idx  {
