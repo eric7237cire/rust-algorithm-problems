@@ -159,10 +159,10 @@ impl<'a> InputReader<'a>
         self.s.chars().take(amt).collect::<Vec<_>>()
     }
 
-    pub fn read_string(&mut self) -> &str
+    pub fn read_string(&mut self) -> String
     {
         self.s.clear();
         self.i.read_line(&mut self.s).unwrap();
-        self.s.trim()
+        self.s.trim().to_string()
     }
 }
