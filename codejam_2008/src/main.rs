@@ -1,7 +1,6 @@
 //#![allow(non_snake_case)]
 mod y2008qual;
 
-
 extern crate codejam;
 
 /*#[macro_use]
