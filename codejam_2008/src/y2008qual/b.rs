@@ -6,7 +6,7 @@ use std::cmp::min;
 use std::cmp::Ordering;
 
 /*
-
+Scan line
 */
 pub fn solve_all_cases()
 {
@@ -77,6 +77,7 @@ fn find_required_trains(station_events: &mut Vec<TrainEvent>) -> i64
     debug!("find_required_trains");
 	station_events.sort();
 
+    //so as trains arrive (+1) they cannot affect the minimum
     let mut trains_min = 0;
     let mut trains = 0;
 

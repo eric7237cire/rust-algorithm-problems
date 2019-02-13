@@ -14,6 +14,7 @@ use codejam::util::log::init_log;
 pub fn run_y2008_round_qual()
 {
     y2008qual::a::solve_all_cases();
+    y2008qual::b::solve_all_cases();
 }
 
 pub fn run_y2008_round_1a()
@@ -40,5 +41,5 @@ fn main()
 {
     init_log();
 
-    y2008qual::b::solve_all_cases();
+    y2008qual::c::solve_all_cases();
 }
