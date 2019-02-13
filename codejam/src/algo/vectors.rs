@@ -1,10 +1,8 @@
 use num_bigint::BigInt;
 use num_traits::*;
 use std::convert::From;
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, Div, Mul, Sub};
 //https://github.com/PistonDevelopers/vecmath/blob/master/src/lib.rs
-
-use num_traits::*;
 
 pub type Vector3<T> = [T; 3];
 pub fn vec3_sub<T>(a: &Vector3<T>, b: &Vector3<T>) -> Vector3<T>

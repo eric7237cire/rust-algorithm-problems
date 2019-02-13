@@ -73,6 +73,15 @@ impl<'a> InputReader<'a>
             .collect()
     }
 
+    pub fn read_string_line(&mut self) -> Vec<String>
+    {
+        self.s.clear();
+        self.i.read_line(&mut self.s).unwrap();
+        self.s
+            .split_whitespace().map(|s| s.to_string())
+            .collect()
+    }
+
     pub fn read_int_line_iter<T: std::marker::Sized + std::str::FromStr>(
         &mut self,
     ) -> impl Iterator<Item = T> + '_

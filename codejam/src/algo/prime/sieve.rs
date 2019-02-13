@@ -160,10 +160,9 @@ impl SieveOfAtkin
                         break;
                     }
                     let integer = integer.unwrap();
-                    let val = test
+                    let val = *test
                         .get(integer)
-                        .expect("Index passed is invalid. This shouldn't happen.")
-                        .clone();
+                        .expect("Index passed is invalid. This shouldn't happen.");
                     let case: AtkinCases = match val.value() % 60 {
                         1 | 13 | 17 | 29 | 37 | 41 | 49 | 53 => AtkinCases::C1,
                         7 | 19 | 31 | 43 => AtkinCases::C2,
@@ -182,29 +181,24 @@ impl SieveOfAtkin
         }
 
         for _ in 0..9 {
-            match rx.recv() {
-                Ok(x) => tests.push(x),
-                _ => (),
+            if let Ok(x) = rx.recv() {
+                tests.push(x);
             }
         }
 
         for i in tests {
-            for j in 0..self.tests.len() - 1 {
-                let current = self.tests.get(j).unwrap().is_prime();
-                self.tests
-                    .get_mut(j)
-                    .unwrap()
-                    .set_prime(current ^ i.get(j).unwrap().is_prime());
+            for (j, test_j) in self.tests.iter_mut().enumerate() {
+                let current = test_j.is_prime();
+                test_j.set_prime(current ^ i[j].is_prime());
             }
         }
 
         // start sieving
         while !self.tests.is_empty() {
-            let first = self
+            let first = *self
                 .tests
                 .first()
-                .expect("Attempted to get item from tests vector while it was empty.")
-                .clone();
+                .expect("Attempted to get item from tests vector while it was empty.");
             if first.is_prime() {
                 self.results.push(first.value());
                 let square = first.value() * first.value();

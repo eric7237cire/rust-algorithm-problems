@@ -3,7 +3,7 @@ use bit_vec::BitVec;
 
 impl DiGraph
 {
-    fn dfs(&self, v: usize) -> DfsIterator
+    pub fn dfs(&self, v: usize) -> DfsIterator
     {
         // Create a stack for DFS
         let mut stack: Vec<usize> = Vec::new();

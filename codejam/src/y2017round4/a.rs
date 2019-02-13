@@ -13,7 +13,7 @@ use std::usize;
 use std::thread;
 
 /*
-incremental matching
+Fast incremental bipartite matching
 performance intentive
 heavy duty recursion (in slower solutions)
 
@@ -24,6 +24,9 @@ Make flow2 faster (which is also BFS but way slower than the solution used)
 
 Found a fast BFS implementation which is currently used in solve from
 one of the contestents
+
+
+
 */
 pub fn solve_all_cases()
 {
@@ -156,7 +159,7 @@ fn solve(case_no: u32, dice: &Vec<Vec<i32>>) -> String
         //			System.err.println(Arrays.toString(matchR));
         if (!found) {
             //				System.err.println(i + " NOFOUND");
-            while (true) {
+            loop {
                 assert_ne!(rangeStart, rangeEnd);
                 //Reset dice index
                 matchR[matchL[rangeStart] as usize] = INVALID_MATCH_i32;

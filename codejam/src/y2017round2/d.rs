@@ -131,7 +131,7 @@ impl Default for Tile
 }
 
 //problem specific code
-fn reachable(grid: &Grid<Tile>, location: GridCoord) -> HashSet<GridRowColVec>
+fn reachable(grid: &Grid<Tile>, location: &GridCoord) -> HashSet<GridRowColVec>
 {
     let mut r = HashSet::new();
     //debug!("\nTracing {} starting at {}", location, direction);
@@ -140,15 +140,15 @@ fn reachable(grid: &Grid<Tile>, location: GridCoord) -> HashSet<GridRowColVec>
         let mut loc: GridRowColVec = location.convert();
 
         for _ in 0..=grid.R + grid.C {
-            loc += *direction;
+            loc += direction;
 
-            if let Some(tile) = grid.get_value(loc) {
+            if let Some(tile) = grid.get_value(&loc) {
                 match *tile {
                     Building => {
                         break;
                     }
                     _ => {
-                        r.insert(loc);
+                        r.insert(loc.clone());
                     }
                 };
             } else {
@@ -192,7 +192,7 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>, M_soldier_limit: usize) -> Str
     //precalucate what squares a turret can reach
     let turret_reachable_squares_list = turret_locations
         .iter()
-        .map(|t_loc| reachable(&grid, *t_loc))
+        .map(|t_loc| reachable(&grid, &t_loc))
         .collect::<Vec<_>>();
 
     let T_map = turret_locations
@@ -224,9 +224,9 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>, M_soldier_limit: usize) -> Str
     let sink = S + T + 1;
 
     let vertex_to_string = |v: usize| match v {
-        s if s < S => format!("Soldier #{} ({})", s + 1, *S_map.get_by_left(&s).unwrap()),
+        s if s < S => format!("Soldier #{} ({:?})", s + 1, *S_map.get_by_left(&s).unwrap()),
         t if t >= S && t < S + T => format!(
-            "Turret #{} ({})",
+            "Turret #{} ({:?})",
             t - S + 1,
             *T_map.get_by_left(&(t - S)).unwrap()
         ),
@@ -331,8 +331,8 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>, M_soldier_limit: usize) -> Str
             debug!("Found (s,t') s={} t'={}", s, t - S);
             ans += &format!("{} {}\n", s + 1, t - S + 1);
 
-            grid[*S_map.get_by_left(&s).unwrap()] = Empty;
-            grid[*T_map.get_by_left(&(t - S)).unwrap()] = Empty;
+            grid[S_map.get_by_left(&s).unwrap()] = Empty;
+            grid[T_map.get_by_left(&(t - S)).unwrap()] = Empty;
             r -= 1;
 
             //Also remove from current matching
@@ -413,8 +413,8 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>, M_soldier_limit: usize) -> Str
             debug!("Taking actions from g' s {} t {}", s + 1, t + 1 - S);
             ans += &format!("{} {}\n", s + 1, t - S + 1);
 
-            grid[*S_map.get_by_left(&s).unwrap()] = Empty;
-            grid[*T_map.get_by_left(&(t - S)).unwrap()] = Empty;
+            grid[S_map.get_by_left(&s).unwrap()] = Empty;
+            grid[T_map.get_by_left(&(t - S)).unwrap()] = Empty;
 
             r -= 1;
         }
@@ -457,7 +457,7 @@ fn build_graph(
         let mut visited = BitVec::from_elem(grid.C * grid.R, false);
 
         queue.push_back((soldier_loc.convert(), 0, false));
-        visited.set(soldier_loc.0 * grid.C + soldier_loc.1, true);
+        visited.set(soldier_loc.data[0] * grid.C + soldier_loc.data[1], true);
 
         while !queue.is_empty() {
             let (loc, dist, seen_turret) = queue.pop_front().unwrap();
@@ -496,14 +496,14 @@ fn build_graph(
             );*/
 
             for dir in DIRECTIONS.iter() {
-                let new_loc = loc + *dir;
+                let new_loc = loc.clone() + dir;
 
-                if let Some(tile) = grid.get_value(new_loc) {
+                if let Some(tile) = grid.get_value(&new_loc) {
                     if *tile == Building {
                         continue;
                     }
 
-                    let newLocIndex = (new_loc.0 * grid.C as i64 + new_loc.1) as usize;
+                    let newLocIndex = (new_loc.data[0] * grid.C as i64 + new_loc.data[1]) as usize;
                     if visited[newLocIndex] {
                         continue;
                     }

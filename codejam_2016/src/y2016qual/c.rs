@@ -1,24 +1,17 @@
-use crate::algo::graph::flow2::Flow;
-use crate::algo::prime::sieve::SieveOfAtkin;
+use codejam::util::codejam::run_cases;
 
-use crate::util::codejam::run_cases;
-use bit_set::BitSet;
-use bit_vec::BitVec;
-use byteorder::{BigEndian, ByteOrder, LittleEndian, NativeEndian, WriteBytesExt};
+use codejam::algo::prime::sieve::SieveOfAtkin;
+
+//use byteorder::{BigEndian, ByteOrder, LittleEndian, NativeEndian, WriteBytesExt};
 use num_bigint::BigUint;
 use num_traits::*;
-use rand::{thread_rng, Rng};
-use std::cmp::max;
-use std::collections::HashSet;
-use std::collections::VecDeque;
 use std::io::Write;
-use std::mem;
 use std::usize;
 
-use std::thread;
-
 /*
-Greedy alogrithm
+Primes
+Byte manipulation
+Change of base
 */
 pub fn solve_all_cases()
 {
@@ -54,11 +47,11 @@ fn solve(N: u16, J: u16) -> String
     let primes: Vec<BigUint> = sieve
         .get_results_vec()
         .into_iter()
-        .map(|p| BigUint::from(p))
+        .map(BigUint::from)
         .collect();
 
     //brute force
-    'jamcoin: for jamcoin in (1 + (1 << (N - 1))..=((1u64 << N) - 1)).step_by(2) {
+    'jamcoin: for jamcoin in (1 + (1 << (N - 1))..(1u64 << N)).step_by(2) {
         //println!("{:b}  N={}", jamcoin, N);
 
         let mut num_ks: Vec<BigUint> = Vec::new();

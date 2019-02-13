@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 //#![warn(clippy::all)]
-#![allow(warnings)]
+//#![allow(warnings)]
 //use self::y2017qual::d::solve_all_cases;
 //use self::y2017round1B::c::solve_all_cases;
 //use self::y2017round1C::a::solve_all_cases;
@@ -17,7 +17,7 @@ mod algo;
 mod y2017round1A;
 mod y2017round1B;
 mod y2017round1C;*/
-mod y2016qual;
+
 mod y2017round2;
 mod y2017round3;
 mod y2017round4;
@@ -44,7 +44,9 @@ fn main()
     y2017round3::c::solve_all_cases();
     y2017round3::d::solve_all_cases();*/
 
-    y2017round4::f::solve_all_cases();
+    y2017round2::c::solve_all_cases();
+    y2017round2::d::solve_all_cases();
+    y2017round3::d::solve_all_cases();
 
-    //y2016qual::c::solve_all_cases();
+    //y2016qual::d::solve_all_cases();
 }
