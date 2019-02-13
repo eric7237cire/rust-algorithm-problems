@@ -1,4 +1,4 @@
-Case #1: 1 2
+Case #1: 0 2
 Case #2: 1 0
 Case #3: 2 0
 Case #4: 4 2
@@ -16,5 +16,5 @@ Case #15: 13 0
 Case #16: 0 8
 Case #17: 6 8
 Case #18: 2 2
-Case #19: 7 3
+Case #19: 6 3
 Case #20: 8 4

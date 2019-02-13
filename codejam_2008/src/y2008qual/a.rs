@@ -4,8 +4,8 @@ use std::io::Write;
 use std::usize;
 
 /*
-Simulation
-Digits
+Greedy
+Induction (proof)
 */
 pub fn solve_all_cases()
 {

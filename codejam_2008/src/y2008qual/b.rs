@@ -6,8 +6,7 @@ use std::cmp::min;
 use std::cmp::Ordering;
 
 /*
-Simulation
-Digits
+
 */
 pub fn solve_all_cases()
 {
@@ -35,7 +34,7 @@ pub fn solve_all_cases()
                 let departures: Vec<_> =
                     (0..nb).map(|_| read_times(reader.read_string())).collect();
 
-                if case_no != 3 {
+                if case_no != 1 {
                     // continue;
                 }
 
@@ -61,8 +60,8 @@ struct TrainEvent
     num_train_change: i64,
 }
 impl Ord for TrainEvent {
-    fn cmp(&self, other: &TrainEvent) -> Ordering {
-        self.time.cmp(&other.time).then_with(|| self.num_train_change.cmp(&other.num_train_change))
+    fn cmp(&self, rhs: &TrainEvent) -> Ordering {
+        self.time.cmp(&rhs.time).then_with(|| rhs.num_train_change.cmp(&self.num_train_change))
     }
 }
 
@@ -75,16 +74,20 @@ impl PartialOrd for TrainEvent {
 
 fn find_required_trains(station_events: &mut Vec<TrainEvent>) -> i64
 {
+    debug!("find_required_trains");
 	station_events.sort();
 
     let mut trains_min = 0;
     let mut trains = 0;
 
 	for evt in station_events.iter() {
+        debug!("Train event at time {}.  Change {}", evt.time, evt.num_train_change);
         trains += evt.num_train_change;
-        trains_min = min(trains, trains_min)
+        trains_min = min(trains, trains_min);
+        debug!("Trains now {}.  min {}", trains, trains_min);
     }
 
+    debug!("Done find_required_trains {} ", trains_min.abs());
 	return trains_min.abs()
 }
 
