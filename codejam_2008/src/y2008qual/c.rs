@@ -3,7 +3,8 @@ use std::io::Write;
 use std::f64::consts::PI;
 
 /*
-
+Circle / slice area
+Direct Geometry area calculations
 */
 pub fn solve_all_cases()
 {
@@ -17,12 +18,6 @@ pub fn solve_all_cases()
 
                 let floats = reader.read_num_line();
 
-
-
-                if case_no != 1 {
-                    // continue;
-                }
-
                 println!("Solving case {}", case_no);
 
                 let ans = solve(floats[0], floats[1], floats[2], floats[3], floats[4]);
@@ -30,7 +25,6 @@ pub fn solve_all_cases()
                     buffer,
                     "Case #{}: {}",
                     case_no, ans
-
                 )
                 .unwrap();
             }
@@ -146,8 +140,8 @@ fn solve(fly_radius: f64, racket_radius : f64, t: f64, chord_radius: f64, gap_le
             debug!( "  X1 arc {} x2 arc {}", x1_arc_intersection, x2_arc_intersection);
 
             //take care of the curve
-            x1_arc_intersection = if x1 > x1_arc_intersection { x1 } else { x1_arc_intersection };
-            x2_arc_intersection = if x2 < x2_arc_intersection { x2 } else { x2_arc_intersection };
+             if x1 > x1_arc_intersection { x1_arc_intersection=x1 }
+             if x2 < x2_arc_intersection { x2_arc_intersection =x2 }
 
             slice_miss_area +=  (y2-y1) * (x2_arc_intersection-x1) ;
 
