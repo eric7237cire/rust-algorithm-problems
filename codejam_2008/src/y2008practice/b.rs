@@ -12,7 +12,8 @@ use std::i64;
 use std::io::Write;
 
 /*
-Change of base
+Grid
+Maze finding
 */
 pub fn solve_all_cases()
 {
