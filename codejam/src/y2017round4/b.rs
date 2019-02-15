@@ -37,7 +37,8 @@ pub fn solve_all_cases()
 
                 let cards = (0..C)
                     .map(|_| {
-                        let mut sw = reader.read_string().split_whitespace();
+                        let some_string = reader.read_string();
+                        let mut sw = some_string.split_whitespace();
                         (
                             sw.next().unwrap().parse::<char>().unwrap(),
                             sw.next().unwrap().parse::<i16>().unwrap(),

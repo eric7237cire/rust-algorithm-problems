@@ -3,6 +3,7 @@ use std::default::Default;
 use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
 use std::ops::{Add, AddAssign, Mul, Sub, Rem, Div,Index, IndexMut};
+use std::ops::Neg;
 
 //#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[derive(PartialEq, Eq, Hash, Clone, Copy, Ord, PartialOrd)]
@@ -72,6 +73,18 @@ impl<T> Vector2d<T> where T: Copy
     pub fn y(&self) -> T
     {
         self.data[1]
+    }
+}
+
+impl<T> Vector2d<T> where T: Neg<Output=T> + Copy
+{
+    pub fn rotate_rc_right(&self) -> Vector2d<T>
+    {
+        Vector2d{ data: [self.data[1], -self.data[0] ] }
+    }
+    pub fn rotate_rc_left(&self) -> Vector2d<T>
+    {
+        Vector2d{ data: [-self.data[1], self.data[0] ] }
     }
 }
 

@@ -9,8 +9,8 @@ use rand::prelude::{SliceRandom, StdRng};
 use rand::{Rng, SeedableRng};
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::io::Write;
-use std::ops::Sub;
-use std::time::Instant;
+//use std::ops::Sub;
+//use std::time::Instant;
 
 /*
 Cross product / dot product

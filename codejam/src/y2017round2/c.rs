@@ -11,7 +11,7 @@ Simulation, grid, backtracking
 use crate::algo::graph::connectivity::ConnectivityGraph;
 use crate::algo::graph::Graph;
 use crate::util::grid::constants::*;
-use crate::util::grid::{Grid, GridCoord, GridRowColVec};
+use crate::util::grid::{Grid};
 
 use crate::util::codejam::run_cases;
 use bimap::BiMap;

@@ -68,7 +68,7 @@ const NUM_DICE_VALUES: usize = 6;
 const MAX_DICE_VALUE: usize = 1_000_000;
 const MAX_N_DICE: usize = 50_000;
 
-const INVALID_MATCH_i32: i32 = -1;
+const INVALID_MATCH_I32: i32 = -1;
 
 fn solve(case_no: u32, dice: &Vec<Vec<i32>>) -> String
 {
@@ -84,10 +84,10 @@ fn solve(case_no: u32, dice: &Vec<Vec<i32>>) -> String
     let n = dice.len();
 
     //matchL[dice value]
-    let mut matchL = vec![INVALID_MATCH_i32; MAX_DICE_VALUE];
+    let mut matchL = vec![INVALID_MATCH_I32; MAX_DICE_VALUE];
 
     //matchR[dice index]
-    let mut matchR = vec![INVALID_MATCH_i32; n];
+    let mut matchR = vec![INVALID_MATCH_I32; n];
 
     //Storing values
     let mut queue = vec![0; MAX_DICE_VALUE];
@@ -103,8 +103,8 @@ fn solve(case_no: u32, dice: &Vec<Vec<i32>>) -> String
         if value_to_dice[cur_dice_value_i].len() == 0 {
             //				System.err.println(i + " NOEDGE");
             for j in rangeStart..rangeEnd {
-                matchR[matchL[j] as usize] = INVALID_MATCH_i32;
-                matchL[j] = INVALID_MATCH_i32;
+                matchR[matchL[j] as usize] = INVALID_MATCH_I32;
+                matchL[j] = INVALID_MATCH_I32;
             }
             rangeStart = cur_dice_value_i + 1;
             rangeEnd = cur_dice_value_i + 1;
@@ -115,14 +115,14 @@ fn solve(case_no: u32, dice: &Vec<Vec<i32>>) -> String
         let mut queueTail = 1;
         queue[0] = cur_dice_value_i as i32;
         used.set(cur_dice_value_i, true);
-        back[cur_dice_value_i] = INVALID_MATCH_i32;
+        back[cur_dice_value_i] = INVALID_MATCH_I32;
         let mut found = false;
         'bfs: loop {
             assert!(queue[queueHead] >= 0);
             let mut cur = queue[queueHead] as usize;
             queueHead += 1;
 
-            let mut cedges = &value_to_dice[cur];
+            let cedges = &value_to_dice[cur];
             for j in 0..cedges.len() {
                 let mut next_dice_index = cedges[j] as usize;
                 //Found a non matched dice index
@@ -162,8 +162,8 @@ fn solve(case_no: u32, dice: &Vec<Vec<i32>>) -> String
             loop {
                 assert_ne!(rangeStart, rangeEnd);
                 //Reset dice index
-                matchR[matchL[rangeStart] as usize] = INVALID_MATCH_i32;
-                matchL[rangeStart] = INVALID_MATCH_i32;
+                matchR[matchL[rangeStart] as usize] = INVALID_MATCH_I32;
+                matchL[rangeStart] = INVALID_MATCH_I32;
                 assert_ne!(rangeStart, rangeEnd);
                 rangeStart += 1;
 

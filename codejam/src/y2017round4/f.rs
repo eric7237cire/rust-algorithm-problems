@@ -1,8 +1,7 @@
-use crate::algo::vectors::*;
+//use crate::algo::vectors::*;
 use crate::util::codejam::run_cases;
 use crate::util::grid::Grid;
 use bimap::BiMap;
-use num_bigint::BigInt;
 //use num_traits::*;
 use rand::distributions::{Distribution, Uniform};
 use rand::prelude::{SliceRandom, StdRng};
@@ -12,7 +11,6 @@ use std::collections::{HashMap, HashSet, VecDeque};
 use std::i64;
 use std::io::Write;
 use std::mem;
-use std::ops::Sub;
 use std::time::Instant;
 
 /*
@@ -136,20 +134,10 @@ fn solve(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> Option<u64>
         .iter()
         .fold(i64::MAX, |acc, t| min(acc, dist(&dest, t)));
 
-    let max_dist_home = teleporters
-        .iter()
-        .fold(i64::MIN, |acc, t| max(acc, dist(&home, t)));
 
-    let max_dist_dest = teleporters
-        .iter()
-        .fold(i64::MIN, |acc, t| max(acc, dist(&dest, t)));
-
-    let max_dist = max(max_dist_dest, max_dist_home);
-
-    ///extra
+    //extra
     let mut dist_matrix = Vec::new();
 
-    let mut max_step_idx = 1;
 
     /*
     create a matrix [log steps][t_idx][t2_idx]
@@ -169,10 +157,10 @@ fn solve(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> Option<u64>
                 }
             }
         } else {
-            for (t1_idx, t1) in teleporters.iter().enumerate() {
-                for (t2_idx, t2) in teleporters.iter().enumerate() {
+            for (t1_idx, _t1) in teleporters.iter().enumerate() {
+                for (t2_idx, _t2) in teleporters.iter().enumerate() {
                     let mut best = -1;
-                    for (v_idx, v) in teleporters.iter().enumerate() {
+                    for (v_idx, _v) in teleporters.iter().enumerate() {
                         best = max(
                             best,
                             dist_matrix[steps_idx - 1][t1_idx][v_idx]
@@ -266,11 +254,10 @@ fn solve(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> Option<u64>
 /// And validates iterative squaring approach to calculing max U distance per step
 fn solve_small_only_U(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> Option<u64>
 {
-    let target_distance = dist(home, dest);
     //let mut L: Vec<Vec<i64>> = Vec::new();
     //let mut U: Vec<Vec<i64>> = Vec::new();
 
-    let target_distance = dist(home, dest);
+    //let target_distance = dist(home, dest);
 
     let min_dist_home = teleporters
         .iter()
@@ -290,7 +277,7 @@ fn solve_small_only_U(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> O
 
     let max_dist = max(max_dist_dest, max_dist_home);
 
-    ///extra
+    //extra
     let mut dist_matrix = Vec::new();
 
     for steps_idx in 0..50 {
@@ -306,10 +293,10 @@ fn solve_small_only_U(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> O
                 }
             }
         } else {
-            for (t1_idx, t1) in teleporters.iter().enumerate() {
-                for (t2_idx, t2) in teleporters.iter().enumerate() {
+            for (t1_idx, _t1) in teleporters.iter().enumerate() {
+                for (t2_idx, _t2) in teleporters.iter().enumerate() {
                     let mut best = -1;
-                    for (v_idx, v) in teleporters.iter().enumerate() {
+                    for (v_idx, _v) in teleporters.iter().enumerate() {
                         best = max(
                             best,
                             dist_matrix[steps_idx - 1][t1_idx][v_idx]
@@ -348,7 +335,7 @@ fn solve_small_only_U(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> O
     }
 
     let mut initial = Vec::new();
-    for (t_idx, t) in teleporters.iter().enumerate() {
+    for (_t_idx, t) in teleporters.iter().enumerate() {
         /*println!("Teleporter #{}, dist home: {}",
         t_idx, dist(home, t));*/
         initial.push(dist(home, t));
