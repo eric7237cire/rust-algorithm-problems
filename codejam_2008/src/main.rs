@@ -1,6 +1,6 @@
 //#![allow(non_snake_case)]
-mod y2008qual;
 mod y2008practice;
+mod y2008qual;
 
 extern crate codejam;
 
@@ -22,6 +22,8 @@ pub fn run_y2008_round_qual()
 pub fn run_y2008_round_practice()
 {
     //https://code.google.com/codejam/contest/32003/dashboard
+
+    y2008practice::a::solve_all_cases();
 }
 
 pub fn run_y2008_round_1a()
@@ -48,6 +50,5 @@ fn main()
 {
     init_log();
 
-
-    y2008practice::a::solve_all_cases();
+    y2008practice::b::solve_all_cases();
 }

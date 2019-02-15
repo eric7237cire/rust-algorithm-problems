@@ -86,7 +86,34 @@ impl<T> Vector2d<T> where T: Neg<Output=T> + Copy
     {
         Vector2d{ data: [-self.data[1], self.data[0] ] }
     }
+    pub fn rotate_rc_reverse(&self) -> Vector2d<T>
+    {
+        Vector2d{ data: [-self.data[0], -self.data[1] ] }
+    }
+
+    pub fn rotate_rc_right_mut(&mut self)
+    {
+        let r = self.data[0];
+        let c = self.data[1];
+        self.data[0] = c;
+        self.data[1] = -r;
+
+
+    }
+    pub fn rotate_rc_left_mut(&mut self)
+    {
+        let r = self.data[0];
+        let c = self.data[1];
+        self.data[0] = -c;
+        self.data[1] = r;
+    }
+    pub fn rotate_rc_reverse_mut(&mut self)
+    {
+        self.data[0] = -self.data[0];
+        self.data[1] = -self.data[1];
+    }
 }
+
 
 impl<T> Vector2d<T> where T: Rem<Output=T> + Div<Output=T> + Copy
 {
@@ -193,5 +220,26 @@ mod test_vector2d
     {
         assert_eq!(Vector2d::with_val(0i8, 2),
                    Vector2d::with_val(0i8, 3) + &WEST.convert());
+    }
+
+    #[test]
+    fn test_rotate()
+    {
+        assert_eq!(NORTH.rotate_rc_right(), EAST);
+        assert_eq!(EAST.rotate_rc_right(), SOUTH);
+        assert_eq!(SOUTH.rotate_rc_right(), WEST);
+        assert_eq!(WEST.rotate_rc_right(), NORTH);
+
+        assert_eq!(NORTH.rotate_rc_left(), WEST);
+        assert_eq!(WEST.rotate_rc_left(), SOUTH);
+        assert_eq!(SOUTH.rotate_rc_left(), EAST);
+        assert_eq!(EAST.rotate_rc_left(), NORTH);
+
+
+        assert_eq!(NORTH.rotate_rc_reverse(), SOUTH);
+        assert_eq!(WEST.rotate_rc_reverse(), EAST);
+        assert_eq!(EAST.rotate_rc_reverse(), WEST);
+        assert_eq!(SOUTH.rotate_rc_reverse(), NORTH);
+
     }
 }

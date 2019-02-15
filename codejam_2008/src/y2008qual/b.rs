@@ -1,9 +1,9 @@
 //use bit_set::BitSet;
 use codejam::util::codejam::run_cases;
-use std::io::Write;
-use std::usize;
 use std::cmp::min;
 use std::cmp::Ordering;
+use std::io::Write;
+use std::usize;
 
 /*
 Scan line
@@ -41,13 +41,7 @@ pub fn solve_all_cases()
                 println!("Solving case {}", case_no);
 
                 let ans = solve(t, arrivals.as_slice(), departures.as_slice());
-                writeln!(
-                    buffer,
-                    "Case #{}: {} {}",
-                    case_no, ans[0], ans[1]
-
-                )
-                .unwrap();
+                writeln!(buffer, "Case #{}: {} {}", case_no, ans[0], ans[1]).unwrap();
             }
         },
     );
@@ -59,40 +53,48 @@ struct TrainEvent
     time: usize,
     num_train_change: i64,
 }
-impl Ord for TrainEvent {
-    fn cmp(&self, rhs: &TrainEvent) -> Ordering {
-        self.time.cmp(&rhs.time).then_with(|| rhs.num_train_change.cmp(&self.num_train_change))
+impl Ord for TrainEvent
+{
+    fn cmp(&self, rhs: &TrainEvent) -> Ordering
+    {
+        self.time
+            .cmp(&rhs.time)
+            .then_with(|| rhs.num_train_change.cmp(&self.num_train_change))
     }
 }
 
-impl PartialOrd for TrainEvent {
-    fn partial_cmp(&self, other: &TrainEvent) -> Option<Ordering> {
+impl PartialOrd for TrainEvent
+{
+    fn partial_cmp(&self, other: &TrainEvent) -> Option<Ordering>
+    {
         Some(self.cmp(other))
     }
 }
 
-
 fn find_required_trains(station_events: &mut Vec<TrainEvent>) -> i64
 {
     debug!("find_required_trains");
-	station_events.sort();
+    station_events.sort();
 
     //so as trains arrive (+1) they cannot affect the minimum
     let mut trains_min = 0;
     let mut trains = 0;
 
-	for evt in station_events.iter() {
-        debug!("Train event at time {}.  Change {}", evt.time, evt.num_train_change);
+    for evt in station_events.iter() {
+        debug!(
+            "Train event at time {}.  Change {}",
+            evt.time, evt.num_train_change
+        );
         trains += evt.num_train_change;
         trains_min = min(trains, trains_min);
         debug!("Trains now {}.  min {}", trains, trains_min);
     }
 
     debug!("Done find_required_trains {} ", trains_min.abs());
-	return trains_min.abs()
+    return trains_min.abs();
 }
 
-fn solve(turn_around_time: usize, a_to_b: &[[usize; 2]], b_to_a: &[[usize; 2]]) -> [i64;2]
+fn solve(turn_around_time: usize, a_to_b: &[[usize; 2]], b_to_a: &[[usize; 2]]) -> [i64; 2]
 {
     debug!("{:?}", a_to_b[0]);
 
@@ -120,5 +122,8 @@ fn solve(turn_around_time: usize, a_to_b: &[[usize; 2]], b_to_a: &[[usize; 2]]) 
         });
     }
 
-    [ find_required_trains(&mut station_a_events) , find_required_trains(&mut station_b_events) ]
+    [
+        find_required_trains(&mut station_a_events),
+        find_required_trains(&mut station_b_events),
+    ]
 }
