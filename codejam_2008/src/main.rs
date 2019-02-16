@@ -1,6 +1,7 @@
 //#![allow(non_snake_case)]
 mod y2008practice;
 mod y2008qual;
+mod y2008beta;
 
 extern crate codejam;
 
@@ -26,6 +27,12 @@ pub fn run_y2008_round_practice()
     y2008practice::a::solve_all_cases();
     y2008practice::b::solve_all_cases();
     y2008practice::c::solve_all_cases();
+    y2008practice::d::solve_all_cases();
+}
+
+pub fn run_y2008_round_beta()
+{
+
 }
 
 pub fn run_y2008_round_1a()
@@ -50,7 +57,9 @@ pub fn run_y2008_round2()
 
 fn main()
 {
+    y2008beta::a::solve_all_cases();
+
     init_log();
 
-    y2008practice::d::solve_all_cases();
+
 }

@@ -79,7 +79,7 @@ impl PartialEq for Stock
 {
     fn eq(&self, rhs: &Stock) -> bool
     {
-        self.spent == rhs.spent && self.mask.data == rhs.mask.data && self.cf == rhs.cf
+        self.spent == rhs.spent && self.mask.data == rhs.mask.data && self.loc == rhs.loc
     }
 }
 
