@@ -142,6 +142,18 @@ impl<T> Vector2d<T> where T: PartialOrd + Sub<Output=T> + Add<Output=T> + Copy
     }
 }
 
+impl<T> Vector2d<T> where T: PartialOrd + Sub<Output=T> + Add<Output=T> + Copy
++ Mul<Output=T> + NumCast
+{
+    pub fn pyth_distance(&self, rhs: &Self) -> f64
+    {
+        let n = (self.data[0] - rhs.data[0]) * (self.data[0] - rhs.data[0]) +
+            (self.data[1] - rhs.data[1]) * (self.data[1] - rhs.data[1]);
+        cast::<T, f64>(n).unwrap().sqrt()
+    }
+}
+
+
 impl<T> Vector2d<T> where T: num_traits::cast::NumCast + Copy
 {
     pub fn convert<M: NumCast>(&self) -> Vector2d<M>

@@ -25,6 +25,7 @@ pub fn run_y2008_round_practice()
 
     y2008practice::a::solve_all_cases();
     y2008practice::b::solve_all_cases();
+       y2008practice::c::solve_all_cases();
 }
 
 pub fn run_y2008_round_1a()
@@ -51,5 +52,5 @@ fn main()
 {
     init_log();
 
-    y2008practice::c::solve_all_cases();
+    y2008practice::d::solve_all_cases();
 }

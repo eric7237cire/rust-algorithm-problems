@@ -4,6 +4,7 @@ use std::i64;
 use std::io::Write;
 
 /*
+Dynamic programming
 */
 pub fn solve_all_cases()
 {
@@ -11,31 +12,28 @@ pub fn solve_all_cases()
         &["C-small-practice", "C-large-practice"],
         "y2008practice",
         |reader, buffer| {
-
             let mut fcomp = Fcomp::new();
 
             let t = reader.read_int();
 
             for case_no in 1..=t {
-                let (f,d,b) = reader.read_tuple_3();
-
+                let (f, d, b) = reader.read_tuple_3();
 
                 println!("Solving case {}", case_no);
 
-                let f_max = if let Some(f) = fcomp.find_f_max(d,b) {
+                let f_max = if let Some(f) = fcomp.find_f_max(d, b) {
                     f as i64
                 } else {
                     -1
                 };
-                let d_min = fcomp.find_d_min(f,b);
-                let b_min = fcomp.find_b_min(f,d);
+                let d_min = fcomp.find_d_min(f, b);
+                let b_min = fcomp.find_b_min(f, d);
 
                 writeln!(buffer, "Case #{}: {} {} {}", case_no, f_max, d_min, b_min).unwrap();
             }
         },
     );
 }
-
 
 struct Fcomp
 {
@@ -47,7 +45,6 @@ const F_MAX_LIMIT: u64 = 1 << 32; //  4294967296;
 
 impl Fcomp
 {
-
     fn new() -> Self
     {
         Fcomp {
@@ -64,7 +61,7 @@ impl Fcomp
                 //#breaking 1 egg means we can figure out d levels
                 Some(d)
             } else if b == 2 {
-                //#Happens to be the sum formula
+                //#Happens to be the sum formula, since you can organize it like 5(if break) + 4 + 3 + 2 + 1
                 Some((d * (d + 1)) / 2)
             } else if b > 2 && d >= 2954 {
                 None
@@ -76,14 +73,9 @@ impl Fcomp
                 None
             } else if b > 16 && d >= 33 {
                 None
-            }
-             else if b == d - 1 {
-                //#Arrange f(d,b) in a downward triangle
-                Some(2u64.pow( (d) as u32) - 2)
             } else if d <= b {
-                Some(2u64.pow( (d) as u32) - 1)
-            }
-            else {
+                Some(2u64.pow((d) as u32) - 1)
+            } else {
                 let lhs = self.find_f_max(d - 1, b - 1);
                 let rhs = self.find_f_max(d - 1, b);
                 if lhs.is_none() || rhs.is_none() {
@@ -93,19 +85,19 @@ impl Fcomp
                 }
             };
 
-        if !ret_val.is_none() && ret_val.unwrap()  > F_MAX_LIMIT {
+        if !ret_val.is_none() && ret_val.unwrap() > F_MAX_LIMIT {
             ret_val = None;
         }
 
         if d < D_LIMIT && b < B_LIMIT {
             //if self.cache[d][b].is_none() {
-                self.cache[d as usize][b as usize] = ret_val;
+            self.cache[d as usize][b as usize] = ret_val;
             //}
         }
         ret_val
     }
 
-    fn find_d_min(&mut self, f: u64,  b: u64) -> u64
+    fn find_d_min(&mut self, f: u64, b: u64) -> u64
     {
         let mut d = 1;
 
@@ -140,9 +132,25 @@ mod tests
     use crate::y2008practice::c::Fcomp;
     use crate::y2008practice::c::F_MAX_LIMIT;
 
+
+    #[test]
+    fn test_f_max()
+    {
+        let mut f_comp = Fcomp::new();
+
+        assert_eq!(Some(14), f_comp.find_f_max(4, 3));
+        assert_eq!(Some(7), f_comp.find_f_max(3, 3));
+        assert_eq!(Some(6), f_comp.find_f_max(3, 2));
+
+        assert_eq!(Some(3), f_comp.find_f_max(3, 1));
+
+
+    }
+
     #[test]
     fn tests()
     {
+
         test_stuff(3, 3, 3, Some(7), 2, 1);
         test_stuff(7, 5, 3, Some(25), 3, 2);
         test_stuff(1, 122, 6, Some(4_258_490_215), 1, 1);
@@ -160,13 +168,10 @@ mod tests
     {
         let mut f_comp = Fcomp::new();
 
-        for d in 1..100 {
-            println!("D is {}",d);
-            for b in 1..100 {
-                assert!(
-                    f_comp.find_f_max(d, b).unwrap_or(0) < F_MAX_LIMIT,
-
-                );
+        for d in 1..10 {
+            println!("D is {}", d);
+            for b in 1..10 {
+                assert!(f_comp.find_f_max(d, b).unwrap_or(0) < F_MAX_LIMIT,);
             }
         }
     }
@@ -177,7 +182,7 @@ mod tests
 
         let (fmax, dmin, bmin) = (
             fcomp.find_f_max(d, b),
-            fcomp.find_d_min(f,  b),
+            fcomp.find_d_min(f, b),
             fcomp.find_b_min(f, d),
         );
 

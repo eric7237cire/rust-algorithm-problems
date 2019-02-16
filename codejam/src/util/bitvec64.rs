@@ -30,6 +30,11 @@ impl BitVec64
         BitVec64 { data: 0 }
     }
 
+    pub fn with_val( data: usize ) -> BitVec64
+    {
+        BitVec64 { data }
+    }
+
     pub fn pop_count(&self) -> u32
     {
         self.data.count_ones()
