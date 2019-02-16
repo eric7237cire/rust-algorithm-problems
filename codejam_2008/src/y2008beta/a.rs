@@ -1,8 +1,10 @@
 //use bit_set::BitSet;
 use codejam::util::codejam::run_cases;
 use std::io::Write;
-use std::usize;
+
 use codejam::util::vector_2d::Vector2d;
+use std::f64;
+use std::f64::consts::PI;
 
 /*
 Triangles
@@ -18,12 +20,6 @@ pub fn solve_all_cases()
             for case_no in 1..=t {
                 let floats = reader.read_num_line();
 
-                let search_engines: Vec<_> = (0..n).map(|_| reader.read_string()).collect();
-
-                let q = reader.read_int();
-
-                let queries: Vec<_> = (0..q).map(|_| reader.read_string()).collect();
-
                 if case_no != 3 {
                     // continue;
                 }
@@ -34,7 +30,10 @@ pub fn solve_all_cases()
                     buffer,
                     "Case #{}: {}",
                     case_no,
-                    solve(search_engines.as_slice(), queries.as_slice())
+                    solve(&Vector2d::with_val(floats[0], floats[1]),
+                          &Vector2d::with_val(floats[2], floats[3]),
+                          &Vector2d::with_val(floats[4], floats[5]))
+
                 )
                 .unwrap();
             }
@@ -71,36 +70,39 @@ fn law_cosines(a: f64, b: f64, c: f64) -> f64
 {
 	//c2 = a2 + b2 – 2ab cos C
 	//#puts a, b, c, ((c ** 2 - a ** 2 - b ** 2) / (-2 * a * b))
-	( (c.powi(2) - a.powi(2) - b.powi(2)) / (-2 * a * b) ).acos()
+	( (c.powi(2) - a.powi(2) - b.powi(2)) / (-2. * a * b) ).acos()
 }
 
 
 fn solve(p1: &Vector2d<f64>, p2: &Vector2d<f64>, p3: &Vector2d<f64>) -> String
 {
-    let mut s_changes = 0;
-    let mut cur_q = 0;
+    let ab = Line::new(p1, p2);
+    let ac = Line::new(p1, p3);
+    let bc = Line::new(p2, p3);
 
-    while cur_q != queries.len() {
-        //given 1 switch, how many queries can we get through by choosing the search engine that occurs the latest in the next
-        //batch of queries
-        let s_potential_progress = search_engines.iter().map(|search| {
-            let idx = queries[cur_q..queries.len()]
-                .iter()
-                .position(|q| q == search);
-            if let Some(idx) = idx {
-                idx + cur_q
-            } else {
-                queries.len()
-            }
-        });
-
-        cur_q = s_potential_progress.max().unwrap();
-        s_changes += 1;
+    if ab.is_parallel(&ac) || ab.is_parallel(&bc) || ac.is_parallel(&bc) {
+        return "not a triangle".to_string();
     }
 
-    if s_changes > 0 {
-        s_changes -= 1;
-    }
+    let mut angles = Vec::new();
+	angles.push(law_cosines(ab.len, ac.len, bc.len));
+	angles.push( law_cosines(ab.len, bc.len, ac.len));
+	angles.push( law_cosines(ac.len, bc.len, ab.len));
 
-    s_changes
+	let desc1 = if ab.len == ac.len || ab.len == bc.len || ac.len == bc.len {
+        "isosceles"
+    } else {
+        "scalene"
+    };
+
+	let desc2 = if
+	 angles.iter().any(  |&ang| (ang - PI / 2.).abs() < 0.00000001 ) {
+        "right"
+    } else if angles.iter().any(  |&ang| ang > PI / 2.) {
+        "obtuse"
+    } else {
+        "acute"
+    };
+
+	format!("{} {} triangle", desc1, desc2)
 }
