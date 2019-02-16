@@ -132,7 +132,6 @@ mod tests
     use crate::y2008practice::c::Fcomp;
     use crate::y2008practice::c::F_MAX_LIMIT;
 
-
     #[test]
     fn test_f_max()
     {
@@ -143,14 +142,11 @@ mod tests
         assert_eq!(Some(6), f_comp.find_f_max(3, 2));
 
         assert_eq!(Some(3), f_comp.find_f_max(3, 1));
-
-
     }
 
     #[test]
     fn tests()
     {
-
         test_stuff(3, 3, 3, Some(7), 2, 1);
         test_stuff(7, 5, 3, Some(25), 3, 2);
         test_stuff(1, 122, 6, Some(4_258_490_215), 1, 1);
