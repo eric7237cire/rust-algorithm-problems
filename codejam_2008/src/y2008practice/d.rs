@@ -9,7 +9,8 @@ use std::collections::HashMap;
 use std::io::Write;
 
 /*
-Dynamic programming
+Priority queue / max heap
+Bitmasks
 */
 pub fn solve_all_cases()
 {
@@ -64,11 +65,12 @@ pub fn solve_all_cases()
 struct Stock
 {
     spent: f64,
-    //basket count
-    bct: u32,
+
     loc: usize,
     //from location?
     cf: usize,
+
+    //1 if an item has been purchased
     mask: BitVec64,
 }
 
@@ -83,24 +85,13 @@ impl PartialEq for Stock
 
 impl Stock
 {
-    fn new(spent: f64, mask: BitVec64, loc: usize) -> Self
+    fn new(spent: f64, mask: BitVec64, loc: usize, cf: usize) -> Self
     {
         Stock {
             spent,
             mask,
             loc,
-            cf: 0,
-            bct: mask.pop_count(),
-        }
-    }
-    fn new2(spent: f64, mask: BitVec64, loc: usize, b: u32, cf: usize) -> Self
-    {
-        Stock {
-            spent,
-            mask,
-            loc,
-            cf,
-            bct: b,
+            cf
         }
     }
 }
@@ -226,17 +217,12 @@ impl Memo
                     store.stk.remove(j);
                 }
             }
-            /*
-                        store.stk.retain(|&item_idx|
-                            store.prices[item_idx] as f64 <= chp[item_idx]
-                        );
-            */
         }
 
         self.bcost[0][0] = 0.0;
         let mut pq = BinaryHeap::new();
 
-        pq.push(Stock::new2(0.0, BitVec64::new(), 0, 0, sts.len()));
+        pq.push(Stock::new(0.0, BitVec64::new(), 0, sts.len()));
 
         while let Some(s) = pq.pop() {
             debug!(
@@ -244,7 +230,7 @@ impl Memo
                 s.spent,
                 s.mask.data,
                 s.loc,
-                s.bct,
+                s.mask.pop_count(),
                 s.cf,
                 width = ni
             );
@@ -275,7 +261,6 @@ impl Memo
                     let mut nm = s.mask;
                     //perishable count
                     let mut pr = 0;
-                    let mut nct = s.bct;
                     let mask = BitVec64::with_val(m);
 
                     for (i, &item_index) in stk.iter().enumerate() {
@@ -286,7 +271,6 @@ impl Memo
                         cost += store.prices[item_index] as f64;
 
                         nm.set(item_index, true);
-                        nct += 1;
                         if per.get(item_index) {
                             pr += 1;
                         }
@@ -297,17 +281,19 @@ impl Memo
                     }
 
                     if pr > 0 {
+                        //must return to home base
                         let gc = store.dist(0, 0) * gp + cost;
 
                         if self.bcost[0][nm.data] > gc + EPS {
                             self.bcost[0][nm.data] = gc;
-                            pq.push(Stock::new2(gc, nm, 0, nct, s.loc));
+                            pq.push(Stock::new(gc, nm, 0, s.loc));
                             debug!(
-                                " Push Stock({},{:b},{},{},{})\n",
-                                gc, nm.data, 0, nct, s.loc
+                                " Push Stock({},{:b},{},{})\n",
+                                gc, nm.data, 0, s.loc
                             );
                         }
                     } else {
+                        //go to every other store, including home
                         self.bcost[s.loc][nm.data] = cost;
                         for (i, other_store) in sts.iter().enumerate() {
                             if s.loc == i {
@@ -317,8 +303,8 @@ impl Memo
 
                             if self.bcost[i][nm.data] > gc + EPS {
                                 self.bcost[i][nm.data] = gc;
-                                pq.push(Stock::new2(gc, nm, i, nct, s.loc));
-                                debug!(" Push Stock({},{},{},{},{})\n", gc, nm.data, i, nct, s.loc);
+                                pq.push(Stock::new(gc, nm, i, s.loc));
+                                debug!(" Push Stock({},{},{},{})\n", gc, nm.data, i, s.loc);
                             }
                         }
                     }
@@ -329,10 +315,10 @@ impl Memo
 
                     if self.bcost[i][s.mask.data] > gc + EPS {
                         self.bcost[i][s.mask.data] = gc;
-                        pq.push(Stock::new2(gc, s.mask, i, s.bct, 0));
+                        pq.push(Stock::new(gc, s.mask, i, 0));
                         debug!(
-                            " Push Stock({},{},{},{},{})\n",
-                            gc, s.mask.data, i, s.bct, 0
+                            " Push Stock({},{},{},{})\n",
+                            gc, s.mask.data, i,  0
                         );
                     }
                 }
