@@ -36,7 +36,7 @@ fn lis(xs: &Vec<u8>) -> usize
 
     for i in 0..xs.len() {
         let it = lis.lower_bound(&xs[i]);
-        if it > lis.len() {
+        if it >= lis.len() {
             lis.push(xs[i]);
         } else {
             lis[it] = xs[i];
