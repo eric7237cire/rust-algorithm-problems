@@ -4,7 +4,8 @@ use std::io::Write;
 use superslice::*;
 
 /*
-Triangles
+Order
+Lower bound
 */
 pub fn solve_all_cases()
 {
@@ -32,14 +33,17 @@ pub fn solve_all_cases()
 
 fn lis(xs: &Vec<u8>) -> usize
 {
+
     let mut lis = Vec::new();
 
-    for i in 0..xs.len() {
-        let it = lis.lower_bound(&xs[i]);
+    for price in xs.iter() {
+        //Returns the index i pointing to the first element in the ordered slice that is not less than x.
+        let it = lis.lower_bound(price);
         if it >= lis.len() {
-            lis.push(xs[i]);
+            lis.push(*price);
         } else {
-            lis[it] = xs[i];
+            assert!( lis[it] >= *price);
+            lis[it] = *price;
         }
     }
 
@@ -61,22 +65,14 @@ fn solve(products: Vec<String>, prices: Vec<u8>) -> String
             .iter()
             .position(|non_sorted_product| non_sorted_product == sorted_product).expect("Should exist");
 
-        let mut xsp = Vec::new();
-        let mut psp = Vec::new();
+        let mut prices_without_p = Vec::new();
 
-        xsp.extend_from_slice(&prices[0..non_sorted_index]);
-        xsp.extend_from_slice(&prices[non_sorted_index + 1..]);
+        prices_without_p.extend_from_slice(&prices[0..non_sorted_index]);
+        prices_without_p.extend_from_slice(&prices[non_sorted_index + 1..]);
 
-        for k in 0..products.len() {
-            if k == non_sorted_index {
-                continue;
-            }
-            psp.push(products[k].clone());
-        }
-
-        if lis(&prices) == lis(&xsp) {
-            prices = xsp;
-            products = psp;
+        if lis(&prices) == lis(&prices_without_p) {
+            prices = prices_without_p;
+            products.remove(non_sorted_index);
             ret.push(sorted_product.clone());
         }
     }
