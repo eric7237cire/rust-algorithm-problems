@@ -8,6 +8,7 @@ use std::f64::consts::PI;
 
 /*
 Triangles
+Basic geometry
 */
 pub fn solve_all_cases()
 {
@@ -30,10 +31,11 @@ pub fn solve_all_cases()
                     buffer,
                     "Case #{}: {}",
                     case_no,
-                    solve(&Vector2d::with_val(floats[0], floats[1]),
-                          &Vector2d::with_val(floats[2], floats[3]),
-                          &Vector2d::with_val(floats[4], floats[5]))
-
+                    solve(
+                        &Vector2d::with_val(floats[0], floats[1]),
+                        &Vector2d::with_val(floats[2], floats[3]),
+                        &Vector2d::with_val(floats[4], floats[5])
+                    )
                 )
                 .unwrap();
             }
@@ -41,38 +43,38 @@ pub fn solve_all_cases()
     );
 }
 
-struct Line {
+struct Line
+{
     slope: Option<f64>,
-    len: f64
+    len: f64,
 }
 
-impl Line {
+impl Line
+{
     fn new(p1: &Vector2d<f64>, p2: &Vector2d<f64>) -> Line
     {
         Line {
-            slope:
-            if p1.x() == p2.x() {
+            slope: if p1.x() == p2.x() {
                 None
             } else {
                 Some((p2.y() - p1.y()) / (p2.x() - p1.x()))
             },
-            len: p1.pyth_distance(p2)
+            len: p1.pyth_distance(p2),
         }
     }
 
-    fn is_parallel(&self, other: &Line) -> bool {
+    fn is_parallel(&self, other: &Line) -> bool
+    {
         self.slope == other.slope
     }
 }
 
-
 fn law_cosines(a: f64, b: f64, c: f64) -> f64
 {
-	//c2 = a2 + b2 – 2ab cos C
-	//#puts a, b, c, ((c ** 2 - a ** 2 - b ** 2) / (-2 * a * b))
-	( (c.powi(2) - a.powi(2) - b.powi(2)) / (-2. * a * b) ).acos()
+    //c2 = a2 + b2 – 2ab cos C
+    //#puts a, b, c, ((c ** 2 - a ** 2 - b ** 2) / (-2 * a * b))
+    ((c.powi(2) - a.powi(2) - b.powi(2)) / (-2. * a * b)).acos()
 }
-
 
 fn solve(p1: &Vector2d<f64>, p2: &Vector2d<f64>, p3: &Vector2d<f64>) -> String
 {
@@ -85,24 +87,23 @@ fn solve(p1: &Vector2d<f64>, p2: &Vector2d<f64>, p3: &Vector2d<f64>) -> String
     }
 
     let mut angles = Vec::new();
-	angles.push(law_cosines(ab.len, ac.len, bc.len));
-	angles.push( law_cosines(ab.len, bc.len, ac.len));
-	angles.push( law_cosines(ac.len, bc.len, ab.len));
+    angles.push(law_cosines(ab.len, ac.len, bc.len));
+    angles.push(law_cosines(ab.len, bc.len, ac.len));
+    angles.push(law_cosines(ac.len, bc.len, ab.len));
 
-	let desc1 = if ab.len == ac.len || ab.len == bc.len || ac.len == bc.len {
+    let desc1 = if ab.len == ac.len || ab.len == bc.len || ac.len == bc.len {
         "isosceles"
     } else {
         "scalene"
     };
 
-	let desc2 = if
-	 angles.iter().any(  |&ang| (ang - PI / 2.).abs() < 0.00000001 ) {
+    let desc2 = if angles.iter().any(|&ang| (ang - PI / 2.).abs() < 0.00000001) {
         "right"
-    } else if angles.iter().any(  |&ang| ang > PI / 2.) {
+    } else if angles.iter().any(|&ang| ang > PI / 2.) {
         "obtuse"
     } else {
         "acute"
     };
 
-	format!("{} {} triangle", desc1, desc2)
+    format!("{} {} triangle", desc1, desc2)
 }

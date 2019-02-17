@@ -50,13 +50,27 @@ fn solve(K: u16, C: u16, S: u16) -> Option<Vec<u64>>
     }
 
     /*
+    K tiles initially
+    C complexity
+    Can uncover S tiles
+
     we just need positions whose digits in base K match
     The strategy is we only care about initial sequences with 1  G
     A G at pos P will have a G in any position who has a digit P in base K
+
+    G..
+    GGGG..G..
+
+    Here K=3
+
+    So take the positions: 0, 1, 2, 3, 4, 5 make them into base 3 with a digit length of C
+    // 00, 01, 02, 10, 11, 12, 20, 21, 22
+    // anything with a 0 digit (including leading) will be a G
     */
     Some(
         (0..K)
             .collect::<Vec<_>>()
+            //For each tile uncovered, we can verify C different positions
             .chunks(C as usize)
             .map(|digits| {
                 let mut pos = 0u64;

@@ -91,7 +91,7 @@ impl Stock
             spent,
             mask,
             loc,
-            cf
+            cf,
         }
     }
 }
@@ -287,10 +287,7 @@ impl Memo
                         if self.bcost[0][nm.data] > gc + EPS {
                             self.bcost[0][nm.data] = gc;
                             pq.push(Stock::new(gc, nm, 0, s.loc));
-                            debug!(
-                                " Push Stock({},{:b},{},{})\n",
-                                gc, nm.data, 0, s.loc
-                            );
+                            debug!(" Push Stock({},{:b},{},{})\n", gc, nm.data, 0, s.loc);
                         }
                     } else {
                         //go to every other store, including home
@@ -316,10 +313,7 @@ impl Memo
                     if self.bcost[i][s.mask.data] > gc + EPS {
                         self.bcost[i][s.mask.data] = gc;
                         pq.push(Stock::new(gc, s.mask, i, 0));
-                        debug!(
-                            " Push Stock({},{},{},{})\n",
-                            gc, s.mask.data, i,  0
-                        );
+                        debug!(" Push Stock({},{},{},{})\n", gc, s.mask.data, i, 0);
                     }
                 }
             }
