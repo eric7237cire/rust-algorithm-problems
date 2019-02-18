@@ -12,10 +12,7 @@ Finding / enumerating all shortest paths
 pub fn solve_all_cases()
 {
     run_cases(
-        &[
-            "C-small-practice",
-            "C-large-practice"
-        ],
+        &["C-small-practice", "C-large-practice"],
         "y2008beta",
         |reader, buffer| {
             let t = reader.read_int();
@@ -34,7 +31,7 @@ pub fn solve_all_cases()
                     .collect();
 
                 if case_no > 1 {
-                   // continue;
+                    // continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -70,21 +67,22 @@ fn get_city_id(
     id
 }
 
-fn  find_all_shortest_paths <'a>(
+fn find_all_shortest_paths<'a>(
     dest_node: usize,
     //minimum distance
     dist: &Vec<Vec<u32>>,
     roads: &'a Vec<Road>,
-    paths: & mut Vec<Vec<&'a Road>>,
+    paths: &mut Vec<Vec<&'a Road>>,
 )
 {
     let min_dist = dist[0][dest_node];
 
     //seed the paths from the roads that start at the starting city
-    for road in roads
-        .iter()
-        .filter(|road| road.city_from == 0 && road.cost <= min_dist && min_dist - road.cost == dist[road.city_to][dest_node])
-    {
+    for road in roads.iter().filter(|road| {
+        road.city_from == 0
+            && road.cost <= min_dist
+            && min_dist - road.cost == dist[road.city_to][dest_node]
+    }) {
         paths.push(vec![road]);
     }
 
@@ -100,7 +98,10 @@ fn  find_all_shortest_paths <'a>(
             let source_node = last_road.city_to;
             let min_dist = dist[source_node][dest_node];
 
-            debug!("path_idx {} from {} min_dist {}", path_idx, source_node, min_dist);
+            debug!(
+                "path_idx {} from {} min_dist {}",
+                path_idx, source_node, min_dist
+            );
 
             for (idx, road) in roads
                 .iter()
@@ -212,15 +213,15 @@ fn solve(starting_city: &str, roads: &[(String, String, u32)]) -> Vec<f64>
         );
 
         for (paths_idx, path) in paths.iter().enumerate() {
-            debug!("Shortest path {} of {}", paths_idx+1, paths.len());
+            debug!("Shortest path {} of {}", paths_idx + 1, paths.len());
 
             for (path_idx, road) in path.iter().enumerate() {
                 //let road = &roads[*r_idx];
                 debug!(
                     "Path step #{} of {}.  Road #{}: {}/{} => {}/{} cost: {}",
-                    path_idx+1,
+                    path_idx + 1,
                     path.len(),
-                    road.road_id+1,
+                    road.road_id + 1,
                     road.city_from,
                     cities[road.city_from],
                     road.city_to,
