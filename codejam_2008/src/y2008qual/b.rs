@@ -24,9 +24,9 @@ pub fn solve_all_cases()
                 let read_times = |in_string: String| -> [usize; 2] {
                     [
                         &in_string[0..2].parse::<usize>().unwrap() * 60
-                            + &in_string[3..5].parse::<usize>().unwrap(),
+                            + in_string[3..5].parse::<usize>().unwrap(),
                         &in_string[6..8].parse::<usize>().unwrap() * 60
-                            + &in_string[9..11].parse::<usize>().unwrap(),
+                            + in_string[9..11].parse::<usize>().unwrap(),
                     ]
                 };
 

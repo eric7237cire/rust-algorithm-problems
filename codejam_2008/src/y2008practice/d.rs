@@ -153,7 +153,7 @@ impl Store
 
     fn dist(&self, xp: i32, yp: i32) -> f64
     {
-        return Vector2d::with_val(self.x, self.y).pyth_distance(&Vector2d::with_val(xp, yp));
+        Vector2d::with_val(self.x, self.y).pyth_distance(&Vector2d::with_val(xp, yp))
     }
 }
 

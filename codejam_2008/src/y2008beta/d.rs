@@ -3,6 +3,10 @@ use std::io::Write;
 use hungarian::minimize;
 
 /*
+Hungarian algorithm
+Munkres - Kuhn
+
+Hexagon board
 */
 pub fn solve_all_cases()
 {
@@ -72,11 +76,10 @@ impl Hex
         } //  #each cy gives you a free x move.  Each jump is 2
     }
 }
-//		@diag1, @diag2, @diag3 = -@x == @y, @x == @y, @y == 0
 
 fn solve(positions: &[u16], values: &[u16]) -> u16
 {
-    let hex_size = positions.len() as i16;
+    let hex_size: usize = positions.len();
     assert_eq!(values.len(), hex_size as usize);
 
     let small_hex_row_len = (hex_size + 1) / 2;
@@ -84,7 +87,7 @@ fn solve(positions: &[u16], values: &[u16]) -> u16
     debug!("S={} top/bottom row width={}", hex_size, small_hex_row_len);
 
     let mut hex_num = 1;
-    let mut y = hex_size - small_hex_row_len;
+    let mut y = (hex_size - small_hex_row_len) as i16;
     let mut hexes = Vec::new();
 
     let mut create_hexes = |row_len: i16| {
@@ -97,11 +100,11 @@ fn solve(positions: &[u16], values: &[u16]) -> u16
     };
 
     for row_len in small_hex_row_len..=hex_size {
-        create_hexes(row_len);
+        create_hexes(row_len as i16);
     }
 
     for row_len in (small_hex_row_len..=hex_size - 1).rev() {
-        create_hexes(row_len);
+        create_hexes(row_len as i16);
     }
 
     let diag1 = hexes.iter().filter(|h| h.x == h.y).collect();
@@ -109,7 +112,6 @@ fn solve(positions: &[u16], values: &[u16]) -> u16
     let diag3 = hexes.iter().filter(|h| 0 == h.y).collect();
 
     let diags: [Vec<&Hex>; 3] = [diag1, diag2, diag3];
-
 
     for h in hexes.iter() {
         debug!("Hex x {} y {} label {}", h.x, h.y, h.label);
@@ -119,10 +121,10 @@ fn solve(positions: &[u16], values: &[u16]) -> u16
         debug!("Diag {} is {:?}", d, diag);
 
         //create weight matrix
-         // Square matrix
-
         let cost_matrix : Vec<u16> = (0..hex_size*hex_size).map( | row_col| {
+            //determines which initial pos/val
             let row = row_col / hex_size;
+            //determines where in the diagonal
             let col = row_col % hex_size;
 
             let pos = positions[row as usize] as usize;
@@ -138,11 +140,9 @@ fn solve(positions: &[u16], values: &[u16]) -> u16
 
         debug!("Assignment {:?}", assignment);
 
-        let cost = assignment.iter().enumerate().map( | (idx, choice) |
+        assignment.iter().enumerate().map( | (idx, choice) |
             cost_matrix[ idx * hex_size as usize + choice.unwrap() ]
-        ).sum();
-
-        cost
+        ).sum()
     }).min().unwrap();
 
     min_cost

@@ -70,8 +70,8 @@ fn get_city_id(
 fn find_all_shortest_paths<'a>(
     dest_node: usize,
     //minimum distance
-    dist: &Vec<Vec<u32>>,
-    roads: &'a Vec<Road>,
+    dist: &[Vec<u32>],
+    roads: &'a [Road],
     paths: &mut Vec<Vec<&'a Road>>,
 )
 {

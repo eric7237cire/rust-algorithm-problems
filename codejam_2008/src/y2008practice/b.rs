@@ -38,7 +38,7 @@ pub fn solve_all_cases()
     );
 }
 
-fn solve(forward_path: &String, back_path: &String) -> String
+fn solve(forward_path: &str, back_path: &str) -> String
 {
     let zeropos = Vector2d::with_val(0, 0);
 
@@ -75,7 +75,7 @@ fn solve(forward_path: &String, back_path: &String) -> String
     };
 
     let mut handle_path =
-        |path: &String, initial_dir: Vector2d<i64>, initial_pos: Vector2d<i64>| {
+        |path: &str, initial_dir: Vector2d<i64>, initial_pos: Vector2d<i64>| {
             let mut dir = initial_dir;
             let mut pos = initial_pos;
             for ch in path.chars() {

@@ -31,7 +31,7 @@ pub fn solve_all_cases()
     );
 }
 
-fn lis(xs: &Vec<u8>) -> usize
+fn lis(xs: &[u8]) -> usize
 {
     let mut lis = Vec::new();
 

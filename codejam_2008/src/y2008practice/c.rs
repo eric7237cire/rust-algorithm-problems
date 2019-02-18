@@ -85,7 +85,7 @@ impl Fcomp
                 }
             };
 
-        if !ret_val.is_none() && ret_val.unwrap() > F_MAX_LIMIT {
+        if ret_val.is_some() && ret_val.unwrap() > F_MAX_LIMIT {
             ret_val = None;
         }
 
