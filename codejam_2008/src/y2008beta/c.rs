@@ -6,6 +6,8 @@ use std::io::Write;
 use std::u32;
 
 /*
+Floyd–Warshall algorithm
+Finding / enumerating all shortest paths
 */
 pub fn solve_all_cases()
 {
@@ -70,6 +72,7 @@ fn get_city_id(
 
 fn find_all_shortest_paths(
     dest_node: usize,
+    //minimum distance
     dist: &Vec<Vec<u32>>,
     roads: &Vec<Road>,
     paths: &mut Vec<Vec<usize>>,
@@ -77,6 +80,7 @@ fn find_all_shortest_paths(
 {
     let min_dist = dist[0][dest_node];
 
+    //seed the paths from the roads that start at the starting city
     for road in roads
         .iter()
         .filter(|road| road.city_from == 0 && road.cost <= min_dist && min_dist - road.cost == dist[road.city_to][dest_node])
@@ -111,6 +115,8 @@ fn find_all_shortest_paths(
                     paths[path_idx].push(r_tup.road_id);
                     done = false;
                 } else {
+                    //we have more than 1 path to extend the original one, so we make a copy, taking
+                    //care to remove the previously added next node
                     let mut new_path = paths[path_idx].clone();
                     new_path.pop();
                     new_path.push(r_tup.road_id);
