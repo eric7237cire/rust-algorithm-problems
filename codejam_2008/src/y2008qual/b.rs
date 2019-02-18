@@ -91,7 +91,7 @@ fn find_required_trains(station_events: &mut Vec<TrainEvent>) -> i64
     }
 
     debug!("Done find_required_trains {} ", trains_min.abs());
-    return trains_min.abs();
+    trains_min
 }
 
 fn solve(turn_around_time: usize, a_to_b: &[[usize; 2]], b_to_a: &[[usize; 2]]) -> [i64; 2]

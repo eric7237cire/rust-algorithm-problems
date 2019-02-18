@@ -58,7 +58,6 @@ pub fn run_y2008_round2()
 
 fn main()
 {
-    y2008beta::c::solve_all_cases();
-
     init_log();
+    y2008beta::c::solve_all_cases();
 }

@@ -33,7 +33,6 @@ pub fn solve_all_cases()
 
 fn lis(xs: &Vec<u8>) -> usize
 {
-
     let mut lis = Vec::new();
 
     for price in xs.iter() {
@@ -42,7 +41,7 @@ fn lis(xs: &Vec<u8>) -> usize
         if it >= lis.len() {
             lis.push(*price);
         } else {
-            assert!( lis[it] >= *price);
+            assert!(lis[it] >= *price);
             lis[it] = *price;
         }
     }
@@ -63,7 +62,8 @@ fn solve(products: Vec<String>, prices: Vec<u8>) -> String
         //j
         let non_sorted_index = products
             .iter()
-            .position(|non_sorted_product| non_sorted_product == sorted_product).expect("Should exist");
+            .position(|non_sorted_product| non_sorted_product == sorted_product)
+            .expect("Should exist");
 
         let mut prices_without_p = Vec::new();
 

@@ -53,7 +53,7 @@ impl Line
     fn new(p1: &Vector2d<f64>, p2: &Vector2d<f64>) -> Line
     {
         Line {
-            slope: if p1.x() == p2.x() {
+            slope: if (p1.x() - p2.x()).abs() < f64::EPSILON {
                 None
             } else {
                 Some((p2.y() - p1.y()) / (p2.x() - p1.x()))
@@ -96,7 +96,10 @@ fn solve(p1: &Vector2d<f64>, p2: &Vector2d<f64>, p3: &Vector2d<f64>) -> String
         "scalene"
     };
 
-    let desc2 = if angles.iter().any(|&ang| (ang - PI / 2.).abs() < 0.00000001) {
+    let desc2 = if angles
+        .iter()
+        .any(|&ang| (ang - PI / 2.).abs() < 0.000_000_01)
+    {
         "right"
     } else if angles.iter().any(|&ang| ang > PI / 2.) {
         "obtuse"
