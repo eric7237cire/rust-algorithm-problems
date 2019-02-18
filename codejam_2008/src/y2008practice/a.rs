@@ -35,7 +35,7 @@ pub fn solve_all_cases()
     );
 }
 
-fn solve(alien_number: &String, source_lang: &String, target_lang: &String) -> String
+fn solve(alien_number: &str, source_lang: &str, target_lang: &str) -> String
 {
     let source_base = source_lang.len();
     let target_base = target_lang.len();
@@ -47,8 +47,8 @@ fn solve(alien_number: &String, source_lang: &String, target_lang: &String) -> S
         debug!("Digit is {}", digit);
         let digit_value = source_lang.chars().position(|ch| ch == digit).unwrap();
         debug!("Digit Value {}", digit_value);
-        al_converted =
-            al_converted + digit_value * source_base.pow((alien_number.len() - i - 1) as u32);
+        al_converted +=
+            digit_value * source_base.pow((alien_number.len() - i - 1) as u32);
     }
 
     debug!("Alien # converted is {}", al_converted);
@@ -58,7 +58,7 @@ fn solve(alien_number: &String, source_lang: &String, target_lang: &String) -> S
         let digit = al_converted % target_base;
         debug!("tlDigit {}", digit);
         tl_converted.push(target_lang.chars().skip(digit).take(1).next().unwrap());
-        al_converted = al_converted / target_base
+        al_converted /= target_base;
     }
 
     tl_converted.reverse();

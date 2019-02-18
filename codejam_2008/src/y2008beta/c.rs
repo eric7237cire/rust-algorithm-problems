@@ -172,8 +172,8 @@ fn solve(starting_city: &str, roads: &[(String, String, u32)]) -> Vec<f64>
         dist[r.city_from][r.city_to] = min(dist[r.city_from][r.city_to], r.cost);
     }
 
-    for k in 0..num_cities {
-        dist[k][k] = 0;
+    for (k, dist_k) in dist.iter_mut().enumerate() {
+        dist_k[k] = 0;
     }
     for k in 0..num_cities {
         for i in 0..num_cities {

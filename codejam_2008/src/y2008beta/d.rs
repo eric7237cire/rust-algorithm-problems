@@ -103,7 +103,7 @@ fn solve(positions: &[u16], values: &[u16]) -> u16
         create_hexes(row_len as i16);
     }
 
-    for row_len in (small_hex_row_len..=hex_size - 1).rev() {
+    for row_len in (small_hex_row_len..hex_size).rev() {
         create_hexes(row_len as i16);
     }
 

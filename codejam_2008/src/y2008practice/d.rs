@@ -54,7 +54,7 @@ pub fn solve_all_cases()
 
                 println!("Solving case {}", case_no);
 
-                let ans = memo.doit(pg as f64, &is_perishable, &mut stores);
+                let ans = memo.doit(pg as f64, is_perishable, &mut stores);
 
                 writeln!(buffer, "Case #{}: {:.7}", case_no, ans).unwrap();
             }
@@ -174,7 +174,7 @@ impl Memo
             bcost: vec![vec![INVALID_COST; 1 << ni]; ns],
         }
     }
-    fn doit(&mut self, gp: f64, per: &BitVec64, sts: &mut Vec<Store>) -> f64
+    fn doit(&mut self, gp: f64, per: BitVec64, sts: &mut Vec<Store>) -> f64
     {
         let ni = sts[0].prices.len();
         //let ns = sts.len();
@@ -209,7 +209,7 @@ impl Memo
             let keep: Vec<bool> = store
                 .stk
                 .iter()
-                .map(|&item_idx| store.prices[item_idx] as f64 <= chp[item_idx])
+                .map(|&item_idx| f64::from(store.prices[item_idx]) <= chp[item_idx])
                 .collect();
 
             for (j, k) in keep.iter().enumerate().rev() {
@@ -268,7 +268,7 @@ impl Memo
                             continue;
                         }
 
-                        cost += store.prices[item_index] as f64;
+                        cost += f64::from(store.prices[item_index]);
 
                         nm.set(item_index, true);
                         if per.get(item_index) {

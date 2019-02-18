@@ -54,12 +54,12 @@ fn solve(forward_path: &str, back_path: &str) -> String
             'W' => {
                 square_state
                     .entry(*pos)
-                    .or_insert_with(|| BitVec64::new())
+                    .or_insert_with(BitVec64::new)
                     .set(get_dir_index(dir), true);
                 *pos += *dir;
                 square_state
                     .entry(*pos)
-                    .or_insert_with(|| BitVec64::new())
+                    .or_insert_with( BitVec64::new)
                     .set(get_dir_index(&dir.rotate_rc_reverse()), true);
             }
             'R' => {

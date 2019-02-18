@@ -62,6 +62,6 @@ fn main()
 {
     init_log();
     run_y2008_round_qual();
-    //run_y2008_round_practice();
-   // run_y2008_round_beta();
+    run_y2008_round_practice();
+    run_y2008_round_beta();
 }
