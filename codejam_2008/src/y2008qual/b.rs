@@ -24,9 +24,9 @@ pub fn solve_all_cases()
                 let read_times = |in_string: String| -> [usize; 2] {
                     [
                         &in_string[0..2].parse::<usize>().unwrap() * 60
-                            + in_string[3..5].parse::<usize>().unwrap(),
+                            + &in_string[3..5].parse::<usize>().unwrap(),
                         &in_string[6..8].parse::<usize>().unwrap() * 60
-                            + in_string[9..11].parse::<usize>().unwrap(),
+                            + &in_string[9..11].parse::<usize>().unwrap(),
                     ]
                 };
 
@@ -91,7 +91,7 @@ fn find_required_trains(station_events: &mut Vec<TrainEvent>) -> i64
     }
 
     debug!("Done find_required_trains {} ", trains_min.abs());
-    trains_min
+    trains_min.abs()
 }
 
 fn solve(turn_around_time: usize, a_to_b: &[[usize; 2]], b_to_a: &[[usize; 2]]) -> [i64; 2]
