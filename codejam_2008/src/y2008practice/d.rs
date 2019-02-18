@@ -29,7 +29,7 @@ pub fn solve_all_cases()
                 let mut is_perishable = BitVec64::new();
 
                 for i in items.iter_mut() {
-                    if i.chars().last().unwrap() == '!' {
+                    if i.ends_with('!') {
                         assert_eq!('!', i.remove(i.len() - 1));
                         is_perishable.set(items_map.len(), true);
                     }
@@ -132,7 +132,7 @@ struct Store
 
 impl Store
 {
-    fn new(s: &String, n: usize, items: &HashMap<String, usize>) -> Self
+    fn new(s: &str, n: usize, items: &HashMap<String, usize>) -> Self
     {
         let mut prices = vec![-1; n];
         let st: Vec<&str> = s.split(|c| c == ' ' || c == ':' || c == '\n').collect();
@@ -166,6 +166,45 @@ struct Memo
     bcost: Vec<Vec<f64>>,
 }
 
+//Lower bound is basically a round trip from the starting point
+fn calculate_lower_bound(ni: usize, gp: f64, sts: &[Store]) -> Vec<f64>
+{
+    //looks like the cheapest prices
+    let mut chp = vec![INVALID_COST; ni];
+
+    //0 is home
+    for store in sts.iter().skip(1) {
+        //gas cost
+        let gc = store.dist(0, 0) * 2. * gp;
+
+        for &item_idx in store.stk.iter() {
+            let tc = gc + f64::from(store.prices[item_idx]);
+            if tc < chp[item_idx] {
+                chp[item_idx] = tc;
+            }
+        }
+    }
+
+    chp
+}
+
+fn remove_non_optimal_items(sts: &mut Vec<Store>, chp: &[f64])
+{
+    for store in sts.iter_mut().skip(1) {
+        let keep: Vec<bool> = store
+            .stk
+            .iter()
+            .map(|&item_idx| f64::from(store.prices[item_idx]) <= chp[item_idx])
+            .collect();
+
+        for (j, k) in keep.iter().enumerate().rev() {
+            if !k {
+                store.stk.remove(j);
+            }
+        }
+    }
+}
+
 impl Memo
 {
     fn new(ns: usize, ni: usize) -> Self
@@ -183,20 +222,7 @@ impl Memo
 
         let mut ub = 0.0;
         //looks like the cheapest prices
-        let mut chp = vec![INVALID_COST; ni];
-
-        //0 is home
-        for store in sts.iter().skip(1) {
-            //gas cost
-            let gc = store.dist(0, 0) * 2. * gp;
-
-            for &item_idx in store.stk.iter() {
-                let tc = gc + store.prices[item_idx] as f64;
-                if tc < chp[item_idx] {
-                    chp[item_idx] = tc;
-                }
-            }
-        }
+        let chp = calculate_lower_bound(ni, gp, sts.as_slice());
 
         ub += chp.iter().sum::<f64>();
 
@@ -205,19 +231,7 @@ impl Memo
         self.bcost[0][all] = ub;
 
         //Remove items that are definitely not optimal
-        for store in sts.iter_mut().skip(1) {
-            let keep: Vec<bool> = store
-                .stk
-                .iter()
-                .map(|&item_idx| f64::from(store.prices[item_idx]) <= chp[item_idx])
-                .collect();
-
-            for (j, k) in keep.iter().enumerate().rev() {
-                if !k {
-                    store.stk.remove(j);
-                }
-            }
-        }
+        remove_non_optimal_items(sts, chp.as_slice());
 
         self.bcost[0][0] = 0.0;
         let mut pq = BinaryHeap::new();

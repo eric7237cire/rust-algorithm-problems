@@ -90,7 +90,10 @@ fn solve(p1: &Vector2d<f64>, p2: &Vector2d<f64>, p3: &Vector2d<f64>) -> String
     angles.push(law_cosines(ab.len, bc.len, ac.len));
     angles.push(law_cosines(ac.len, bc.len, ab.len));
 
-    let desc1 = if (ab.len - ac.len).abs() < f64::EPSILON || (ab.len - bc.len).abs() < f64::EPSILON || (ac.len - bc.len).abs() < f64::EPSILON {
+    let desc1 = if (ab.len - ac.len).abs() < f64::EPSILON
+        || (ab.len - bc.len).abs() < f64::EPSILON
+        || (ac.len - bc.len).abs() < f64::EPSILON
+    {
         "isosceles"
     } else {
         "scalene"

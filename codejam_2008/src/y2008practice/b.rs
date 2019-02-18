@@ -59,7 +59,7 @@ fn solve(forward_path: &str, back_path: &str) -> String
                 *pos += *dir;
                 square_state
                     .entry(*pos)
-                    .or_insert_with( BitVec64::new)
+                    .or_insert_with(BitVec64::new)
                     .set(get_dir_index(&dir.rotate_rc_reverse()), true);
             }
             'R' => {
@@ -74,15 +74,14 @@ fn solve(forward_path: &str, back_path: &str) -> String
         debug!("Current pos {:?}, direction {:?}", pos, dir);
     };
 
-    let mut handle_path =
-        |path: &str, initial_dir: Vector2d<i64>, initial_pos: Vector2d<i64>| {
-            let mut dir = initial_dir;
-            let mut pos = initial_pos;
-            for ch in path.chars() {
-                handle_step(ch, &mut dir, &mut pos);
-            }
-            (dir, pos)
-        };
+    let mut handle_path = |path: &str, initial_dir: Vector2d<i64>, initial_pos: Vector2d<i64>| {
+        let mut dir = initial_dir;
+        let mut pos = initial_pos;
+        for ch in path.chars() {
+            handle_step(ch, &mut dir, &mut pos);
+        }
+        (dir, pos)
+    };
 
     let (dir, pos) = handle_path(forward_path, SOUTH, Vector2d::with_val(0, 0));
     let mut dir = dir;

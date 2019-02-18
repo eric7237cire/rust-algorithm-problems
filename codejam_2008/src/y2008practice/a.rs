@@ -47,8 +47,7 @@ fn solve(alien_number: &str, source_lang: &str, target_lang: &str) -> String
         debug!("Digit is {}", digit);
         let digit_value = source_lang.chars().position(|ch| ch == digit).unwrap();
         debug!("Digit Value {}", digit_value);
-        al_converted +=
-            digit_value * source_base.pow((alien_number.len() - i - 1) as u32);
+        al_converted += digit_value * source_base.pow((alien_number.len() - i - 1) as u32);
     }
 
     debug!("Alien # converted is {}", al_converted);

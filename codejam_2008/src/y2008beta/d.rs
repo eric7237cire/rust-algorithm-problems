@@ -1,6 +1,6 @@
 use codejam::util::codejam::run_cases;
-use std::io::Write;
 use hungarian::minimize;
+use std::io::Write;
 
 /*
 Hungarian algorithm
@@ -11,10 +11,7 @@ Hexagon board
 pub fn solve_all_cases()
 {
     run_cases(
-        &[
-            "D-small-practice",
-            "D-large-practice"
-        ],
+        &["D-small-practice", "D-large-practice"],
         "y2008beta",
         |reader, buffer| {
             let t = reader.read_int();
@@ -117,33 +114,40 @@ fn solve(positions: &[u16], values: &[u16]) -> u16
         debug!("Hex x {} y {} label {}", h.x, h.y, h.label);
     }
 
-    let min_cost: u16 = diags.iter().enumerate().map( | (d, diag)| {
-        debug!("Diag {} is {:?}", d, diag);
+    let min_cost: u16 = diags
+        .iter()
+        .enumerate()
+        .map(|(d, diag)| {
+            debug!("Diag {} is {:?}", d, diag);
 
-        //create weight matrix
-        let cost_matrix : Vec<u16> = (0..hex_size*hex_size).map( | row_col| {
-            //determines which initial pos/val
-            let row = row_col / hex_size;
-            //determines where in the diagonal
-            let col = row_col % hex_size;
+            //create weight matrix
+            let cost_matrix: Vec<u16> = (0..hex_size * hex_size)
+                .map(|row_col| {
+                    //determines which initial pos/val
+                    let row = row_col / hex_size;
+                    //determines where in the diagonal
+                    let col = row_col % hex_size;
 
-            let pos = positions[row as usize] as usize;
-            let cost = hexes[pos - 1].distance(diag[col as usize])  * values[row as usize] ;
-            assert_eq!(hexes[pos-1].label, pos);
+                    let pos = positions[row as usize] as usize;
+                    let cost = hexes[pos - 1].distance(diag[col as usize]) * values[row as usize];
+                    assert_eq!(hexes[pos - 1].label, pos);
 
-            cost
-        }).collect();
+                    cost
+                })
+                .collect();
 
+            let assignment = minimize(&cost_matrix, hex_size as usize, hex_size as usize);
 
+            debug!("Assignment {:?}", assignment);
 
-        let assignment = minimize(&cost_matrix, hex_size as usize, hex_size as usize);
-
-        debug!("Assignment {:?}", assignment);
-
-        assignment.iter().enumerate().map( | (idx, choice) |
-            cost_matrix[ idx * hex_size as usize + choice.unwrap() ]
-        ).sum()
-    }).min().unwrap();
+            assignment
+                .iter()
+                .enumerate()
+                .map(|(idx, choice)| cost_matrix[idx * hex_size as usize + choice.unwrap()])
+                .sum()
+        })
+        .min()
+        .unwrap();
 
     min_cost
 }

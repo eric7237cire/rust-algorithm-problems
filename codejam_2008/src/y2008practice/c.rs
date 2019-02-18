@@ -63,15 +63,12 @@ impl Fcomp
             } else if b == 2 {
                 //#Happens to be the sum formula, since you can organize it like 5(if break) + 4 + 3 + 2 + 1
                 Some((d * (d + 1)) / 2)
-            } else if b > 2 && d >= 2954 {
-                None
-            } else if b > 3 && d >= 568 {
-                None
-            } else if b > 4 && d >= 221 {
-                None
-            } else if b >= 6 && d > 122 {
-                None
-            } else if b > 16 && d >= 33 {
+            } else if (b > 2 && d >= 2954)
+                || (b > 3 && d >= 568)
+                || (b > 4 && d >= 221)
+                || (b >= 6 && d > 122)
+                || (b > 16 && d >= 33)
+            {
                 None
             } else if d <= b {
                 Some(2u64.pow((d) as u32) - 1)
