@@ -34,6 +34,7 @@ pub fn run_y2008_round_beta()
 {
     y2008beta::a::solve_all_cases();
     y2008beta::b::solve_all_cases();
+    y2008beta::c::solve_all_cases();
 }
 
 pub fn run_y2008_round_1a()
@@ -59,5 +60,5 @@ pub fn run_y2008_round2()
 fn main()
 {
     init_log();
-    y2008beta::c::solve_all_cases();
+    y2008beta::d::solve_all_cases();
 }
