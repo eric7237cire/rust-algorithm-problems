@@ -16,7 +16,7 @@ impl Squares
 {
     pub fn new(max: u64) -> Squares
     {
-        Squares { count: 0, max: max }
+        Squares { count: 0, max }
     }
 }
 
@@ -77,7 +77,7 @@ impl SieveOfAtkin
         }
         SieveOfAtkin {
             results: res,
-            tests: tests,
+            tests,
         }
     }
 

@@ -3,6 +3,7 @@
 mod y2008beta;
 mod y2008practice;
 mod y2008qual;
+mod y2008round1a;
 
 extern crate codejam;
 
@@ -39,6 +40,13 @@ pub fn run_y2008_round_beta()
     y2008beta::d::solve_all_cases();
 }
 
+pub fn run_y2008_practice_contest()
+{
+    //https://code.google.com/codejam/contest/32004/dashboard#s=p2
+
+    //TODO
+}
+
 pub fn run_y2008_round_1a()
 {
 
@@ -62,7 +70,9 @@ pub fn run_y2008_round2()
 fn main()
 {
     init_log();
-    run_y2008_round_qual();
+
+    y2008round1a::a::solve_all_cases()
+ /*   run_y2008_round_qual();
     run_y2008_round_practice();
-    run_y2008_round_beta();
+    run_y2008_round_beta();*/
 }
