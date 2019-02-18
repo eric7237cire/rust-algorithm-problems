@@ -50,15 +50,17 @@ pub struct InputReader<'a>
     pub i: Input<'a>,
 }
 
-impl<'a> InputReader<'a>
-{
-    pub fn new() -> InputReader<'a>
-    {
+impl<'a> Default for InputReader<'a> {
+    fn default() -> Self {
         InputReader {
             s: String::new(),
             i: Input::console(),
         }
     }
+}
+
+impl<'a> InputReader<'a>
+{
 
     pub fn read_num_line<T>(&mut self) -> Vec<T>
     where

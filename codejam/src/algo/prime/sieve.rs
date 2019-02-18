@@ -215,16 +215,14 @@ impl SieveOfAtkin
                         break;
                     }
 
-                    match self.tests.binary_search(&TestInteger {
+                    if let Ok(index) = self.tests.binary_search(&TestInteger {
                         value: n_square,
                         is_prime: true,
                     }) {
-                        Ok(index) => {
                             self.tests.get_mut(index)
                                     .expect("Attempted to get known index from tests vector. This shouldn't happen.")
                                     .set_prime(false);
-                        }
-                        Err(_) => (),
+                        
                     }
                 }
             }

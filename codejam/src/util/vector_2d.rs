@@ -12,14 +12,17 @@ pub struct Vector2d<T>
     pub data: [T; 2]
 }
 
-impl<T> Vector2d<T>
-{
-    pub fn new() -> Vector2d < T >
-    where
-    T: Default,
-    {
+
+impl<T> Default for Vector2d<T>
+where
+    T: Default {
+    fn default() -> Self {
         Vector2d { data: [Default::default(), Default::default()] }
     }
+}
+
+impl<T> Vector2d<T>
+{
 
     pub fn with_val(x: T, y: T) -> Vector2d < T >
 

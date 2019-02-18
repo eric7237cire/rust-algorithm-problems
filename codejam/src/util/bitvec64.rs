@@ -20,7 +20,7 @@ impl BitVec64
         }
     }
 
-    pub fn get(&self, index: usize) -> bool
+    pub fn get(self, index: usize) -> bool
     {
         (self.data >> index) & 1 > 0
     }
@@ -35,7 +35,7 @@ impl BitVec64
         BitVec64 { data }
     }
 
-    pub fn pop_count(&self) -> u32
+    pub fn pop_count(self) -> u32
     {
         self.data.count_ones()
     }
