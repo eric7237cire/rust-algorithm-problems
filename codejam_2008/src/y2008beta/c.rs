@@ -70,12 +70,12 @@ fn get_city_id(
     id
 }
 
-fn find_all_shortest_paths(
+fn  find_all_shortest_paths <'a>(
     dest_node: usize,
     //minimum distance
     dist: &Vec<Vec<u32>>,
-    roads: &Vec<Road>,
-    paths: &mut Vec<Vec<usize>>,
+    roads: &'a Vec<Road>,
+    paths: & mut Vec<Vec<&'a Road>>,
 )
 {
     let min_dist = dist[0][dest_node];
@@ -85,10 +85,10 @@ fn find_all_shortest_paths(
         .iter()
         .filter(|road| road.city_from == 0 && road.cost <= min_dist && min_dist - road.cost == dist[road.city_to][dest_node])
     {
-        paths.push(vec![road.road_id]);
+        paths.push(vec![road]);
     }
 
-    debug!("Starting shortest paths: {:?}", paths);
+    // debug!("Starting shortest paths: {:?}", paths);
 
     let mut done = false;
 
@@ -96,13 +96,13 @@ fn find_all_shortest_paths(
         done = true;
 
         for path_idx in 0..paths.len() {
-            let last_road = &roads[*paths[path_idx].last().unwrap()];
+            let last_road = *paths[path_idx].last().unwrap();
             let source_node = last_road.city_to;
             let min_dist = dist[source_node][dest_node];
 
             debug!("path_idx {} from {} min_dist {}", path_idx, source_node, min_dist);
 
-            for (idx, r_tup) in roads
+            for (idx, road) in roads
                 .iter()
                 .filter(|road| {
                     road.city_from == source_node
@@ -112,19 +112,19 @@ fn find_all_shortest_paths(
                 .enumerate()
             {
                 if idx == 0 {
-                    paths[path_idx].push(r_tup.road_id);
+                    paths[path_idx].push(road);
                     done = false;
                 } else {
                     //we have more than 1 path to extend the original one, so we make a copy, taking
                     //care to remove the previously added next node
                     let mut new_path = paths[path_idx].clone();
                     new_path.pop();
-                    new_path.push(r_tup.road_id);
+                    new_path.push(road);
                     paths.push(new_path);
                 }
             }
 
-            debug!("after paths: {:?}", paths);
+            //debug!("after paths: {:?}", paths);
         }
     }
 }
@@ -199,7 +199,7 @@ fn solve(starting_city: &str, roads: &[(String, String, u32)]) -> Vec<f64>
     let mut road_probs = vec![0f64; roads.len()];
 
     for &dest_city in reachable.iter() {
-        let mut paths: Vec<Vec<usize>> = Vec::new();
+        let mut paths: Vec<Vec<&Road>> = Vec::new();
 
         find_all_shortest_paths(dest_city, &dist, &roads, &mut paths);
 
@@ -214,13 +214,13 @@ fn solve(starting_city: &str, roads: &[(String, String, u32)]) -> Vec<f64>
         for (paths_idx, path) in paths.iter().enumerate() {
             debug!("Shortest path {} of {}", paths_idx+1, paths.len());
 
-            for (path_idx, r_idx) in path.iter().enumerate() {
-                let road = &roads[*r_idx];
+            for (path_idx, road) in path.iter().enumerate() {
+                //let road = &roads[*r_idx];
                 debug!(
                     "Path step #{} of {}.  Road #{}: {}/{} => {}/{} cost: {}",
                     path_idx+1,
                     path.len(),
-                    r_idx+1,
+                    road.road_id+1,
                     road.city_from,
                     cities[road.city_from],
                     road.city_to,
@@ -228,7 +228,7 @@ fn solve(starting_city: &str, roads: &[(String, String, u32)]) -> Vec<f64>
                     road.cost
                 );
 
-                road_probs[*r_idx] += (1.0 / reachable.len() as f64) / paths.len() as f64;
+                road_probs[road.road_id] += (1.0 / reachable.len() as f64) / paths.len() as f64;
             }
         }
     }
