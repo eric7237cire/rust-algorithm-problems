@@ -32,7 +32,7 @@ pub fn solve_all_cases()
                 let mut trees = Vec::new();
                 trees.push(Vector2d::with_val(x, y));
 
-                for i in 1..n {
+                for _i in 1..n {
                     x = (a * x + b) % m;
                     y = (c * y + d) % m;
                     trees.push(Vector2d::with_val(x, y));
@@ -63,7 +63,7 @@ fn solve(trees: &[Vector2d<u64>]) -> u64
     let mut ret = 0;
 
     // The first case.
-    for bi in buckets.iter().filter( |bi| **bi > 2) {
+    for bi in buckets.iter().filter(|bi| **bi > 2) {
         // We use the formula for n choose 3 so that,
         // we don't use the same point twice or count
         // the same triangle more than once.
@@ -71,9 +71,11 @@ fn solve(trees: &[Vector2d<u64>]) -> u64
     }
     // The third case.
     for (i, bi) in buckets.iter().enumerate() {
-        for (j, bj) in buckets.iter().enumerate().skip(i+1) {
-            for (k, bk) in buckets.iter().enumerate().skip(j+1) {
+        for (j, bj) in buckets.iter().enumerate().skip(i + 1) {
+            for (k, bk) in buckets.iter().enumerate().skip(j + 1) {
+                //Row sum must be % 3 == 0 to have center be an integer
                 if (((i / 3) + (j / 3) + (k / 3)) % 3 == 0)
+                    //col sum must be %3 == 0 to have center be an integer
                     && ((i % 3) + (j % 3) + (k % 3)) % 3 == 0
                 {
                     ret += bi * bj * bk;
