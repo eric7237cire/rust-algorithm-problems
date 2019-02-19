@@ -1,13 +1,12 @@
-use bit_set::BitSet;
-use bit_vec::BitVec;
 use codejam::algo::graph::disjointset::DisjointSet;
 use codejam::algo::prime::sieve::SieveOfAtkin;
 use codejam::util::codejam::run_cases;
-use itertools::Itertools;
+
 use std::io::Write;
 
 /*
-BitSets & BitVecs
+Disjoint set
+Primes sieve
 */
 pub fn solve_all_cases()
 {
@@ -17,7 +16,7 @@ pub fn solve_all_cases()
         |reader, buffer| {
             let t = reader.read_int();
 
-            let mut sieve = SieveOfAtkin::new(1_000);
+            let mut sieve = SieveOfAtkin::new(100_000);
             println!("Starting sieve");
             sieve.run();
             let primes: Vec<u64> = sieve.get_results_vec();
