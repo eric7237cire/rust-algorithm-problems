@@ -40,18 +40,17 @@ pub fn solve_all_cases()
     );
 }
 
-fn solve(a: u64, b: u64, p_lower_bound: u64, sieve: &Sieve) -> usize
+fn solve(a: usize, b: usize, p_lower_bound: usize, sieve: &Sieve) -> usize
 {
     //First step, find  P <= primes <= interval
     let lower_bound_primes = p_lower_bound;
     let upper_bound_primes = b - a;
 
-    let interval_size = (b - a + 1) as usize;
+    let interval_size = b - a + 1;
 
     let mut ds = DisjointSet::new(interval_size);
 
-    for prime in sieve.primes_from(p_lower_bound as usize).take_while(|x| *x <= upper_bound_primes as usize) {
-        let prime = prime as u64;
+    for prime in sieve.primes_from(p_lower_bound).take_while(|x| *x <= upper_bound_primes ) {
         let a_mod_prime = a % prime;
         let interval_p = if a_mod_prime == 0 {
             a
@@ -59,12 +58,10 @@ fn solve(a: u64, b: u64, p_lower_bound: u64, sieve: &Sieve) -> usize
             a + prime - a_mod_prime
         };
 
-        //printf("First hit in interval %lld\n", interval_p);
-
         let set_to_merge = interval_p - a;
 
-        for i in (interval_p - a + prime..interval_size as u64).step_by(prime as usize) {
-            ds.merge_sets(i as usize, set_to_merge as usize);
+        for i in (interval_p - a + prime..interval_size ).step_by(prime) {
+            ds.merge_sets(i , set_to_merge );
         }
     }
     ds.number_of_sets()
