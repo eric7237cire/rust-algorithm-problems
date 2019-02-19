@@ -71,8 +71,8 @@ fn solve(trees: &[Vector2d<u64>]) -> u64
     }
     // The third case.
     for (i, bi) in buckets.iter().enumerate() {
-        for (j, bj) in buckets.iter().enumerate().skip(i) {
-            for (k, bk) in buckets.iter().enumerate().skip(j) {
+        for (j, bj) in buckets.iter().enumerate().skip(i+1) {
+            for (k, bk) in buckets.iter().enumerate().skip(j+1) {
                 if (((i / 3) + (j / 3) + (k / 3)) % 3 == 0)
                     && ((i % 3) + (j % 3) + (k % 3)) % 3 == 0
                 {
