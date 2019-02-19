@@ -40,7 +40,7 @@ fn solve(n: u64) -> u64
 
     //17 same as 117, so pattern repeats
 
-    if (n > 117) {
+    if n > 117 {
         n = 17 + (n - 17) % 100;
     }
 
