@@ -49,7 +49,7 @@ pub fn run_y2008_practice_contest()
 
 pub fn run_y2008_round_1a()
 {
-
+y2008round1a::a::solve_all_cases()
 }
 
 pub fn run_y2008_round_1b()
@@ -71,7 +71,7 @@ fn main()
 {
     init_log();
 
-    y2008round1a::a::solve_all_cases()
+    y2008round1a::b::solve_all_cases()
  /*   run_y2008_round_qual();
     run_y2008_round_practice();
     run_y2008_round_beta();*/

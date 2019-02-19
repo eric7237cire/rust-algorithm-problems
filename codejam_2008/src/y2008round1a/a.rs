@@ -4,7 +4,7 @@ use std::io::Write;
 
 /*
 Arithmetic
-Proof?
+Proof
 */
 pub fn solve_all_cases()
 {
@@ -48,7 +48,5 @@ fn solve(v1: &mut Vec<i64>, v2: &mut Vec<i64>) -> i64
     v2.reverse();
 
     v1.iter().zip(v2.iter()).map( |(e1,e2)| e1 * e2).sum()
-
-
 
 }
