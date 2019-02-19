@@ -43,7 +43,6 @@ pub fn solve_all_cases()
 fn solve(a: usize, b: usize, p_lower_bound: usize, sieve: &Sieve) -> usize
 {
     //First step, find  P <= primes <= interval
-    let lower_bound_primes = p_lower_bound;
     let upper_bound_primes = b - a;
 
     let interval_size = b - a + 1;
