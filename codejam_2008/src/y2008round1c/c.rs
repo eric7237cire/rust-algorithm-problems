@@ -4,7 +4,7 @@ use std::io::Write;
 use superslice::Ext;
 
 /*
-Binary Interval tree using an array
+Binary Sum tree using an array
 */
 pub fn solve_all_cases()
 {
@@ -86,9 +86,6 @@ fn solve(speed_limits: &mut Vec<u64>) -> u64
         //We have a new subsequence for every existing sequence that
         // ends in a value < speedLimit
         let num_seq = (1 + bt.sum_to(sl)) % MOD;
-
-        //Debug.WriteLine("Adding " + newSubsequences);
-        //let old_val = bt.get(sl);
 
         bt.set(sl, num_seq);
     }
