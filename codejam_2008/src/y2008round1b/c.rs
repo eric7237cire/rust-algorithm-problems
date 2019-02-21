@@ -10,7 +10,7 @@ pub fn solve_all_cases()
 {
     run_cases(
         &[
-            "C-small-practice", // "C-large-practice"
+            "C-small-practice",  "C-large-practice"
         ],
         "y2008round1b",
         |reader, buffer| {
