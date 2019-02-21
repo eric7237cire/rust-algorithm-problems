@@ -9,7 +9,7 @@ minimization / optimization
 
 pub fn solve_all_cases()
 {
-    let mut reader = InputReader::new();
+    let mut reader : InputReader = Default::default();
     let t = reader.read_int();
 
     for case in 1..=t {

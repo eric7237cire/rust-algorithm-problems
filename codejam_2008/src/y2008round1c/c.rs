@@ -1,8 +1,7 @@
-use codejam::util::codejam::run_cases;
-use itertools::Itertools;
-use std::cmp::min;
-use std::io::Write;
 use codejam::util::binary_sum_tree::BinarySumTree;
+use codejam::util::codejam::run_cases;
+use std::io::Write;
+use superslice::Ext;
 
 /*
 Binary Interval tree using an array
@@ -10,16 +9,44 @@ Binary Interval tree using an array
 pub fn solve_all_cases()
 {
     run_cases(
-        &["C-small-practice", "C-large-practice"],
+        &["C-small-practice",
+        //    "C-large-practice"
+        ],
         "y2008round1c",
         |reader, buffer| {
             let t = reader.read_int();
 
             for case_no in 1..=t {
-                let k: usize = reader.read_int();
+                /*
+                The first line of each case contains n, m, X, Y and Z
+                each separated by a space. n will be the length of the sequence
+                of speed limits. m will be the length of the generating array A.
+                The next m lines will contain the m elements of A,
+                one integer per line (from A[0] to A[m-1]).
+                */
+                let num_line: Vec<u64> = reader.read_num_line();
+                assert_eq!(5, num_line.len());
+                let m = num_line[1] as usize;
 
-                let nums = reader.read_num_line();
-                assert_eq!(nums[0], nums.len() - 1);
+                /*
+                              for i = 0 to n-1
+                print A[i mod m]
+                A[i mod m] = (X * A[i mod m] + Y * (i + 1)) mod Z
+                */
+
+                let mut a : Vec<u64> = (0..m).map(|_| reader.read_int()).collect();
+                let n = num_line[0] as usize;
+                let x = num_line[2];
+                let y = num_line[3];
+                let z = num_line[4];
+
+                let mut speed_limits = (0..n)
+                    .map(|i| {
+                        let next = a[i % m];
+                        a[i % m] = (x * a[i % m] + y * (i + 1) as u64) % z;
+                        next
+                    })
+                    .collect();
 
                 if case_no != 3 {
                     // continue;
@@ -31,7 +58,7 @@ pub fn solve_all_cases()
                     buffer,
                     "Case #{}: {}",
                     case_no,
-                    solve(k, &nums[1..]).iter().join(" ")
+                    solve( &mut speed_limits)
                 )
                 .unwrap();
             }
@@ -39,33 +66,32 @@ pub fn solve_all_cases()
     );
 }
 
-
-fn solve(k: usize, indices: &[usize]) -> Vec<usize>
+const MOD: u64 = 1_000_000_007;
+fn solve(speed_limits: &mut Vec<u64>) -> u64
 {
-    let mut bt = BinarySumTree::new(k);
+    debug!("Speed limits: {:?}", speed_limits);
+    let mut sorted_speed_limits = speed_limits.clone();
+    sorted_speed_limits.sort();
 
-    for i in 0..k {
-        bt.set(i, 1);
+    //normalize everything
+    for si in speed_limits.iter_mut() {
+        *si = sorted_speed_limits.lower_bound(si) as u64;
     }
 
-    println!("After set");
-    let mut deck = vec![0; k];
+    //offset by 1 so bt[1] == # of sequences ending with 0
+    let mut bt = BinarySumTree::new(speed_limits.len()+1);
 
-    let mut cur_pos = deck.len() - 1;
-    let mut sum_to_current_pos = bt.sum_to(cur_pos);
+    for speed_limit in speed_limits.iter() {
+        let sl = *speed_limit as usize;
+        //We have a new subsequence for every existing sequence that
+        // ends in a value < speedLimit
+        let num_seq = (1 + bt.sum_to(sl)) % MOD;
 
-    for card_no in 1..=k {
-        let target_sum = 1 + (card_no as i64 + sum_to_current_pos - 1) % bt.sum();
-        cur_pos = bt.lower_bound(target_sum);
-        debug!("Target sum is {}.  Cur_pos {}", target_sum, cur_pos);
-        assert_eq!(deck[cur_pos], 0);
-        deck[cur_pos] = card_no;
-        bt.set(cur_pos, 0);
-        sum_to_current_pos = target_sum - 1;
+        //Debug.WriteLine("Adding " + newSubsequences);
+        //let old_val = bt.get(sl);
 
-        //debug!("Deck after {} is {:?}", card_no, deck);
-        //            bt.debug_print();
+        bt.set(sl, num_seq);
     }
 
-    indices.iter().map(|i| deck[i - 1]).collect()
+    bt.sum()
 }

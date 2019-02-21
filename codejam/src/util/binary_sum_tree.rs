@@ -15,7 +15,7 @@ use std::cmp::min;
    */
 pub struct BinarySumTree
 {
-    data: Vec<i64>,
+    data: Vec<u64>,
     //Number of elements, not the size of the tree
     num_elems: usize,
     num_levels: usize,
@@ -36,7 +36,7 @@ impl BinarySumTree
         }
     }
 
-    pub fn set(&mut self, idx: usize, val: i64)
+    pub fn set(&mut self, idx: usize, val: u64)
     {
         assert!(idx < self.num_elems);
         let mut i = idx + (1 << (self.num_levels - 1));
@@ -45,13 +45,14 @@ impl BinarySumTree
         while i > 0 {
             //divide by 2
             i >>= 1;
-            self.data[i] += val - old_val;
+            //Because data type is unsigned
+            self.data[i] = self.data[i] + val - old_val;
         }
     }
 
     //assumes sums are positive
     //returns smallest index such that sum(0..=index) >= target_sum
-    pub fn lower_bound(&self, target_sum: i64) -> usize
+    pub fn lower_bound(&self, target_sum: u64) -> usize
     {
         let mut range_width = 1 << (self.num_levels - 1);
         //exclusive upper bound
@@ -89,12 +90,12 @@ impl BinarySumTree
         range_to - 1
     }
 
-    pub fn sum(&self) -> i64
+    pub fn sum(&self) -> u64
     {
         self.data[1]
     }
 
-    pub fn sum_to(&self, to: usize) -> i64
+    pub fn sum_to(&self, to: usize) -> u64
     {
         //beginning of last row, leaves
         let start = 1 << (self.num_levels - 1);
@@ -162,19 +163,19 @@ mod test_binary_tree
         assert_eq!(14, bt.sum_to(7));
         assert_eq!(15, bt.sum_to(8));
 
-        bt.set(0, -8);
+        bt.set(0, 8);
 
         bt.debug_print();
 
-        assert_eq!(-8, bt.sum_to(0));
-        assert_eq!(-1, bt.sum_to(1));
-        assert_eq!(-1, bt.sum_to(2));
-        assert_eq!(3, bt.sum_to(3));
-        assert_eq!(3, bt.sum_to(4));
-        assert_eq!(6, bt.sum_to(5));
-        assert_eq!(6, bt.sum_to(6));
-        assert_eq!(6, bt.sum_to(7));
-        assert_eq!(7, bt.sum_to(8));
+        assert_eq!(8, bt.sum_to(0));
+        assert_eq!(15, bt.sum_to(1));
+        assert_eq!(15, bt.sum_to(2));
+        assert_eq!(19, bt.sum_to(3));
+        assert_eq!(19, bt.sum_to(4));
+        assert_eq!(22, bt.sum_to(5));
+        assert_eq!(22, bt.sum_to(6));
+        assert_eq!(22, bt.sum_to(7));
+        assert_eq!(23, bt.sum_to(8));
     }
 
     #[test]
@@ -183,7 +184,7 @@ mod test_binary_tree
         let mut rng: StdRng = SeedableRng::seed_from_u64(42);
 
         let num_elems_gen = Uniform::from(1..100usize);
-        let values_gen = Uniform::from(-100..100i64);
+        let values_gen = Uniform::from(0..100u64);
 
         for _ in 0..10 {
             let size = num_elems_gen.sample(&mut rng);
@@ -199,7 +200,7 @@ mod test_binary_tree
                 bt.set(pos, val);
 
                 for i in 0..size {
-                    assert_eq!(check.iter().take(i + 1).sum::<i64>(), bt.sum_to(i));
+                    assert_eq!(check.iter().take(i + 1).sum::<u64>(), bt.sum_to(i));
                 }
             }
         }
@@ -209,8 +210,8 @@ mod test_binary_tree
     fn test_small()
     {
         let mut bt = BinarySumTree::new(1);
-        bt.set(0, -3);
-        assert_eq!(bt.sum_to(0), -3);
+        bt.set(0, 3);
+        assert_eq!(bt.sum_to(0), 3);
 
         bt.set(0, 7);
         assert_eq!(bt.sum_to(0), 7);
@@ -220,11 +221,11 @@ mod test_binary_tree
     fn test_big()
     {
         let mut bt = BinarySumTree::new(1_000_000);
-        bt.set(0, -3);
-        assert_eq!(bt.sum_to(0), -3);
+        bt.set(0, 3);
+        assert_eq!(bt.sum_to(0), 3);
 
         bt.set(1_000_000 - 1, 7);
-        assert_eq!(bt.sum_to(1_000_000 - 1), 4);
+        assert_eq!(bt.sum_to(1_000_000 - 1), 10);
     }
 
     #[test]
@@ -234,12 +235,12 @@ mod test_binary_tree
         let mut bt = BinarySumTree::new(size);
 
         for i in 0..size {
-            bt.set(i, (2 * (i + 1)) as i64);
+            bt.set(i, (2 * (i + 1)) as u64);
         }
 
         for i in 0..size {
             //sum formula
-            let target_sum = ((i + 1) * (i + 2)) as i64;
+            let target_sum = ((i + 1) * (i + 2)) as u64;
             println!("sum of 2+4+...+ for index {} should be {}", i, target_sum);
             assert_eq!(bt.lower_bound(target_sum), i as usize);
         }
@@ -252,7 +253,7 @@ mod test_binary_tree
         let mut bt = BinarySumTree::new(size);
 
         for i in 0..size {
-            bt.set(i, (2 * (i + 1)) as i64);
+            bt.set(i, (2 * (i + 1)) as u64);
         }
 
         //2+4+6+8+10

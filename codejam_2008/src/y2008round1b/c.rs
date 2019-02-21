@@ -1,8 +1,8 @@
 use codejam::util::codejam::run_cases;
 use itertools::Itertools;
 
-use std::io::Write;
 use codejam::util::binary_sum_tree::BinarySumTree;
+use std::io::Write;
 
 /*
 Binary Sum tree using an array
@@ -54,7 +54,7 @@ fn solve(k: usize, indices: &[usize]) -> Vec<usize>
     let mut sum_to_current_pos = bt.sum_to(cur_pos);
 
     for card_no in 1..=k {
-        let target_sum = 1 + (card_no as i64 + sum_to_current_pos - 1) % bt.sum();
+        let target_sum = 1 + (card_no as u64 + sum_to_current_pos - 1) % bt.sum();
         cur_pos = bt.lower_bound(target_sum);
         debug!("Target sum is {}.  Cur_pos {}", target_sum, cur_pos);
         assert_eq!(deck[cur_pos], 0);

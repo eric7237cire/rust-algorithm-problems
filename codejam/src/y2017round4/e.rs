@@ -196,7 +196,7 @@ fn solve(stacks: &Vec<VecDeque<(u16, u16)>>) -> bool
 
 fn BFS(
     edges: &HashMap<u16, Vec<u16>>,
-    visited: &mut HashSet<u16>,
+    _visited: &mut HashSet<u16>,
     v: u16,
     targets: &HashSet<u16>,
 ) -> bool

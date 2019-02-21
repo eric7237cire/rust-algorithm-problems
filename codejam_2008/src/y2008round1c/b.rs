@@ -36,11 +36,10 @@ fn solve(s: &[char]) -> u64
       to x (mod 210) if we only consider the first i
       characters of the string. (*)
       */
-    let mut dp: Vec<Vec<u64>> = vec![vec![0; MOD]; s.len()+1];
+    let mut dp: Vec<Vec<u64>> = vec![vec![0; MOD]; s.len() + 1];
 
     dp[0][0] = 1;
     for i in 0..s.len() {
-
         //: Between each two adjacent digits you may choose put a plus sign, a minus sign, or nothing.
         let start_sgn = if i == 0 { 1 } else { -1 };
         //insert a + or a -
