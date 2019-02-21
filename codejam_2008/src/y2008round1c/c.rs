@@ -1,17 +1,17 @@
 use codejam::util::codejam::run_cases;
 use itertools::Itertools;
-
+use std::cmp::min;
 use std::io::Write;
 use codejam::util::binary_sum_tree::BinarySumTree;
 
 /*
-Binary Sum tree using an array
+Binary Interval tree using an array
 */
 pub fn solve_all_cases()
 {
     run_cases(
         &["C-small-practice", "C-large-practice"],
-        "y2008round1b",
+        "y2008round1c",
         |reader, buffer| {
             let t = reader.read_int();
 
@@ -38,6 +38,7 @@ pub fn solve_all_cases()
         },
     );
 }
+
 
 fn solve(k: usize, indices: &[usize]) -> Vec<usize>
 {
