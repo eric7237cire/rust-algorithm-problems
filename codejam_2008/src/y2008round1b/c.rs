@@ -40,8 +40,20 @@ pub fn solve_all_cases()
     );
 }
 
-//A binary tree represented in an array
-struct BinaryTree
+//A binary tree represented in an array, starting at 1 for convenience
+/*
+ (1) 001 [0..=7]
+ (2) 010 [0..=3] (3) 011 [4..=7]
+ (4) 100 [0..=1] (5) 101 [2..=3] (6) 110 [4..=5] (7) 111
+ (8) 1000 [0..=0] .... (15) 1111
+
+
+    //parent is (i) / 2
+    //left child is =(2*i);
+    //and right_son=(2*i)+1;
+
+    */
+struct BinarySumTree
 {
     data: Vec<i64>,
     //Number of elements, not the size of the tree
@@ -49,7 +61,7 @@ struct BinaryTree
     num_levels: usize
 }
 
-impl BinaryTree
+impl BinarySumTree
 {
     fn new(num_elems: usize) -> Self
     {
@@ -57,7 +69,7 @@ impl BinaryTree
         while 1 << (levels-1) < num_elems {
             levels += 1;
         }
-        BinaryTree {
+        BinarySumTree {
             data: vec![0; 1 << levels ],
             num_elems,
             num_levels: levels
@@ -91,14 +103,13 @@ impl BinaryTree
         }
         let mut cur_node = 1;
         let mut target_sum = target_sum;
-        while range_width >= 2 {
-            println!("Cur node {} target sum {} range width {} range to {} val @ cur_node {}",
+
+        //go all the way to the bottom level because we want the smallest index
+        //and there could be zeros
+        while range_width > 1 {
+      /*      println!("Cur node {} target sum {} range width {} range to {} val @ cur_node {}",
             cur_node, target_sum, range_width, range_to, self.data[cur_node]);
-
-            if self.data[cur_node] == target_sum {
-                return min(self.num_elems-1, range_to-1);
-            }
-
+*/
             range_width /= 2;
 
             //lhs
@@ -132,7 +143,7 @@ impl BinaryTree
         let mut i = to + start;
         let mut sum = self.data[i];
         while i > 1 {
-            debug!("I is {}  {:0>width$b}", i, i, width=7);
+            //debug!("I is {}  {:0>width$b}", i, i, width=7);
 
             if i & 1 > 0 {
                 sum += self.data[i - 1];
@@ -161,67 +172,34 @@ impl BinaryTree
 
 fn solve(k: usize, indices: &[usize]) -> Vec<usize>
 {
-    let mut bt = vec![0; k << 1];
+    let mut bt = BinarySumTree::new(k);
 
-    // (0) 000
-    // (1) 001  (2)   010
-    // (3) 011  (4) 100  (5) 101 (6) 110
-
-    // (1) 001 [0..=7]
-    // (2) 010 [0..=3] (3) 011 [4..=7]
-    // (4) 100 [0..=1] (5) 101 [2..=3] (6) 110 [4..=5] (7) 111
-    // (8) 1000 [0..=0] .... (15) 1111
-
-    // query for up to index x
-    // x=0 = 1000
-    // x=1 = 0100
-    // x=2 = 0100 + 1010
-    // x=3 = 0010
-    // x=4 = 0010 + 1000
-    // x=5 = 110
-    // x=6 = 0010 + 0110 + 1110
-    // x=7 = 0001
-
-    //parent is (i) / 2
-    //left child is =(2*i);
-    //and right_son=(2*i)+1;
-
-    // query(0 to 7) = 4 + 2 + 1
-    // query(0 to 5) = 4 + 1
-
-    for i in k..bt.len() {
-        //add last row
-        bt[i] = 1;
-        let mut p = i;
-        while p > 0 {
-            //divide by 2
-            p >>= 1;
-            bt[p] += 1;
-        }
+    for i in 0..k {
+        bt.set(i, 1);
     }
 
-    debug!("Binary tree: {:?}", bt);
-
-    let mut i = 1;
-    let mut level = 0;
-    while i < bt.len() {
-        let stop = min(bt.len() - i, 1 << level);
-        debug!("Level {} = {:?}", level, &bt[i..i + stop]);
-        level += 1;
-        i += stop;
-    }
-
-    assert_eq!(bt[1], k);
 
     let mut deck = vec![0; k];
 
-    let mut cur_pos = 0;
-    for card_no in 1..k {
+    let mut cur_pos = deck.len() -1 ;
+
+    for card_no in 1..=k {
         //for sum, write in binary 1
+        let sum_to_current_pos = bt.sum_to(cur_pos);
+        let cur_sum = bt.sum();
+        let target_sum = 1 + (card_no as i64 +sum_to_current_pos-1) % cur_sum;
+        cur_pos = bt.lower_bound( target_sum );
+        debug!("Target sum is {}.  Cur_pos {}" , target_sum, cur_pos);
+        assert_eq!(deck[cur_pos], 0);
+        deck[cur_pos] = card_no;
+        bt.set(cur_pos, 0);
+
+        debug!("Deck after {} is {:?}", card_no, deck);
+//            bt.debug_print();
 
     }
 
-    vec![1, 2]
+    indices.iter().map( |i| deck[i-1]).collect()
 }
 
 #[cfg(test)]
@@ -237,7 +215,7 @@ mod test_binary_tree
     #[test]
     fn test_bt()
     {
-        let mut bt = BinaryTree::new(9);
+        let mut bt = BinarySumTree::new(9);
                 bt.debug_print();
 
         assert_eq!(5, bt.num_levels);
@@ -283,7 +261,7 @@ mod test_binary_tree
 
         for _ in 0..10 {
             let size = num_elems_gen.sample(&mut rng);
-            let mut bt = BinaryTree::new(size);
+            let mut bt = BinarySumTree::new(size);
 
             let mut check = vec![0; size];
 
@@ -305,7 +283,7 @@ mod test_binary_tree
     #[test]
     fn test_small()
     {
-        let mut bt = BinaryTree::new(1);
+        let mut bt = BinarySumTree::new(1);
         bt.set(0, -3);
         assert_eq!(bt.sum_to(0), -3);
 
@@ -316,7 +294,7 @@ mod test_binary_tree
     #[test]
     fn test_big()
     {
-        let mut bt = BinaryTree::new(1_000_000);
+        let mut bt = BinarySumTree::new(1_000_000);
         bt.set(0, -3);
         assert_eq!(bt.sum_to(0), -3);
 
@@ -327,7 +305,7 @@ mod test_binary_tree
     #[test]
     fn test_lower_bound_exact() {
         let size = 100;
-        let mut bt = BinaryTree::new(size);
+        let mut bt = BinarySumTree::new(size);
 
         for i in 0..size {
             bt.set(i, (2*(i+1)) as i64);
@@ -345,7 +323,7 @@ mod test_binary_tree
     #[test]
     fn test_lower_bound_inexact() {
         let size = 5;
-        let mut bt = BinaryTree::new(size);
+        let mut bt = BinarySumTree::new(size);
 
         for i in 0..size {
             bt.set(i, (2*(i+1)) as i64);
@@ -366,4 +344,16 @@ mod test_binary_tree
         assert_eq!(bt.lower_bound(31), 5);
     }
 
+
+    #[test]
+    fn test_lower_bound_bug() {
+        let mut bt = BinarySumTree::new(5);
+        bt.set(4, 1);
+
+        assert_eq!(4, bt.lower_bound(1));
+
+        bt.set(4, 0);
+        bt.set(3, 1);
+        assert_eq!(3, bt.lower_bound(1));
+    }
 }
