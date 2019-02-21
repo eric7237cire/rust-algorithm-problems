@@ -10,7 +10,7 @@ pub fn solve_all_cases()
 {
     run_cases(
         &["C-small-practice",
-        //    "C-large-practice"
+            "C-large-practice"
         ],
         "y2008round1c",
         |reader, buffer| {
@@ -93,5 +93,5 @@ fn solve(speed_limits: &mut Vec<u64>) -> u64
         bt.set(sl, num_seq);
     }
 
-    bt.sum()
+    bt.sum() % MOD
 }
