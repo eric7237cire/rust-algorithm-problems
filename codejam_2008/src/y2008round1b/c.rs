@@ -4,7 +4,7 @@ use std::cmp::min;
 use std::io::Write;
 
 /*
-Binary Interval tree using an array
+Binary Sum tree using an array
 */
 pub fn solve_all_cases()
 {
