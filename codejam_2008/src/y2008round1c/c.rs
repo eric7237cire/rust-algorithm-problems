@@ -9,9 +9,7 @@ Binary Sum tree using an array
 pub fn solve_all_cases()
 {
     run_cases(
-        &["C-small-practice",
-            "C-large-practice"
-        ],
+        &["C-small-practice", "C-large-practice"],
         "y2008round1c",
         |reader, buffer| {
             let t = reader.read_int();
@@ -34,7 +32,7 @@ pub fn solve_all_cases()
                 A[i mod m] = (X * A[i mod m] + Y * (i + 1)) mod Z
                 */
 
-                let mut a : Vec<u64> = (0..m).map(|_| reader.read_int()).collect();
+                let mut a: Vec<u64> = (0..m).map(|_| reader.read_int()).collect();
                 let n = num_line[0] as usize;
                 let x = num_line[2];
                 let y = num_line[3];
@@ -54,13 +52,7 @@ pub fn solve_all_cases()
 
                 println!("Solving case {}", case_no);
 
-                writeln!(
-                    buffer,
-                    "Case #{}: {}",
-                    case_no,
-                    solve( &mut speed_limits)
-                )
-                .unwrap();
+                writeln!(buffer, "Case #{}: {}", case_no, solve(&mut speed_limits)).unwrap();
             }
         },
     );
@@ -79,7 +71,7 @@ fn solve(speed_limits: &mut Vec<u64>) -> u64
     }
 
     //offset by 1 so bt[1] == # of sequences ending with 0
-    let mut bt = BinarySumTree::new(speed_limits.len()+1);
+    let mut bt = BinarySumTree::new(speed_limits.len() + 1);
 
     for speed_limit in speed_limits.iter() {
         let sl = *speed_limit as usize;
