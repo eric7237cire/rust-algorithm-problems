@@ -187,7 +187,7 @@ fn solve(k: usize, indices: &[usize]) -> Vec<usize>
         assert_eq!(deck[cur_pos], 0);
         deck[cur_pos] = card_no;
         bt.set(cur_pos, 0);
-        sum_to_current_pos = target_sum-1;
+        sum_to_current_pos = target_sum - 1;
 
         //debug!("Deck after {} is {:?}", card_no, deck);
         //            bt.debug_print();

@@ -65,7 +65,7 @@ pub fn run_y2008_round_1b()
 
 pub fn run_y2008_round_1c()
 {
-
+y2008round1c::a::solve_all_cases();
 }
 
 pub fn run_y2008_round2()
@@ -77,7 +77,7 @@ fn main()
 {
     init_log();
 
-    y2008round1c::a::solve_all_cases();
+    y2008round1c::b::solve_all_cases();
 
     /*   run_y2008_round_qual();
     run_y2008_round_practice();
