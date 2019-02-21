@@ -77,6 +77,54 @@ impl BinaryTree
         }
     }
 
+    //assumes sums are positive
+    //returns smallest index such that sum(0..=index) >= target_sum
+    fn lower_bound(&self, target_sum: i64) -> usize
+    {
+        let mut range_width = 1 << (self.num_levels - 1);
+        //exclusive upper bound
+        let mut range_to = range_width;
+
+        if self.data[1] < target_sum {
+            //fail with a sensible value
+            return self.num_elems;
+        }
+        let mut cur_node = 1;
+        let mut target_sum = target_sum;
+        while range_width >= 2 {
+            println!("Cur node {} target sum {} range width {} range to {} val @ cur_node {}",
+            cur_node, target_sum, range_width, range_to, self.data[cur_node]);
+
+            if self.data[cur_node] == target_sum {
+                return min(self.num_elems-1, range_to-1);
+            }
+
+            range_width /= 2;
+
+            //lhs
+            if self.data[cur_node*2] >= target_sum {
+                cur_node = cur_node * 2;
+                assert!(range_width < range_to);
+                range_to -= range_width;
+            } else {
+                //subtract lhs
+                target_sum -= self.data[cur_node*2];
+                cur_node = cur_node * 2 + 1;
+
+                assert!(self.data[cur_node] >= target_sum);
+            }
+
+
+        }
+
+        range_to-1
+    }
+
+    fn sum(&self) -> i64
+    {
+        self.data[1]
+    }
+
     fn sum_to(&self, to: usize) -> i64
     {
         //beginning of last row, leaves
@@ -84,7 +132,7 @@ impl BinaryTree
         let mut i = to + start;
         let mut sum = self.data[i];
         while i > 1 {
-            println!("I is {}  {:0>width$b}", i, i, width=7);
+            debug!("I is {}  {:0>width$b}", i, i, width=7);
 
             if i & 1 > 0 {
                 sum += self.data[i - 1];
@@ -180,6 +228,11 @@ fn solve(k: usize, indices: &[usize]) -> Vec<usize>
 mod test_binary_tree
 {
     use super::*;
+    use rand::distributions::{Distribution, Uniform};
+    use rand::prelude::StdRng;
+    use rand::SeedableRng;
+    use rand::Rng;
+
 
     #[test]
     fn test_bt()
@@ -220,24 +273,97 @@ mod test_binary_tree
         assert_eq!(7, bt.sum_to(8));
     }
 
+    #[test]
     fn test_random()
     {
         let mut rng: StdRng = SeedableRng::seed_from_u64(42);
 
-        let num_elems_gen = Uniform::from(1..10usize);
-        let values_gen = Uniform::from(-10..10i64);
+        let num_elems_gen = Uniform::from(1..100usize);
+        let values_gen = Uniform::from(-100..100i64);
 
-        for _ in 0..100 {
+        for _ in 0..10 {
             let size = num_elems_gen.sample(&mut rng);
             let mut bt = BinaryTree::new(size);
 
-            let mut check = vec![ 0; size];
+            let mut check = vec![0; size];
 
-            for _ in 0..100 {
+            for _ in 0..size {
                 let pos = rng.gen_range(0, size);
                 let val = values_gen.sample(&mut rng);
 
                 check[pos] = val;
+                bt.set(pos, val);
+
+                for i in 0..size {
+                    assert_eq!(check.iter().take(i + 1).sum::<i64>(),
+                               bt.sum_to(i));
+                }
             }
         }
+    }
+
+    #[test]
+    fn test_small()
+    {
+        let mut bt = BinaryTree::new(1);
+        bt.set(0, -3);
+        assert_eq!(bt.sum_to(0), -3);
+
+        bt.set(0, 7);
+        assert_eq!(bt.sum_to(0), 7);
+    }
+
+    #[test]
+    fn test_big()
+    {
+        let mut bt = BinaryTree::new(1_000_000);
+        bt.set(0, -3);
+        assert_eq!(bt.sum_to(0), -3);
+
+        bt.set(1_000_000 - 1, 7);
+        assert_eq!(bt.sum_to(1_000_000-1), 4);
+    }
+
+    #[test]
+    fn test_lower_bound_exact() {
+        let size = 100;
+        let mut bt = BinaryTree::new(size);
+
+        for i in 0..size {
+            bt.set(i, (2*(i+1)) as i64);
+        }
+
+        for i in 0..size {
+            //sum formula
+            let target_sum = ((i+1)*(i+2)) as i64;
+            println!("sum of 2+4+...+ for index {} should be {}",
+            i, target_sum);
+            assert_eq!(bt.lower_bound(target_sum), i as usize);
+        }
+    }
+
+    #[test]
+    fn test_lower_bound_inexact() {
+        let size = 5;
+        let mut bt = BinaryTree::new(size);
+
+        for i in 0..size {
+            bt.set(i, (2*(i+1)) as i64);
+        }
+
+        //2+4+6+8+10
+        assert_eq!(bt.lower_bound(1), 0);
+        assert_eq!(bt.lower_bound(3), 1);
+        assert_eq!(bt.lower_bound(5), 1);
+        assert_eq!(bt.lower_bound(7), 2);
+        assert_eq!(bt.lower_bound(11), 2);
+        assert_eq!(bt.lower_bound(13), 3);
+        assert_eq!(bt.lower_bound(19), 3);
+        assert_eq!(bt.lower_bound(21), 4);
+        assert_eq!(bt.lower_bound(29), 4);
+
+        assert_eq!(bt.lower_bound(30), 4);
+        assert_eq!(bt.lower_bound(31), 5);
+    }
+
 }
