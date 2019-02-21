@@ -1,12 +1,12 @@
 use codejam::util::codejam::run_cases;
 use std::io::Write;
-use crate::y2008round2::a::Gate::*;
-use std::cmp::min;
 
-enum Gate {
-    AND = 1,
-    OR = 0
-}
+use std::cmp::min;
+use std::usize;
+
+const AND: u8 = 1;
+const OR: u8 = 0;
+
 
 /*
 Dynamic programming
@@ -24,9 +24,9 @@ pub fn solve_all_cases()
 
                 let (m,v) : (usize, usize) = reader.read_tuple_2();
 
-                let interior_nodes: Vec<(Gate, bool)> = (0..(m-1) / 2).map(|_| {
+                let interior_nodes: Vec<(u8, bool)> = (0..(m-1) / 2).map(|_| {
                     let (g, c) : (usize,usize) = reader.read_tuple_2();
-                    ( g as Gate, c == 1)
+                    ( g as u8, c == 1)
                 }
                 ).collect();
 
@@ -59,7 +59,7 @@ pub fn solve_all_cases()
     );
 }
 
-fn solve(v: bool, m: usize, interior_nodes: &[(Gate, bool)], leaf_nodes: &[bool]) -> Option<usize>
+fn solve(v: bool, m: usize, interior_nodes: &[(u8, bool)], leaf_nodes: &[bool]) -> Option<usize>
 {
     //dp[x] = min number of changes for x to be true
     let mut dp = vec![None; m];
@@ -67,13 +67,13 @@ fn solve(v: bool, m: usize, interior_nodes: &[(Gate, bool)], leaf_nodes: &[bool]
     for (i, ln) in leaf_nodes.iter().enumerate()
         {
             //if v is false we switch the input values
-            dp[i + interior_nodes.len()] = if v==ln { Some(1) } else { None} ;
+            dp[i + interior_nodes.len()] = if v==*ln { Some(1) } else { None} ;
         }
     //2n + 1; 2n + 2
 
-    for (i, int_node) in interior_nodes.iter().enumerate()
+    for (i, int_node) in interior_nodes.iter().enumerate().rev()
         {
-            let gate: Gate = if v { int_node.0 } else { (1-int_node.0) as Gate };
+            let gate: u8 = if v { int_node.0 } else { 1-int_node.0 };
             let changable = int_node.1;
             let mut min_cost = usize::MAX;
 
@@ -94,6 +94,12 @@ fn solve(v: bool, m: usize, interior_nodes: &[(Gate, bool)], leaf_nodes: &[bool]
                 }
             }
 
+            if min_cost != usize::MAX {
+                assert!(dp[i].is_none());
+                dp[i] = Some(min_cost);
+            }
+
         }
-    None
+
+    dp[0]
 }
