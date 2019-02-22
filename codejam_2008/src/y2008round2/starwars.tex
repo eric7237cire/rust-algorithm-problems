@@ -17,9 +17,13 @@
 -A \leq x-x_i &\leq A \\ 
 -A + x_i \leq x &\leq A + x_i \intertext{Multiply everything by -1, switching sign} \\ 
 A - x_i \geq -x &\geq -A - x_i \intertext{Switching order} \\ 
--A - x_i \leq -x &\leq A - x_i \intertext{so} \\
--A - B - C + x_i + y_i + z_i \leq x + y + z \leq A + B + C + x_i + y_i + z_i \\
--R\cdot p_i + x_i + y_i + z_i \leq x + y + z \leq R\cdot p_i + x_i + y_i + z_i \\
+-A - x_i \leq -x &\leq A - x_i \intertext{so subsituting A+B+C} \\
 \end{align*}
-	
+\begin{align}
+-A - B - C + x_i + y_i + z_i &\leq x + y + z \leq A + B + C + x_i + y_i + z_i \intertext{Substituting -z} 
+-R\cdot p_i + x_i + y_i - z_i &\leq x + y - z \leq R\cdot p_i + x_i + y_i - z_i  \\
+-R\cdot p_i + x_i - y_i + z_i &\leq x - y + z \leq R\cdot p_i + x_i - y_i + z_i  \\
+-R\cdot p_i - x_i + y_i + z_i &\leq -x + y + z \leq R\cdot p_i - x_i + y_i + z_i  
+\end{align}
+	These 4 orthoganal vectors cover the possibilites (since 1,1,-1 is equivalent to -1,-1,1.  Just multiply everything by -1)
 \end{document}
