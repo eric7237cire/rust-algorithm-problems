@@ -41,7 +41,7 @@ pub fn solve_all_cases()
 
                 println!("Solving case {}", case_no);
 
-                writeln!(buffer, "Case #{}: {}", case_no, solve(ships.as_slice())).unwrap();
+                writeln!(buffer, "Case #{}: {:.6}", case_no, solve(ships.as_slice())).unwrap();
             }
         },
     );
@@ -79,7 +79,7 @@ fn fmax(a: f64, b: f64) -> f64
 fn solve(ships: &[Ship]) -> f64
 {
     let mut lb = 0.;
-    let mut ub = 1_000_000.;
+    let mut ub = 10_000_000.;
 
     while ub - lb > SMALLEST_DIFF {
         let mut max_a = f64::MIN;
