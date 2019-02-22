@@ -35,8 +35,8 @@ pub fn solve_all_cases()
                     })
                     .collect();
 
-                if case_no != 1 {
-                     // continue;
+                if case_no != 9 {
+                    // continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -129,7 +129,7 @@ fn solve(ships: &[Ship]) -> f64
             max_a = fmax(max_a, a);
             min_b = fmin(min_b, b);
             max_c = fmax(max_c, c);
-            min_d = fmin(min_b, d);
+            min_d = fmin(min_d, d);
             max_e = fmax(max_e, e);
             min_f = fmin(min_f, f);
             max_g = fmax(max_g, g);
@@ -249,10 +249,10 @@ fn solve(ships: &[Ship]) -> f64
         //valid = x_interval_min <= x_interval_max && y_interval_min <= y_interval_max && z_interval_min <= z_interval_max;
 
         if valid {
-            debug!("Valid, upper bound is now {}", ub);
+            debug!("Valid, upper bound is now {}", y);
             ub = y;
         } else {
-            debug!("InValid, lower bound is now {}", lb);
+            debug!("InValid, lower bound is now {}", y);
             lb = y;
         }
     }
