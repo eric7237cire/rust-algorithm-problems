@@ -13,7 +13,7 @@ pub fn solve_all_cases()
     run_cases(
         &[
             "C-small-practice",
-            //    "C-large-practice"
+            "C-large-practice"
         ],
         "y2008round2",
         |reader, buffer| {
@@ -36,7 +36,7 @@ pub fn solve_all_cases()
                     .collect();
 
                 if case_no != 1 {
-                  //  continue;
+                     // continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -91,7 +91,7 @@ fn solve(ships: &[Ship]) -> f64
         let mut max_g = f64::MIN;
         let mut min_h = f64::MAX;
 
-        let mut valid = true;
+        let mut valid ;
         let y = (ub + lb) / 2.;
         debug!("Trying power = {}.  # of ships: {}", y, ships.len());
         /*
@@ -155,7 +155,6 @@ fn solve(ships: &[Ship]) -> f64
             let z_i1 = [(a - d) as f64 / 2., (b - c) as f64 / 2.];
             let z_i2 = [(e + g) as f64 / 2., (f + h) as f64 / 2.];
 
-        
             //let x = fmax(x_i1[0], x_i2[0]);
 
             /*
@@ -206,38 +205,46 @@ fn solve(ships: &[Ship]) -> f64
         let f = min_f;
         let g = max_g;
         let h = min_h;
-        
+
         //debug!("Overall x interval {:?} and {:?}", x_i1, x_i2);
-                let x_i1 = [(a - h) as f64 / 2., (b - g) as f64 / 2.];
-            let x_i2 = [(c + e) as f64 / 2., (d + f) as f64 / 2.];
+        let x_i1 = [(a - h) as f64 / 2., (b - g) as f64 / 2.];
+        let x_i2 = [(c + e) as f64 / 2., (d + f) as f64 / 2.];
 
-            let y_i1 = [(a - f) as f64 / 2., (b - e) as f64 / 2.];
-            let y_i2 = [(c + g) as f64 / 2., (d + h) as f64 / 2.];
+        let y_i1 = [(a - f) as f64 / 2., (b - e) as f64 / 2.];
+        let y_i2 = [(c + g) as f64 / 2., (d + h) as f64 / 2.];
 
-            let z_i1 = [(a - d) as f64 / 2., (b - c) as f64 / 2.];
-            let z_i2 = [(e + g) as f64 / 2., (f + h) as f64 / 2.];
+        let z_i1 = [(a - d) as f64 / 2., (b - c) as f64 / 2.];
+        let z_i2 = [(e + g) as f64 / 2., (f + h) as f64 / 2.];
 
+        debug!("Interval X 1 {:?} Interval 2 {:?} ", x_i1, x_i2);
+        debug!("Interval Y 1 {:?} Interval 2 {:?} ", y_i1, y_i2);
+        debug!("Interval Z 1 {:?} Interval 2 {:?} ", z_i1, z_i2);
 
-            debug!(
-                "Interval X 1 {:?} Interval 2 {:?} ",
-                x_i1, x_i2
-            );
-            debug!(
-                "Interval Y 1 {:?} Interval 2 {:?} ",
-                y_i1, y_i2
-            );
-            debug!(
-                "Interval Z 1 {:?} Interval 2 {:?} ",
-                z_i1, z_i2
-            );
+        /*
+        A ≤ x + y + z ≤ B
+   C ≤ x + y - z ≤ D
+   E ≤ x - y + z ≤ F
+   G ≤ -x + y + z ≤ H
+   */
+        debug!("A {} ≤ x + y + z ≤ B {}", a, b);
+        debug!("C {} ≤ x + y - z ≤ D {}", c, d);
+        debug!("E {} ≤ x - y + z ≤ F {}", e, f);
+        debug!("G {} ≤ -x + y + z ≤ H {}", g, h);
 
+        valid = a <= b && c <= d && e <= f && g <= h;
 
-        valid =
-            x_i1[0] <= x_i2[1] && x_i2[0] <= x_i1[1] && x_i1[0] <= x_i1[1] && x_i2[0] <= x_i2[1];
-                valid = valid && 
-            y_i1[0] <= y_i2[1] && y_i2[0] <= y_i1[1] && y_i1[0] <= y_i1[1] && y_i2[0] <= y_i2[1];
         valid = valid &&
-            z_i1[0] <= z_i2[1] && z_i2[0] <= z_i1[1] && z_i1[0] <= z_i1[1] && z_i2[0] <= z_i2[1];
+            x_i1[0] <= x_i2[1] && x_i2[0] <= x_i1[1] && x_i1[0] <= x_i1[1] && x_i2[0] <= x_i2[1];
+        valid = valid
+            && y_i1[0] <= y_i2[1]
+            && y_i2[0] <= y_i1[1]
+            && y_i1[0] <= y_i1[1]
+            && y_i2[0] <= y_i2[1];
+        valid = valid
+            && z_i1[0] <= z_i2[1]
+            && z_i2[0] <= z_i1[1]
+            && z_i1[0] <= z_i1[1]
+            && z_i2[0] <= z_i2[1];
 
         //valid = x_interval_min <= x_interval_max && y_interval_min <= y_interval_max && z_interval_min <= z_interval_max;
 
