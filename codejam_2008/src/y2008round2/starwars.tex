@@ -1,0 +1,25 @@
+
+\documentclass[14pt,a4paper]{extarticle}
+\usepackage[a4paper,margin=6mm]{geometry}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\title{\LaTeX\ Mathematics Examples}
+\author{Prof Tony Roberts}
+
+\begin{document}
+
+\begin{align*}
+\left|x-x_i\right| +\left|y-y_i\right| +\left|z-z_i\right| &\leq R\cdot p_i	\\
+\left|x-x_i\right| &\leq A  \\
+\left|y-y_i\right| &\leq B \\
+\left|z-z_i\right| &\leq C \intertext{ isolating x and removing absolute value} \\
+-A \leq x-x_i &\leq A \\ 
+-A + x_i \leq x &\leq A + x_i \intertext{Multiply everything by -1, switching sign} \\ 
+A - x_i \geq -x &\geq -A - x_i \intertext{Switching order} \\ 
+-A - x_i \leq -x &\leq A - x_i \intertext{so} \\
+-A - B - C + x_i + y_i + z_i \leq x + y + z \leq A + B + C + x_i + y_i + z_i \\
+-R\cdot p_i + x_i + y_i + z_i \leq x + y + z \leq R\cdot p_i + x_i + y_i + z_i \\
+\end{align*}
+	
+\end{document}
