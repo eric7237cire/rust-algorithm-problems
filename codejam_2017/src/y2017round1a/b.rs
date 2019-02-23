@@ -1,4 +1,5 @@
-use super::super::util::input::read_int_line;
+//use codejam::util::input::read_int_line;
+use codejam::util::codejam::run_cases;
 use std::io::stdin;
 use std::thread;
 
@@ -12,31 +13,40 @@ code not mine, just translation
 */
 pub fn solve_all_cases()
 {
-    let mut children: Vec<thread::JoinHandle<_>> = vec![];
+    run_cases(
+        &["B-small-practice", "B-large-practice"],
+        "y2008round1a",
+        |reader, buffer| {
+            let t = reader.read_int();
+            let mut children: Vec<thread::JoinHandle<_>> = vec![];
 
-    let mut s = String::new();
-    stdin().read_line(&mut s).unwrap();
-    let t = s.trim().parse::<u32>().unwrap();
+            for case_no in 1..=t {
+                //handle input / output
 
-    for case in 1..=t {
-        //handle input / output
-        let n_and_p: Vec<u8> = read_int_line();
-        let (n, p) = (n_and_p[0], n_and_p[1]);
+                let (n, p) = reader.read_tuple_2();
 
-        let r: Vec<u32> = read_int_line();
+                let r: Vec<u32> = reader.read_int_line();
 
-        let mut q: Vec<Vec<u32>> = Vec::new();
-        for _ in 0..n {
-            q.push(read_int_line());
-        }
-        children.push(thread::spawn(move || -> String {
-            solve(case, n, p, &r, &q)
-        }));
-    }
+                let mut q: Vec<Vec<u32>> = Vec::new();
+                for _ in 0..n {
+                    q.push(reader.read_int_line());
+                }
+                children.push(thread::spawn(move || -> String {
+                    solve(case_no, n, p, &r, &q)
+                }));
 
-    for child in children {
-        print!("{}", child.join().unwrap());
-    }
+                if case_no != 1 {
+                    //        continue;
+                }
+
+                println!("Solving case {}", case_no);
+
+                for child in children {
+                    writeln!(buffer, "{}", child.join().unwrap()).unwrap();
+                }
+            }
+        },
+    );
 }
 
 fn solve(case_no: u32, N: u8, P: u8, R: &Vec<u32>, Q: &Vec<Vec<u32>>) -> String

@@ -5,3 +5,22 @@ authors = ["eric7237cire <eric7237cire@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+rust-algorithm-problems = { path = "../codejam" }
+log = {version = "*", features = ["max_level_debug", "release_max_level_warn"] }
+itertools = "*"
+num-traits = "*"
+indexmap = "*"
+rand = "*"
+bimap = "0.1"
+num-bigint = "*"
+num-integer = "*"
+num-rational = "*"
+permutohedron = "*"
+bit-set = "*"
+bit-vec = "*"
+byteorder = "*"
+hamming = "*"
+threadpool = "*"
+rulinalg = "*"
+nalgebra = "*"
+try_opt = "*"

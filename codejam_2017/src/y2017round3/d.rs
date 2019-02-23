@@ -1,7 +1,7 @@
 use self::constants::*;
-use crate::algo::large_nums::*;
-use crate::util::codejam::run_cases;
-use crate::util::grid::Grid;
+use codejam::algo::large_nums::*;
+use codejam::util::codejam::run_cases;
+use codejam::util::grid::Grid;
 use itertools::Itertools;
 use num_integer::div_rem;
 use std::cmp::min;
@@ -605,15 +605,15 @@ fn calc_grid_sum_4_influencers(
 mod test_round3_d
 {
     use super::*;
-    use crate::util::grid::constants::*;
-    use crate::util::grid::Grid;
-    use crate::util::grid::*;
+    use codejam::util::grid::constants::*;
+    use codejam::util::grid::Grid;
+    use codejam::util::grid::*;
+    use codejam::util::vector_2d::Vector2d;
     use rand::distributions::{Distribution, Uniform};
     use rand::prelude::StdRng;
     use rand::SeedableRng;
     use std::ops::Range;
     use std::usize;
-    use crate::util::vector_2d::Vector2d;
 
     ///
     /// Assume inf is in top/left corner.  each grid cell gets D added to it
@@ -664,7 +664,7 @@ mod test_round3_d
 
         let corner_coords: Vec<_> = (0..=3)
             .map(|i| {
-                 Vector2d::with_val(
+                Vector2d::with_val(
                     if i < 2 { 0 } else { height - 1 },
                     if i == 0 || i == 3 { 0 } else { width - 1 },
                 )
@@ -732,7 +732,10 @@ mod test_round3_d
 
         let mut g: Grid<usize> = Grid::new(height, width);
 
-        let corner_coords = vec![ Vector2d::with_val(0, 0),  Vector2d::with_val(height - 1, width - 1)];
+        let corner_coords = vec![
+            Vector2d::with_val(0, 0),
+            Vector2d::with_val(height - 1, width - 1),
+        ];
 
         for (coord, val) in corner_coords.iter().zip(corners.iter()) {
             g[coord] = *val;
@@ -825,13 +828,8 @@ mod test_round3_d
                 0..grid_height,
                 D,
             );
-            let sum2 = calc_grid_sum_4_influencers(
-                &corner_values[..],
-                grid_width,
-                grid_height,
-                D,
-                MODULO,
-            );
+            let sum2 =
+                calc_grid_sum_4_influencers(&corner_values[..], grid_width, grid_height, D, MODULO);
 
             debug!("Sum1 {:?} Sum2 {:?}", sum1, sum2);
             assert_eq!(sum1, sum2);
@@ -870,13 +868,8 @@ mod test_round3_d
                 grid_height,
                 D,
             );
-            let sum4 = calc_sum_2_influencers(
-                &corner_values[0..2],
-                grid_width,
-                grid_height,
-                D,
-                MODULO,
-            );
+            let sum4 =
+                calc_sum_2_influencers(&corner_values[0..2], grid_width, grid_height, D, MODULO);
 
             debug!("Sum3 {:?} Sum4 {:?}", sum3, sum4);
             assert_eq!(sum3, sum4);

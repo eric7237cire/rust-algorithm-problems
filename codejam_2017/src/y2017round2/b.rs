@@ -1,5 +1,5 @@
-use super::super::util::input::*;
-use super::super::util::math::*;
+use codejam::util::input::*;
+use codejam::util::math::*;
 use std::cmp::max;
 
 /*
@@ -9,7 +9,7 @@ minimization / optimization
 
 pub fn solve_all_cases()
 {
-    let mut reader : InputReader = Default::default();
+    let mut reader: InputReader = Default::default();
     let t = reader.read_int();
 
     for case in 1..=t {

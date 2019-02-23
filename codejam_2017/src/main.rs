@@ -16,6 +16,9 @@ extern crate itertools;*/
 #[macro_use]
 extern crate log;
 
+#[macro_use]
+extern crate try_opt;
+
 use codejam::util::log::init_log;
 
 pub fn run_y2017_round_qual()
@@ -51,15 +54,32 @@ pub fn run_y2017_round2()
     y2017round2::a::solve_all_cases();
     y2017round2::b::solve_all_cases();
     y2017round2::c::solve_all_cases();
+    y2017round2::d::solve_all_cases();
 }
 
+pub fn run_y2017_round3()
+{
+    y2017round3::a::solve_all_cases();
+    y2017round3::b::solve_all_cases();
+    y2017round3::c::solve_all_cases();
+    y2017round3::d::solve_all_cases();
+}
+
+pub fn run_y2017_round4()
+{
+    y2017round4::a::solve_all_cases();
+    y2017round4::b::solve_all_cases();
+    y2017round4::c::solve_all_cases();
+    y2017round4::d::solve_all_cases();
+    y2017round4::e::solve_all_cases();
+    y2017round4::f::solve_all_cases();
+}
 fn main()
 {
     init_log();
 
-    y2017round2::d::solve_all_cases();
-
-    /*   run_y2017_round_qual();
-    run_y2017_round_practice();
-    run_y2017_round_beta();*/
+    run_y2017_round1a();
+    run_y2017_round1b();
+    run_y2017_round2();
+    //run_y2017_round4();
 }

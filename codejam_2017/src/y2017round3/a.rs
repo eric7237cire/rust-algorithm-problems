@@ -1,4 +1,4 @@
-use crate::util::codejam::run_cases;
+use codejam::util::codejam::run_cases;
 use indexmap::IndexSet;
 use num_integer::binomial;
 use permutohedron::LexicalPermutation;

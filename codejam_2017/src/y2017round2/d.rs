@@ -7,11 +7,11 @@ BFS
 Cycles
 Hard
 */
-use crate::algo::graph::flow::*;
-use crate::algo::graph::*;
-use crate::util::grid::constants::*;
-use crate::util::grid::{Grid, GridCoord, GridRowColVec};
-use crate::util::input::*;
+use codejam::algo::graph::flow::*;
+use codejam::algo::graph::*;
+use codejam::util::grid::constants::*;
+use codejam::util::grid::{Grid, GridCoord, GridRowColVec};
+use codejam::util::input::*;
 //use std::thread;
 use bimap::BiMap;
 use bit_vec::BitVec;
@@ -86,7 +86,7 @@ enum Tile
 }
 
 use self::Tile::*;
-use crate::util::codejam::run_cases;
+use codejam::util::codejam::run_cases;
 
 impl Tile
 {

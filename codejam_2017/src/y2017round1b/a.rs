@@ -1,4 +1,4 @@
-use super::super::util::input::read_int_line;
+use codejam::util::codejam::run_cases;
 use std::io::stdin;
 use std::thread;
 
@@ -17,37 +17,45 @@ struct Horse
 
 pub fn solve_all_cases()
 {
-    let mut children: Vec<thread::JoinHandle<_>> = vec![];
+    run_cases(
+        &["A-small-practice", "A-large-practice"],
+        "y2008round1B",
+        |reader, buffer| {
+            let t = reader.read_int();
 
-    let mut s = String::new();
-    stdin().read_line(&mut s).unwrap();
-    let t = s.trim().parse::<u32>().unwrap();
+            for case_no in 1..=t {
+                //D & N
+                let input: Vec<u64> = reader.read_int_line();
+                let n = input[1];
+                let mut horse = (0..n)
+                    .map(|_| {
+                        let input: Vec<u64> = reader.read_int_line();
+                        Horse {
+                            start_pos: input[0] as f64,
+                            velocity: input[1] as f64,
+                        }
+                    })
+                    .collect::<Vec<_>>();
 
-    for case in 1..=t {
-        //D & N
-        let input: Vec<u64> = read_int_line();
-        let n = input[1];
-        let mut horse = (0..n)
-            .map(|_| {
-                let input: Vec<u64> = read_int_line();
-                Horse {
-                    start_pos: input[0] as f64,
-                    velocity: input[1] as f64,
+                if case_no != 1 {
+                    //        continue;
                 }
-            })
-            .collect::<Vec<_>>();
 
-        children.push(thread::spawn(move || -> String {
-            solve(case, input[0] as f64, &mut horse)
-        }));
-    }
+                println!("Solving case {}", case_no);
 
-    for child in children {
-        print!("{}", child.join().unwrap());
-    }
+                writeln!(
+                    buffer,
+                    "Case #{}: {}",
+                    case_no,
+                    solve(input[0] as f64, &mut horse)
+                )
+                .unwrap();
+            }
+        },
+    );
 }
 
-fn solve(case_no: u32, D: f64, horses: &mut Vec<Horse>) -> String
+fn solve(D: f64, horses: &mut Vec<Horse>) -> String
 {
     //let mut horses = horses.clone();
 
@@ -89,5 +97,5 @@ fn solve(case_no: u32, D: f64, horses: &mut Vec<Horse>) -> String
         hs, hs.velocity, min_v
     );
 
-    format!("Case #{}: {:.6}\n", case_no, min_v)
+    format!("{:.6}\n", min_v)
 }

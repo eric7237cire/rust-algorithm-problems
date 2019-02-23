@@ -8,17 +8,20 @@ Simulation, grid, backtracking
 2-satisfiability / 2SAT
 
 */
-use crate::algo::graph::connectivity::ConnectivityGraph;
-use crate::algo::graph::Graph;
-use crate::util::grid::constants::*;
-use crate::util::grid::{Grid};
 
-use crate::util::codejam::run_cases;
 use bimap::BiMap;
 use std::default::Default;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::io::Write;
+
+use self::Tile::*;
+use codejam::algo::graph::connectivity::ConnectivityGraph;
+use codejam::algo::graph::Graph;
+use codejam::util::codejam::run_cases;
+use codejam::util::grid::constants::*;
+use codejam::util::grid::Grid;
+use codejam::util::vector_2d::Vector2d;
 
 pub fn solve_all_cases()
 {
@@ -55,9 +58,6 @@ enum Tile
     VerticalBeam,
     HorizonalBeam,
 }
-
-use self::Tile::*;
-use crate::util::vector_2d::Vector2d;
 
 impl Tile
 {

@@ -1,5 +1,5 @@
-use super::super::util::input::*;
-use crate::util::input::InputReader;
+use codejam::util::codejam::run_cases;
+use codejam::util::input::*;
 
 /*
 state machine
@@ -8,21 +8,30 @@ optimization
 */
 pub fn solve_all_cases()
 {
-    let mut reader : InputReader = Default::default();
-    let t = reader.read_int();
+    run_cases(
+        &["A-small-practice", "A-large-practice"],
+        "y2017round2",
+        |reader, buffer| {
+            let t = reader.read_int();
 
-    for case in 1..=t {
-        let (_, P) = reader.read_tuple_2::<usize>();
-        let mut G: Vec<_> = reader.read_num_line::<usize>();
+            for case_no in 1..=t {
+                let (_, P) = reader.read_tuple_2::<usize>();
+                let mut G: Vec<_> = reader.read_num_line::<usize>();
 
-        print!("{}", solve(case, &mut G, P));
-    }
+                if case_no != 1 {
+                    //        continue;
+                }
+
+                println!("Solving case {}", case_no);
+
+                writeln!(buffer, "Case #{}: {:.6}", case_no, solve(&mut G, P)).unwrap();
+            }
+        },
+    );
 }
 
-fn solve(case_no: u32, G: &mut Vec<usize>, P: usize) -> String
+fn solve(G: &mut Vec<usize>, P: usize) -> String
 {
-    debug!("Solving case {}", case_no);
-
     for g in G.iter_mut() {
         *g %= P;
     }
@@ -70,5 +79,5 @@ fn solve(case_no: u32, G: &mut Vec<usize>, P: usize) -> String
         }
     }
 
-    format!("Case #{}: {}\n", case_no, groups_happy)
+    format!("{}\n", groups_happy)
 }

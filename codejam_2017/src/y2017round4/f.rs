@@ -1,7 +1,7 @@
-//use crate::algo::vectors::*;
-use crate::util::codejam::run_cases;
-use crate::util::grid::Grid;
+//use codejam::algo::vectors::*;
 use bimap::BiMap;
+use codejam::util::codejam::run_cases;
+use codejam::util::grid::Grid;
 //use num_traits::*;
 use rand::distributions::{Distribution, Uniform};
 use rand::prelude::{SliceRandom, StdRng};
@@ -87,7 +87,7 @@ fn get_longest_path_for_step(
         }
 
         // println!("Multiplying with {}", step_idx);
-       
+
         //
         for t1_idx in 0..N {
             for t2_idx in 0..N {
@@ -133,10 +133,8 @@ fn solve(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> Option<u64>
         .iter()
         .fold(i64::MAX, |acc, t| min(acc, dist(&dest, t)));
 
-
     //extra
     let mut dist_matrix = Vec::new();
-
 
     /*
     create a matrix [log steps][t_idx][t2_idx]

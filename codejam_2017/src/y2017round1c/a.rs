@@ -1,4 +1,4 @@
-use super::super::util::input::*;
+use codejam::util::input::*;
 //use std::u16;
 use std::f64;
 //use std::cmp::max;

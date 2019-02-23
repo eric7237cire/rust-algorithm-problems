@@ -1,4 +1,4 @@
-use super::super::util::input::read_int_line;
+use codejam::util::codejam::run_cases;
 use std::cmp;
 use std::io::stdin;
 use std::thread;
@@ -8,26 +8,36 @@ very hard ad hoc (code not mine, just translation)
 */
 pub fn solve_all_cases()
 {
-    let mut children: Vec<thread::JoinHandle<_>> = vec![];
+    run_cases(
+        &["C-small-practice", "C-large-practice"],
+        "y2008round1a",
+        |reader, buffer| {
+            let t = reader.read_int();
+            let mut children: Vec<thread::JoinHandle<_>> = vec![];
 
-    let mut s = String::new();
-    stdin().read_line(&mut s).unwrap();
-    let t = s.trim().parse::<u32>().unwrap();
+            for case_no in 1..=t {
+                //handle input / output
+                //Hd, Ad, Hk, Ak, B, and D;
+                let input: Vec<i64> = reader.read_int_line();
 
-    for case in 1..=t {
-        //Hd, Ad, Hk, Ak, B, and D;
-        let input: Vec<i64> = read_int_line();
+                children.push(thread::spawn(move || -> String {
+                    solve(
+                        case_no, input[0], input[1], input[2], input[3], input[4], input[5],
+                    )
+                }));
 
-        children.push(thread::spawn(move || -> String {
-            solve(
-                case, input[0], input[1], input[2], input[3], input[4], input[5],
-            )
-        }));
-    }
+                if case_no != 1 {
+                    //        continue;
+                }
 
-    for child in children {
-        print!("{}", child.join().unwrap());
-    }
+                println!("Solving case {}", case_no);
+
+                for child in children {
+                    writeln!(buffer, "{}", child.join().unwrap()).unwrap();
+                }
+            }
+        },
+    );
 }
 
 const R: i64 = 100;

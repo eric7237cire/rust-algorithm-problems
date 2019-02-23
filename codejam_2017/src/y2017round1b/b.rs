@@ -1,8 +1,10 @@
-use super::super::util::input::read_int_line;
 use itertools::Itertools;
 use std::fmt;
 use std::io::stdin;
 use std::iter::FromIterator;
+
+use self::Colors::*;
+use codejam::util::codejam::run_cases;
 
 /*
 
@@ -12,24 +14,26 @@ was close, used the official explanation to implement
 */
 pub fn solve_all_cases()
 {
-    //let mut children: Vec<thread::JoinHandle<_>> = vec![];
+    run_cases(
+        &["B-small-practice", "B-large-practice"],
+        "y2008round1B",
+        |reader, buffer| {
+            let t = reader.read_int();
 
-    let mut s = String::new();
-    stdin().read_line(&mut s).unwrap();
-    let t = s.trim().parse::<u32>().unwrap();
+            for case_no in 1..=t {
+                //N, R, O(RY), Y, G(YB), B, and V(RB).
+                let input: Vec<u16> = reader.read_int_line();
 
-    for case in 1..=t {
-        //N, R, O(RY), Y, G(YB), B, and V(RB).
-        let input: Vec<u16> = read_int_line();
+                if case_no != 1 {
+                    //        continue;
+                }
 
-        //  children.push(thread::spawn(move || -> String { solve(case, &input) }));
-        print!("{}", solve(case, &input));
-    }
-    /*
-    for child in children
-    {
-        print!("{}", child.join().unwrap());
-    }*/
+                println!("Solving case {}", case_no);
+
+                writeln!(buffer, "Case #{}: {}", case_no, solve(&input)).unwrap();
+            }
+        },
+    );
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -100,7 +104,6 @@ impl From<char> for Colors
     }
 }
 
-use self::Colors::*;
 static COLORS: [Colors; 6] = [Red, Orange, Yellow, Green, Blue, Violet];
 
 impl ::std::fmt::Display for Colors
@@ -364,15 +367,13 @@ fn solution(counts: &mut Counts) -> Option<String>
     Some(sol)
 }
 
-fn solve(case_no: u32, nroygbv: &Vec<u16>) -> String
+fn solve(nroygbv: &Vec<u16>) -> String
 {
-    debug!("Solving case {}", case_no);
     let mut counts: Counts = nroygbv.iter().skip(1).collect();
     let ans = solution(&mut counts);
 
     format!(
-        "Case #{}: {}\n",
-        case_no,
+        "{}",
         match ans {
             Some(ans) => ans,
             _ => "IMPOSSIBLE".to_string(),

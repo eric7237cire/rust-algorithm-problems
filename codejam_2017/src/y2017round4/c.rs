@@ -1,5 +1,5 @@
-use crate::util::codejam::run_cases;
-use crate::util::grid::Grid;
+use codejam::util::codejam::run_cases;
+use codejam::util::grid::Grid;
 use nalgebra::*;
 use rand::distributions::{Distribution, Uniform};
 use rand::prelude::StdRng;

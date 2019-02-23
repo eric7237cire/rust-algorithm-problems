@@ -1,5 +1,5 @@
-use crate::algo::graph::disjointset::DisjointSet;
-use crate::util::codejam::run_cases;
+use codejam::algo::graph::disjointset::DisjointSet;
+use codejam::util::codejam::run_cases;
 use std::cmp::min;
 use std::io::Write;
 

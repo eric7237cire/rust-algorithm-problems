@@ -1,4 +1,4 @@
-use super::super::util::input::*;
+use codejam::util::input::*;
 use std::cmp::min;
 
 const DAY: usize = 24 * 60;

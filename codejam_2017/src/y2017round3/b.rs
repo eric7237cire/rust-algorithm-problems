@@ -1,6 +1,6 @@
-use crate::algo::graph::DiGraph;
-use crate::util::codejam::run_cases;
 use bit_set::BitSet;
+use codejam::algo::graph::DiGraph;
+use codejam::util::codejam::run_cases;
 use std::io::Write;
 
 /*
