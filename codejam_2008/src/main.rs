@@ -7,6 +7,7 @@ mod y2008round1a;
 mod y2008round1b;
 mod y2008round1c;
 mod y2008round2;
+mod y2008round3;
 
 extern crate codejam;
 
@@ -76,13 +77,19 @@ pub fn run_y2008_round2()
     y2008round2::a::solve_all_cases();
     y2008round2::b::solve_all_cases();
     y2008round2::c::solve_all_cases();
+    y2008round2::d::solve_all_cases();
+}
+
+pub fn run_y2008_round3()
+{
+
 }
 
 fn main()
 {
     init_log();
+    y2008round3::a::solve_all_cases();
 
-    y2008round2::d::solve_all_cases();
 
     /*   run_y2008_round_qual();
     run_y2008_round_practice();
