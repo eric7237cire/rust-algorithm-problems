@@ -1,15 +1,11 @@
 use codejam::algo::vectors::*;
 use codejam::util::codejam::run_cases;
-use codejam::util::grid::Grid;
 use num_bigint::BigInt;
 use num_traits::*;
-use rand::distributions::{Distribution, Uniform};
+use rand::distributions::{ Uniform};
 use rand::prelude::{SliceRandom, StdRng};
 use rand::{Rng, SeedableRng};
-use std::collections::{HashMap, HashSet};
 use std::io::Write;
-use std::ops::Sub;
-use std::time::Instant;
 
 /*
 Cross product / dot product

@@ -3,9 +3,7 @@ use bit_vec::BitVec;
 use codejam::algo::graph::flow2::Flow;
 use codejam::util::codejam::run_cases;
 use rand::{thread_rng, Rng};
-use std::cmp::{max, min};
-use std::collections::HashSet;
-use std::collections::VecDeque;
+use std::cmp::{max};
 use std::io::Write;
 use std::mem;
 use std::usize;
@@ -13,11 +11,8 @@ use std::usize;
 use byteorder::{ByteOrder, NativeEndian, WriteBytesExt};
 use hamming::weight;
 use num_bigint::BigInt;
-use num_integer::Integer;
-use num_rational::{BigRational, Ratio};
+use num_rational::{BigRational};
 use num_traits::{FromPrimitive, One, Signed, Zero};
-use std::ops::{Add, Div, Mul, Sub};
-use std::thread;
 
 /*
 Dynamic programming, min/max

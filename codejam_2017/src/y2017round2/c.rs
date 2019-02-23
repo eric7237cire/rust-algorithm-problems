@@ -281,7 +281,7 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>) -> String
             for (idx, &b) in tsa.iter().enumerate() {
                 grid[&laser_coords[idx]] = if b { VerticalBeam } else { HorizonalBeam };
             }
-            format!("Case #{}: POSSIBLE\n{}", case_no, grid)
+            format!("Case #{}: POSSIBLE\n{}", case_no, print_grid(&grid))
         }
     } else {
         //what I did, backtracking.  must be release mode
@@ -299,7 +299,7 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>) -> String
             return format!("Case #{}: IMPOSSIBLE\n", case_no);
         }
 
-        format!("Case #{}: POSSIBLE\n{}", case_no, grid)
+        format!("Case #{}: POSSIBLE\n{}", case_no, print_grid(&grid))
     }
 }
 
@@ -370,20 +370,16 @@ fn helper(
     return false;
 }
 
-impl Display for Grid<Tile>
+fn print_grid(grid: &Grid<Tile>) -> String
 {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result
-    {
-        for r in 0..self.R {
-            for c in 0..self.C {
-                if let Err(err) = write!(f, "{}", self[(r, c)]) {
-                    return Err(err);
-                }
+    let mut s = String::new();
+        for r in 0..grid.R {
+            for c in 0..grid.C {
+                s += format!("{}", grid[(r, c)]);
             }
-            if let Err(err) = writeln!(f, "") {
-                return Err(err);
-            }
+            s += "\n";
         }
-        write!(f, "")
-    }
+
+
+    s
 }

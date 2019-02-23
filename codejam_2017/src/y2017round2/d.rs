@@ -526,6 +526,7 @@ fn build_graph(
     G
 }
 
+/*
 impl Display for Grid<Tile>
 {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result
@@ -542,4 +543,4 @@ impl Display for Grid<Tile>
         }
         write!(f, "")
     }
-}
+}*/

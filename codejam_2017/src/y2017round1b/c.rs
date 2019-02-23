@@ -3,6 +3,8 @@ use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::f64;
 use std::u16;
+use codejam::util::codejam::run_cases;
+use std::io::Write;
 
 /*
 dijkstras ; creating nodes based on other state
@@ -15,19 +17,23 @@ struct Horse
 
 type Distance = u32;
 type CityIndex = usize;
-
 pub fn solve_all_cases()
 {
-    let mut reader = InputReader::new();
-    let t = reader.read_int();
+    run_cases(
+        &["C-small-practice", "C-large-practice"],
+        "y2008round1b",
+        |reader, buffer| {
+            let t = reader.read_int();
 
-    for case in 1..=t {
-        let (N, Q) = reader.read_tuple_2::<u8, u8>();
-        let horses: Vec<_> = (0..N)
-            .map(|_| reader.read_tuple_2::<Distance, u16>())
-            .map(|tp| Horse { E: tp.0, S: tp.1 })
+            for case_no in 1..=t {
+                let (n,q) = reader.read_tuple_2();
+
+
+        let horses: Vec<_> = (0..n)
+            .map(|_| reader.read_tuple_2::<u32>())
+            .map(|tp| Horse { E: tp.0, S: tp.1 as u16 })
             .collect();
-        let city_dist: Vec<_> = (0..N)
+        let city_dist: Vec<_> = (0..n)
             .map(|_| {
                 reader
                     .read_num_line::<i32>()
@@ -36,12 +42,18 @@ pub fn solve_all_cases()
                     .collect()
             })
             .collect();
-        let queries: Vec<_> = (0..Q)
-            .map(|_| reader.read_tuple_2::<CityIndex, CityIndex>())
+        let queries: Vec<_> = (0..q)
+            .map(|_| reader.read_tuple_2::<CityIndex>())
             .collect();
-        print!("{}", solve(case, &horses, &city_dist, &queries));
-    }
+
+                println!("Solving case {}", case_no);
+
+                writeln!(buffer, "Case #{}: {:0>3}", case_no, solve( &horses, &city_dist, &queries)).unwrap();
+            }
+        },
+    );
 }
+
 
 #[derive(Copy, Clone)]
 struct Node
@@ -101,16 +113,13 @@ impl Ord for Node
 }
 
 fn solve(
-    case_no: u32,
     horses: &Vec<Horse>,
     city_dist: &Vec<Vec<Option<Distance>>>,
     queries: &Vec<(CityIndex, CityIndex)>,
 ) -> String
 {
-    debug!("Solving case {}", case_no);
     format!(
-        "Case #{}: {}\n",
-        case_no,
+        "{}\n",
         queries
             .iter()
             .map(|q| solve_query(horses, city_dist, q.0 - 1, q.1 - 1))

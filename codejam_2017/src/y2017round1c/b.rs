@@ -1,5 +1,8 @@
 use codejam::util::input::*;
 use std::cmp::min;
+use std::io::Write;
+use self::Parent::*;
+use codejam::util::codejam::run_cases;
 
 const DAY: usize = 24 * 60;
 
@@ -12,31 +15,37 @@ enum Parent
     Cameron,
     Jamie,
 }
-use self::Parent::*;
 
 pub fn solve_all_cases()
 {
-    let mut reader = InputReader::new();
-    let t = reader.read_int();
+    run_cases(
+        &["B-small-practice", "B-large-practice"],
+        "y2008round1c",
+        |reader, buffer| {
+            let t = reader.read_int();
 
-    for case in 1..=t {
-        let (Ac, Aj) = reader.read_tuple_2::<u8, u8>();
+            for case_no in 1..=t {
+                let (Ac, Aj) = reader.read_tuple_2::<u8>();
 
         let mut fixed: Vec<Option<Parent>> = vec![None; DAY];
         for i in 0..Ac + Aj {
-            let (start, stop) = reader.read_tuple_2::<u16, u16>();
+            let (start, stop) = reader.read_tuple_2::<u16>();
             //intervals are open on right
             for t in start..stop {
                 fixed[t as usize] = if i < Ac { Some(Cameron) } else { Some(Jamie) };
             }
         }
-        print!("{}", solve(case, &fixed));
-    }
+                println!("Solving case {}", case_no);
+
+                writeln!(buffer, "Case #{}: {:0>3}", case_no, solve(&fixed)).unwrap();
+            }
+        },
+    );
+
 }
 
-fn solve(case_no: u32, fixed: &[Option<Parent>]) -> String
+fn solve(fixed: &[Option<Parent>]) -> String
 {
-    debug!("Solving case {}", case_no);
     //From alkjash python solution
 
     /*
@@ -71,5 +80,5 @@ fn solve(case_no: u32, fixed: &[Option<Parent>]) -> String
         ans += 1;
     }
 
-    format!("Case #{}: {}\n", case_no, ans)
+    format!("{}", ans)
 }

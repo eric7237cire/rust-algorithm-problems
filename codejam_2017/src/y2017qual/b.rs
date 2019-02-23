@@ -1,12 +1,28 @@
-use std::io::stdin;
+use codejam::util::codejam::run_cases;
+use std::io::Write;
 //Adhoc / digits / integers
-pub fn solve_case()
-{
-    //handle input / output
-    let mut s = String::new();
-    stdin().read_line(&mut s).unwrap();
 
-    println!("{}", solve(&s));
+pub fn solve_all_cases()
+{
+    run_cases(
+        &["B-small-practice", "B-large-practice"],
+        "y2017qual",
+        |reader, buffer| {
+            let t = reader.read_int();
+
+            for case_no in 1..=t {
+                let s = reader.read_string();
+
+                if case_no != 1 {
+                    //        continue;
+                }
+
+                println!("Solving case {}", case_no);
+
+                writeln!(buffer, "Case #{}: {}", case_no, solve(&s)).unwrap();
+            }
+        },
+    );
 }
 
 /*

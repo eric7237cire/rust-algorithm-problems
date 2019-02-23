@@ -1,10 +1,9 @@
 use codejam::util::codejam::run_cases;
 use codejam::util::grid::Grid;
 use nalgebra::*;
-use rand::distributions::{Distribution, Uniform};
+use rand::distributions::{Uniform};
 use rand::prelude::StdRng;
 use rand::SeedableRng;
-use rulinalg::matrix::Matrix;
 use std::collections::{HashMap, HashSet};
 use std::io::Write;
 use std::time::Instant;
@@ -153,17 +152,17 @@ impl Search
     */
     fn dfs(&mut self, spanning: &mut Spanning, v: usize, level: usize)
     {
-        if (self.mp.len() == K - 1) {
+        if self.mp.len() == K - 1 {
             return;
         }
-        if (v == MAX_VERTEX) {
+        if v == MAX_VERTEX {
             return;
         }
         //println!("DFS {}", v);
 
         //try connecting v to all vertices less than it
         for v_connected_perm in 1..(1 << v) {
-            if (self.mp.len() == K - 1) {
+            if self.mp.len() == K - 1 {
                 return;
             }
             for i in 0..v {
@@ -174,7 +173,7 @@ impl Search
                 };
             }
             let cnt = spanning.spanning_tree_count(v + 1);
-            if (cnt > K) {
+            if cnt > K {
                 continue;
             }
             if !self.mp.contains_key(&cnt) {

@@ -1,16 +1,26 @@
-use std::io::stdin;
+use codejam::util::codejam::run_cases;
+use std::io::Write;
 
 //counting balanced binary tree nodes
-pub fn solve_case()
-{
-    //handle input / output
-    let mut s = String::new();
-    stdin().read_line(&mut s).unwrap();
-    debug!("Read {}", s);
-    let nums: Vec<u64> = s.split_whitespace().map(|n| n.parse().unwrap()).collect();
 
-    let ans = solve(nums[0], nums[1]);
-    println!("{} {}", ans.0, ans.1);
+pub fn solve_all_cases()
+{
+    run_cases(
+        &["C-small-practice", "C-large-practice"],
+        "y2017qual",
+        |reader, buffer| {
+            let t = reader.read_int();
+
+            for case_no in 1..=t {
+                let nums: Vec<u64> = reader.read_num_line();
+
+                println!("Solving case {}", case_no);
+
+                let ans = solve(nums[0], nums[1]);
+                writeln!(buffer, "Case #{}: {} {}", case_no, ans.0, ans.1).unwrap();
+            }
+        },
+    );
 }
 
 fn solve(n: u64, k: u64) -> (u64, u64)

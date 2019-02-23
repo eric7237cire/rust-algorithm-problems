@@ -26,6 +26,7 @@ pub fn run_y2017_round_qual()
     y2017qual::a::solve_all_cases();
     y2017qual::b::solve_all_cases();
     y2017qual::c::solve_all_cases();
+    y2017qual::d::solve_all_cases();
 }
 
 pub fn run_y2017_round_1a()
@@ -78,8 +79,9 @@ fn main()
 {
     init_log();
 
-    run_y2017_round1a();
-    run_y2017_round1b();
+    run_y2017_round_qual();
+    run_y2017_round_1a();
+    run_y2017_round_1b();
     run_y2017_round2();
     //run_y2017_round4();
 }

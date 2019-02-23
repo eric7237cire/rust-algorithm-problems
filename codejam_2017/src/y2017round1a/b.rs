@@ -1,6 +1,6 @@
-//use codejam::util::input::read_int_line;
+//use codejam::util::input::read_num_line;
 use codejam::util::codejam::run_cases;
-use std::io::stdin;
+use std::io::Write;
 use std::thread;
 
 /*
@@ -25,11 +25,11 @@ pub fn solve_all_cases()
 
                 let (n, p) = reader.read_tuple_2();
 
-                let r: Vec<u32> = reader.read_int_line();
+                let r: Vec<u32> = reader.read_num_line();
 
                 let mut q: Vec<Vec<u32>> = Vec::new();
                 for _ in 0..n {
-                    q.push(reader.read_int_line());
+                    q.push(reader.read_num_line());
                 }
                 children.push(thread::spawn(move || -> String {
                     solve(case_no, n, p, &r, &q)

@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use std::fmt;
-use std::io::stdin;
+use std::io::Write;
 use std::iter::FromIterator;
 
 use self::Colors::*;
@@ -22,7 +22,7 @@ pub fn solve_all_cases()
 
             for case_no in 1..=t {
                 //N, R, O(RY), Y, G(YB), B, and V(RB).
-                let input: Vec<u16> = reader.read_int_line();
+                let input: Vec<u16> = reader.read_num_line();
 
                 if case_no != 1 {
                     //        continue;

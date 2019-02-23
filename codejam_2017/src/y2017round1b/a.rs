@@ -1,5 +1,5 @@
 use codejam::util::codejam::run_cases;
-use std::io::stdin;
+use std::io::Write;
 use std::thread;
 
 /*
@@ -25,11 +25,11 @@ pub fn solve_all_cases()
 
             for case_no in 1..=t {
                 //D & N
-                let input: Vec<u64> = reader.read_int_line();
+                let input: Vec<u64> = reader.read_num_line();
                 let n = input[1];
                 let mut horse = (0..n)
                     .map(|_| {
-                        let input: Vec<u64> = reader.read_int_line();
+                        let input: Vec<u64> = reader.read_num_line();
                         Horse {
                             start_pos: input[0] as f64,
                             velocity: input[1] as f64,

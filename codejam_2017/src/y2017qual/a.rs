@@ -1,23 +1,43 @@
-use std::io::stdin;
+use codejam::util::codejam::run_cases;
+use std::io::Write;
 
 //use bit_vec::BitVec;
 
 //Greedy algorithm
 
-pub fn solve_case()
+pub fn solve_all_cases()
 {
-    //handle input / output
-    let mut s = String::new();
-    stdin().read_line(&mut s).unwrap();
-    let s: Vec<_> = s.split_whitespace().collect();
-    let k = s[1].trim().parse::<usize>().unwrap();
-    let s = s[0].trim();
-    let mut v: Vec<bool> = s.chars().map(|x| x == '+').collect();
+    run_cases(
+        &["A-small-practice", "A-large-practice"],
+        "y2017qual",
+        |reader, buffer| {
+            let t = reader.read_int();
 
-    match solve(&mut v, k) {
-        None => println!("IMPOSSIBLE"),
-        Some(ans) => println!("{}", ans),
-    }
+            for case_no in 1..=t {
+                let s: Vec<_> = reader.read_string_line();
+                let k = s[1].trim().parse::<usize>().unwrap();
+                let s = s[0].trim();
+                let mut v: Vec<bool> = s.chars().map(|x| x == '+').collect();
+
+                if case_no != 1 {
+                    //        continue;
+                }
+
+                println!("Solving case {}", case_no);
+
+                writeln!(
+                    buffer,
+                    "Case #{}: {}",
+                    case_no,
+                    match solve(&mut v, k) {
+                        None => "IMPOSSIBLE".to_string(),
+                        Some(ans) => ans.to_string(),
+                    }
+                )
+                .unwrap();
+            }
+        },
+    );
 }
 
 fn solve(pancake_row: &mut [bool], k: usize) -> Option<usize>

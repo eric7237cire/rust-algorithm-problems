@@ -1,5 +1,5 @@
-use std::io::stdin;
-use std::thread;
+use std::io::Write;
+use codejam::util::codejam::run_cases;
 
 /*
 grid
@@ -9,38 +9,29 @@ TODO use grid class
 */
 pub fn solve_all_cases()
 {
-    let mut children: Vec<thread::JoinHandle<_>> = vec![];
+    run_cases(
+        &["A-small-practice", "A-large-practice"],
+        "y2008round1a",
+        |reader, buffer| {
+            let t = reader.read_int();
 
-    let mut s = String::new();
-    stdin().read_line(&mut s).unwrap();
-    let t = s.trim().parse::<u32>().unwrap();
+            for case_no in 1..=t {
 
-    for case in 1..=t {
-        //handle input / output
-        let mut s = String::new();
-        stdin().read_line(&mut s).unwrap();
-        //debug!("Read {}", s);
-        let r_and_c: Vec<u8> = s.split_whitespace().map(|n| n.parse().unwrap()).collect();
-        let (r, _) = (r_and_c[0], r_and_c[1]);
+                //handle input / output
+                let (r, c) = reader.read_tuple_2();
 
-        let mut grid: Vec<Vec<char>> = Vec::new();
+                let mut grid: Vec<Vec<char>> = Vec::new();
 
-        for _ in 0..r {
-            s.clear();
-            stdin().read_line(&mut s).unwrap();
-            grid.push(s.chars().collect());
-        }
+                for _ in 0..r {
+                    let s = reader.read_string();
+                    grid.push(s.chars().collect());
+                }
 
-        if cfg!(feature = "debug_print") && case != 4 {
-            continue;
-        }
 
-        children.push(thread::spawn(move || -> String { solve(case, &mut grid) }));
-    }
+                writeln!(buffer, "Case #{}: {:.6}", case_no, solve( &mut grid)).unwrap();
+            }
+        });
 
-    for child in children {
-        print!("{}", child.join().unwrap());
-    }
 }
 
 fn handle_col(r: usize, c: usize, grid: &mut Vec<Vec<char>>, last_value: &mut char)
@@ -57,7 +48,7 @@ fn handle_col(r: usize, c: usize, grid: &mut Vec<Vec<char>>, last_value: &mut ch
     }
 }
 
-fn solve(case_no: u32, grid: &mut Vec<Vec<char>>) -> String
+fn solve( grid: &mut Vec<Vec<char>>) -> String
 {
     //let mut last_value: char = '?';
 
@@ -96,7 +87,7 @@ fn solve(case_no: u32, grid: &mut Vec<Vec<char>>) -> String
         }
     }
 
-    let mut ans = format!("Case #{}:\n", case_no);
+    let mut ans = "\n".to_string();
     for r in 0..n_rows {
         for c in 0..n_cols {
             ans += &grid[r][c].to_string();

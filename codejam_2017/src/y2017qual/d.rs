@@ -1,5 +1,5 @@
-use std::io::stdin;
-use std::thread;
+use std::io::Write;
+use codejam::util::codejam::run_cases;
 
 type BoardInt = i32;
 type BoardVV = Vec<Vec<bool>>;
@@ -16,71 +16,59 @@ problem modeling/understanding
 
 pub fn solve_all_cases()
 {
-    let mut children: Vec<thread::JoinHandle<_>> = vec![];
+    run_cases(
+        &["D-small-practice", "D-large-practice"],
+        "y2017qual",
+        |reader, buffer| {
+            let t = reader.read_int();
 
-    let mut s = String::new();
-    stdin().read_line(&mut s).unwrap();
-    let t = s.trim().parse::<u32>().unwrap();
+            for case_no in 1..=t {
+                let (n, m) = reader.read_tuple_2();
 
-    for case in 1..=t {
-        //handle input / output
-        let mut s = String::new();
-        stdin().read_line(&mut s).unwrap();
-        //debug!("Read {}", s);
-        let n_and_m: Vec<u32> = s.split_whitespace().map(|n| n.parse().unwrap()).collect();
-        let (n, m) = (n_and_m[0], n_and_m[1]);
+                /* + are bishops
+                 * x are rooks; place as many as possible such that no row has 2
+                 * It is a bit confusing to understand that from the restriction
+                 * Whenever any two models share a diagonal of the grid, at least one of the two must be an x
+                 *
+                 * We basically place as many as possible of each indepedently, then combine them to 'o'
+                 * we pivot the bishop boards to make it the same problem as rooks
+                 */
+                let mut existing_rooks: Vec<RowCol> = Vec::new();
+                let mut existing_bishops: Vec<RowCol> = Vec::new();
 
-        /* + are bishops
-         * x are rooks; place as many as possible such that no row has 2
-         * It is a bit confusing to understand that from the restriction
-         * Whenever any two models share a diagonal of the grid, at least one of the two must be an x
-         *
-         * We basically place as many as possible of each indepedently, then combine them to 'o'
-         * we pivot the bishop boards to make it the same problem as rooks
-         */
-        let mut existing_rooks: Vec<RowCol> = Vec::new();
-        let mut existing_bishops: Vec<RowCol> = Vec::new();
+                for _ in 0..m {
 
-        for _ in 0..m {
-            s.clear();
-            stdin().read_line(&mut s).unwrap();
-            let chars_line: Vec<&str> = s.split_whitespace().collect();
+                    let chars_line: Vec<_> = reader.read_string_line();
 
-            let (m_type, row, col): (char, BoardInt, BoardInt) = (
-                chars_line[0].chars().next().unwrap(),
-                chars_line[1].parse().unwrap(),
-                chars_line[2].parse().unwrap(),
-            );
+                    let (m_type, row, col): (char, BoardInt, BoardInt) = (
+                        chars_line[0].chars().next().unwrap(),
+                        chars_line[1].parse().unwrap(),
+                        chars_line[2].parse().unwrap(),
+                    );
 
-            if m_type == 'o' || m_type == 'x' {
-                existing_rooks.push(RowCol(row - 1, col - 1));
+                    if m_type == 'o' || m_type == 'x' {
+                        existing_rooks.push(RowCol(row - 1, col - 1));
+                    }
+                    if m_type == 'o' || m_type == '+' {
+                        existing_bishops.push(RowCol(row - 1, col - 1));
+                    }
+                }
+
+                println!("Solving case {}", case_no);
+
+                writeln!(
+                    buffer,
+                    "Case #{}: {}",
+                    case_no,
+                    solve(n, existing_bishops, existing_rooks)
+                )
+                .unwrap();
             }
-            if m_type == 'o' || m_type == '+' {
-                existing_bishops.push(RowCol(row - 1, col - 1));
-            }
-        }
-
-        if cfg!(feature = "debug_print") && case != 4 {
-            continue;
-        }
-
-        children.push(thread::spawn(move || -> String {
-            solve(case, n, existing_bishops, existing_rooks)
-        }));
-    }
-
-    for child in children {
-        // collect each child thread's return-value
-        print!("{}", child.join().unwrap());
-    }
+        },
+    );
 }
 
-fn solve(
-    case_num: u32,
-    n: u32,
-    existing_bishops: Vec<RowCol>,
-    existing_rooks: Vec<RowCol>,
-) -> String
+fn solve(n: u32, existing_bishops: Vec<RowCol>, existing_rooks: Vec<RowCol>) -> String
 {
     let b = Board::new(n as BoardInt, existing_bishops, existing_rooks);
 
@@ -90,7 +78,7 @@ fn solve(
     let score = b.existing_bishops.len() + bishops.len() + b.existing_rooks.len() + rooks.len();
 
     let (lines, added) = b.write_solution_lines(&rooks, &bishops);
-    format!("Case #{}: {} {}\n{}", case_num, score, added, lines)
+    format!("{} {}\n{}", score, added, lines)
 }
 
 struct Board

@@ -1,6 +1,6 @@
 use codejam::util::codejam::run_cases;
 use std::cmp;
-use std::io::stdin;
+use std::io::Write;
 use std::thread;
 
 /*
@@ -13,18 +13,11 @@ pub fn solve_all_cases()
         "y2008round1a",
         |reader, buffer| {
             let t = reader.read_int();
-            let mut children: Vec<thread::JoinHandle<_>> = vec![];
 
             for case_no in 1..=t {
                 //handle input / output
                 //Hd, Ad, Hk, Ak, B, and D;
-                let input: Vec<i64> = reader.read_int_line();
-
-                children.push(thread::spawn(move || -> String {
-                    solve(
-                        case_no, input[0], input[1], input[2], input[3], input[4], input[5],
-                    )
-                }));
+                let input: Vec<i64> = reader.read_num_line();
 
                 if case_no != 1 {
                     //        continue;
@@ -32,9 +25,10 @@ pub fn solve_all_cases()
 
                 println!("Solving case {}", case_no);
 
-                for child in children {
-                    writeln!(buffer, "{}", child.join().unwrap()).unwrap();
-                }
+
+                writeln!(buffer, "Case #{}: {}", case_no, solve(
+                         input[0], input[1], input[2], input[3], input[4], input[5],
+                    )).unwrap();
             }
         },
     );
@@ -42,7 +36,7 @@ pub fn solve_all_cases()
 
 const R: i64 = 100;
 
-fn solve(case_no: u32, Hd: i64, Ad: i64, Hk: i64, Ak: i64, B: i64, D: i64) -> String
+fn solve( Hd: i64, Ad: i64, Hk: i64, Ak: i64, B: i64, D: i64) -> String
 {
     let MAX_TURN = 10i64.pow(15);
     let mut Ak = Ak;
@@ -121,8 +115,8 @@ fn solve(case_no: u32, Hd: i64, Ad: i64, Hk: i64, Ak: i64, B: i64, D: i64) -> St
     }
 
     if minturn == MAX_TURN {
-        format!("Case #{}: {}\n", case_no, "IMPOSSIBLE")
+        format!("{}", "IMPOSSIBLE")
     } else {
-        format!("Case #{}: {}\n", case_no, minturn)
+        format!("{}", minturn)
     }
 }

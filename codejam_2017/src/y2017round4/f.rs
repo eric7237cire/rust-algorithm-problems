@@ -1,13 +1,5 @@
-//use codejam::algo::vectors::*;
-use bimap::BiMap;
 use codejam::util::codejam::run_cases;
-use codejam::util::grid::Grid;
-//use num_traits::*;
-use rand::distributions::{Distribution, Uniform};
-use rand::prelude::{SliceRandom, StdRng};
-//use rand::{Rng, SeedableRng};
 use std::cmp::{max, min};
-//use std::collections::{HashMap, HashSet, VecDeque};
 use std::i64;
 use std::io::Write;
 use std::mem;

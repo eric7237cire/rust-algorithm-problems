@@ -1,6 +1,8 @@
 use codejam::util::input::*;
 //use std::cmp::min;
 use std::cmp::Ordering::*;
+use codejam::util::codejam::run_cases;
+use std::io::Write;
 
 /*
 hard custom algorithm / proof
@@ -9,19 +11,26 @@ probability of success of at least K independent events
 */
 pub fn solve_all_cases()
 {
-    let mut reader = InputReader::new();
-    let t = reader.read_int();
+    run_cases(
+        &["C-small-practice", "C-large-practice"],
+        "y2008round1c",
+        |reader, buffer| {
+            let t = reader.read_int();
 
-    for case in 1..=t {
-        let (_, K) = reader.read_tuple_2::<u8, u8>();
-        let U = reader.read_int::<f64>();
-        let mut P = reader.read_num_line::<f64>();
+            for case_no in 1..=t {
+                let (_, K) = reader.read_tuple_2::<u8>();
+                let U = reader.read_int::<f64>();
+                let mut P = reader.read_num_line::<f64>();
 
-        debug!("P: {:?}", P);
+                println!("Solving case {}", case_no);
 
-        print!("{}", solve(case, &mut P, U, K));
-    }
+                writeln!(buffer, "Case #{}: {:0>3}", case_no, solve(&mut P, U, K)).unwrap();
+            }
+        },
+    );
+
 }
+
 
 fn prob_at_least_k(P: &[f64], K: usize) -> f64
 {
@@ -70,10 +79,8 @@ fn prob1()
     println!("Prob 12 heads of 18 coins: {:.5}", p);
 }
 
-fn solve(case_no: u32, prob: &mut Vec<f64>, U: f64, K: u8) -> String
+fn solve(prob: &mut Vec<f64>, U: f64, K: u8) -> String
 {
-    debug!("Solving case {}", case_no);
-
     prob.sort_by(|&a, &b| a.partial_cmp(&b).unwrap());
 
     let mut best_ans = -1f64;
@@ -134,5 +141,5 @@ fn solve(case_no: u32, prob: &mut Vec<f64>, U: f64, K: u8) -> String
         }
     }
 
-    format!("Case #{}: {:.9}\n", case_no, best_ans)
+    format!("{:.9}\n", best_ans)
 }
