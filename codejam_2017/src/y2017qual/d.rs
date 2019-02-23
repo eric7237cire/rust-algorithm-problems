@@ -246,11 +246,11 @@ impl Board
                 "After processing row {}.  Placed at {},{}",
                 index, min_row, min_col
             );
-            self.print_board(&board, is_rooks);
+            //self.print_board(&board, is_rooks);
         }
 
         piece_array
     }
 }
 
-include!("d_debug.rs");
+//include!("d_debug.rs");

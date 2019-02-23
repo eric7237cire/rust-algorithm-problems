@@ -115,12 +115,12 @@ fn solve(case_no: u32, cards: &Vec<(char, i16)>, s: i16) -> String
     let mul_pos_card: BigRational = cards
         .iter()
         .filter(|(op, val)| *op == '*' && val > &BigRational::zero())
-        .fold(BigRational::one(), |acc, (op, val)| &acc * val);
+        .fold(BigRational::one(), |acc, (_op, val)| &acc * val);
 
     let div_pos_card: BigRational = cards
         .iter()
         .filter(|(op, val)| *op == '/' && val > &BigRational::zero())
-        .fold(BigRational::one(), |acc, (op, val)| &acc * val);
+        .fold(BigRational::one(), |acc, (_op, val)| &acc * val);
 
     cards.clear();
 
@@ -139,7 +139,7 @@ fn solve(case_no: u32, cards: &Vec<(char, i16)>, s: i16) -> String
         let mul_neg_val: BigRational = neg_mul_cards
             .iter()
             .skip(2)
-            .fold(BigRational::one(), |acc, (op, val)| &acc * val);
+            .fold(BigRational::one(), |acc, (_op, val)| &acc * val);
         cards.push(('*', mul_neg_val));
     }
 
@@ -158,7 +158,7 @@ fn solve(case_no: u32, cards: &Vec<(char, i16)>, s: i16) -> String
         let div_neg_val: BigRational = neg_div_cards
             .iter()
             .skip(2)
-            .fold(BigRational::one(), |acc, (op, val)| &acc * val);
+            .fold(BigRational::one(), |acc, (_op, val)| &acc * val);
         cards.push(('/', div_neg_val));
     }
 

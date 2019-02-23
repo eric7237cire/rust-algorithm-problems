@@ -3,7 +3,7 @@ use codejam::util::codejam::run_cases;
 use num_bigint::BigInt;
 use num_traits::*;
 use rand::prelude::{ StdRng};
-use rand::{Rng, SeedableRng};
+use rand::{SeedableRng};
 use rand::seq::SliceRandom;
 use std::io::Write;
 

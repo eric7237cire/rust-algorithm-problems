@@ -22,9 +22,6 @@ use std::default::Default;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::io::Write;
-use std::sync::mpsc::channel;
-use std::time::Instant;
-use threadpool::ThreadPool;
 
 pub fn solve_all_cases()
 {
@@ -172,10 +169,14 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>, m_soldier_limit: usize) -> Str
         .map(|t_loc| reachable(&grid, &t_loc))
         .collect::<Vec<_>>();
 
+    debug!("Turret locations {:?}", turret_locations);
+
     let t_map = turret_locations
         .into_iter()
         .enumerate()
         .collect::<BiMap<_, _>>();
+
+
 
     let s = grid.filter_by_val(&Soldier).count();
     let t = grid.filter_by_val(&Turret).count();
@@ -304,18 +305,18 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>, m_soldier_limit: usize) -> Str
         let st_prime = g_prime.iter().find(|&(_s, t)| !turrets_in_m.contains(t));
 
         if st_prime.is_some() {
-            let &(s, t) = st_prime.unwrap();
-            debug!("Found (s,t') s={} t'={}", s, t - s);
-            ans += &format!("{} {}\n", s + 1, t - s + 1);
+            let &(ss, tt) = st_prime.unwrap();
+            debug!("Found (s,t') s={} t'={}", ss, tt - s);
+            ans += &format!("{} {}\n", ss + 1, tt - s + 1);
 
-            grid[s_map.get_by_left(&s).unwrap()] = Empty;
-            grid[t_map.get_by_left(&(t - s)).unwrap()] = Empty;
+            grid[s_map.get_by_left(&ss).unwrap()] = Empty;
+            grid[t_map.get_by_left(&(tt - s)).unwrap()] = Empty;
             r -= 1;
 
             //Also remove from current matching
             let to_remove = m
                 .iter()
-                .position(|&(s_in_m, _t)| s_in_m == s)
+                .position(|&(s_in_m, _t)| s_in_m == ss)
                 .expect("Soldier should be in mapping");
             m.remove(to_remove);
 
@@ -386,12 +387,12 @@ fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>, m_soldier_limit: usize) -> Str
             .iter()
             .filter(|&uv| g_prime.contains(uv))
             .collect::<Vec<_>>();
-        for &&(s, t) in st_actions.iter() {
-            debug!("Taking actions from g' s {} t {}", s + 1, t + 1 - s);
-            ans += &format!("{} {}\n", s + 1, t - s + 1);
+        for &&(ss, tt) in st_actions.iter() {
+            debug!("Taking actions from g' s {} t {}", ss + 1, tt + 1 - s);
+            ans += &format!("{} {}\n", ss + 1, tt - s + 1);
 
-            grid[s_map.get_by_left(&s).unwrap()] = Empty;
-            grid[t_map.get_by_left(&(t - s)).unwrap()] = Empty;
+            grid[s_map.get_by_left(&ss).unwrap()] = Empty;
+            grid[t_map.get_by_left(&(tt - s)).unwrap()] = Empty;
 
             r -= 1;
         }

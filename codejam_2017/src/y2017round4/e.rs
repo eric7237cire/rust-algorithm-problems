@@ -37,7 +37,7 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case in 1..=t {
-                let (n, c) = reader.read_tuple_2::<usize>();
+                let (_n, c) = reader.read_tuple_2::<usize>();
                 let stack_indexes = reader.read_num_line::<usize>();
                 let stacks = stack_indexes
                     .iter()

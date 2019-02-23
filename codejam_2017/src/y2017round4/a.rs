@@ -1,11 +1,8 @@
 
 use bit_vec::BitVec;
-use codejam::algo::graph::flow2::Flow;
 use codejam::util::codejam::run_cases;
 use std::cmp::max;
-use std::collections::HashSet;
 use std::io::Write;
-use std::mem;
 use std::usize;
 
 use std::thread;
