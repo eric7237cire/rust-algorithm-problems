@@ -11,10 +11,7 @@ Geometry
 pub fn solve_all_cases()
 {
     run_cases(
-        &[
-            "C-small-practice",
-            "C-large-practice"
-        ],
+        &["C-small-practice", "C-large-practice"],
         "y2008round2",
         |reader, buffer| {
             let t = reader.read_int();
@@ -36,7 +33,7 @@ pub fn solve_all_cases()
                     .collect();
 
                 if case_no != 1 {
-            //        continue;
+                    //        continue;
                 }
 
                 println!("Solving case {}", case_no);
@@ -91,7 +88,7 @@ fn solve(ships: &[Ship]) -> f64
         let mut max_g = f64::MIN;
         let mut min_h = f64::MAX;
 
-        let valid ;
+        let valid;
         let y = (ub + lb) / 2.;
         debug!("Trying power = {}.  # of ships: {}", y, ships.len());
         /*
@@ -139,10 +136,7 @@ fn solve(ships: &[Ship]) -> f64
                         debug!("G = {}", g);
                         debug!("H = {}", h);
             */
-
-
         }
-
 
         let a = max_a;
         let b = min_b;
