@@ -62,9 +62,9 @@ pub fn solve_all_cases()
 
 const STACK_SIZE: usize = 40 * 1024 * 1024;
 
-const NUM_DICE_VALUES: usize = 6;
+//const NUM_DICE_VALUES: usize = 6;
 const MAX_DICE_VALUE: usize = 1_000_000;
-const MAX_N_DICE: usize = 50_000;
+//const MAX_N_DICE: usize = 50_000;
 
 const INVALID_MATCH_I32: i32 = -1;
 
@@ -189,8 +189,9 @@ fn solve(case_no: u32, dice: &Vec<Vec<i32>>) -> String
     format!("Case #{}: {}\n", case_no, ans)
 }
 
-const INVALID_MATCH: usize = usize::MAX - 1;
+//const INVALID_MATCH: usize = usize::MAX - 1;
 
+/*
 struct DfsDice
 {
     //vis[dice value] = true if already visited
@@ -228,6 +229,8 @@ impl DfsDice
         return false;
     }
 }
+*/
+
 /*
 fn add_value_to_flow(flow: &mut Flow, value_to_add: usize, value_to_dice: &Vec<Vec<usize>>)
 {

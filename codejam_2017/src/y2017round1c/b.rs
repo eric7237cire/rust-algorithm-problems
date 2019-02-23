@@ -20,7 +20,7 @@ pub fn solve_all_cases()
 {
     run_cases(
         &["B-small-practice", "B-large-practice"],
-        "y2008round1c",
+        "y2017round1c",
         |reader, buffer| {
             let t = reader.read_int();
 
@@ -37,14 +37,14 @@ pub fn solve_all_cases()
         }
                 println!("Solving case {}", case_no);
 
-                writeln!(buffer, "Case #{}: {:0>3}", case_no, solve(&fixed)).unwrap();
+                writeln!(buffer, "Case #{}: {}", case_no, solve(&fixed)).unwrap();
             }
         },
     );
 
 }
 
-fn solve(fixed: &[Option<Parent>]) -> String
+fn solve(fixed: &[Option<Parent>]) -> u16
 {
     //From alkjash python solution
 
@@ -80,5 +80,5 @@ fn solve(fixed: &[Option<Parent>]) -> String
         ans += 1;
     }
 
-    format!("{}", ans)
+    ans
 }

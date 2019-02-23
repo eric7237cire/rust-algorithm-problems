@@ -51,12 +51,14 @@ impl Camp
             - tours[self.arrivals[arrival_idx]].duration % 24)
             % 24
     }
+    /*
     fn is_free(&self, tours: &[Tour]) -> bool
     {
         let p1 = self.wait_time(0, 0, &tours) + self.wait_time(1, 1, &tours);
         let p2 = self.wait_time(0, 1, &tours) + self.wait_time(1, 0, &tours);
         p1 == p2
     }
+    */
 }
 fn solve(case_no: u32, c: usize, tour_input: &[(usize, usize, usize)]) -> String
 {

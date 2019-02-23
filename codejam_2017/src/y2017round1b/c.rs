@@ -21,7 +21,7 @@ pub fn solve_all_cases()
 {
     run_cases(
         &["C-small-practice", "C-large-practice"],
-        "y2008round1b",
+        "y2017round1b",
         |reader, buffer| {
             let t = reader.read_int();
 
@@ -119,7 +119,7 @@ fn solve(
 ) -> String
 {
     format!(
-        "{}\n",
+        "{}",
         queries
             .iter()
             .map(|q| solve_query(horses, city_dist, q.0 - 1, q.1 - 1))

@@ -32,10 +32,6 @@ pub fn solve_all_cases()
         &["D-small-practice", "D-large-practice"],
         "y2017round2",
         |reader, buffer| {
-            //let mut children: Vec<thread::JoinHandle<_>> = vec![];
-            let pool = ThreadPool::new(6);
-
-            let (tx, rx) = channel();
 
             let t = reader.read_int();
 
@@ -49,29 +45,10 @@ pub fn solve_all_cases()
                     }
                 }
 
-                let tx = tx.clone();
-                pool.execute(move || {
-                    let now = Instant::now();
-                    let _ = writeln!(::std::io::stderr(), "Starting {} of {} ", case, t);
-                    let s = solve(case, &mut grid, m);
-                    tx.send((case, s)).expect("Channel is there");
-
-                    let duration = now.elapsed();
-                    let secs = duration.as_secs() as f64 + duration.subsec_nanos() as f64 / 1e9f64;
-                    let _ = writeln!(
-                        ::std::io::stderr(),
-                        "Finished #{} in {:.2} second(s)",
-                        case,
-                        secs
-                    );
-                });
-            }
-
-            let mut output = rx.iter().take(t as usize).collect::<Vec<_>>();
-            output.sort();
-            for (_, s) in output {
+                let s = solve(case, &mut grid, m);
                 write!(buffer, "{}", s).unwrap();
             }
+
         },
     );
 }

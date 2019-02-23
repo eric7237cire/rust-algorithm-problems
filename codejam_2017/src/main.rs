@@ -80,10 +80,10 @@ fn main()
     init_log();
 
     //run_y2017_round_qual();
-    run_y2017_round_1a();
-    //run_y2017_round_1b();
-    //run_y2017_round_1c();
-    //run_y2017_round2();
-    //run_y2017_round3();
-    //run_y2017_round4();
+    //run_y2017_round_1a();
+    run_y2017_round_1b();
+    run_y2017_round_1c();
+    run_y2017_round2();
+    run_y2017_round3();
+    run_y2017_round4();
 }

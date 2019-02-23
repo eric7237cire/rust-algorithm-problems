@@ -14,7 +14,7 @@ pub fn solve_all_cases()
 
     run_cases(
         &["B-small-practice", "B-large-practice"],
-        "y2008round2",
+        "y2017round2",
         |reader, buffer| {
             let t = reader.read_int();
 

@@ -12,8 +12,8 @@ probability of success of at least K independent events
 pub fn solve_all_cases()
 {
     run_cases(
-        &["C-small-practice", "C-large-practice"],
-        "y2008round1c",
+        &["C-small-practice-1", "C-small-practice-2", ],
+        "y2017round1c",
         |reader, buffer| {
             let t = reader.read_int();
 
@@ -24,7 +24,7 @@ pub fn solve_all_cases()
 
                 println!("Solving case {}", case_no);
 
-                writeln!(buffer, "Case #{}: {:0>3}", case_no, solve(&mut p, u, k)).unwrap();
+                writeln!(buffer, "Case #{}: {:.9}", case_no, solve(&mut p, u, k)).unwrap();
             }
         },
     );
@@ -79,7 +79,7 @@ fn prob1()
     println!("Prob 12 heads of 18 coins: {:.5}", p);
 }
 
-fn solve(prob: &mut Vec<f64>, u: f64, k: u8) -> String
+fn solve(prob: &mut Vec<f64>, u: f64, k: u8) -> f64
 {
     prob.sort_by(|&a, &b| a.partial_cmp(&b).unwrap());
 
@@ -141,5 +141,5 @@ fn solve(prob: &mut Vec<f64>, u: f64, k: u8) -> String
         }
     }
 
-    format!("{:.9}\n", best_ans)
+    best_ans
 }

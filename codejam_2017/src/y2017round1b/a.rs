@@ -18,7 +18,7 @@ pub fn solve_all_cases()
 {
     run_cases(
         &["A-small-practice", "A-large-practice"],
-        "y2008round1B",
+        "y2017round1b",
         |reader, buffer| {
             let t = reader.read_int();
 
@@ -44,7 +44,7 @@ pub fn solve_all_cases()
 
                 writeln!(
                     buffer,
-                    "Case #{}: {}",
+                    "Case #{}: {:.6}",
                     case_no,
                     solve(input[0] as f64, &mut horse)
                 )
@@ -54,7 +54,7 @@ pub fn solve_all_cases()
     );
 }
 
-fn solve(d: f64, horses: &mut Vec<Horse>) -> String
+fn solve(d: f64, horses: &mut Vec<Horse>) -> f64
 {
     //let mut horses = horses.clone();
 
@@ -96,5 +96,5 @@ fn solve(d: f64, horses: &mut Vec<Horse>) -> String
         hs, hs.velocity, min_v
     );
 
-    format!("{:.6}\n", min_v)
+    min_v
 }

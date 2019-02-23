@@ -24,13 +24,13 @@ pub fn solve_all_cases()
 
                 println!("Solving case {}", case_no);
 
-                writeln!(buffer, "Case #{}: {:.6}", case_no, solve(&mut g, p)).unwrap();
+                writeln!(buffer, "Case #{}: {}", case_no, solve(&mut g, p)).unwrap();
             }
         },
     );
 }
 
-fn solve(g: &mut Vec<usize>, p: usize) -> String
+fn solve(g: &mut Vec<usize>, p: usize) -> i32
 {
     for g in g.iter_mut() {
         *g %= p;
@@ -79,5 +79,5 @@ fn solve(g: &mut Vec<usize>, p: usize) -> String
         }
     }
 
-    format!("{}\n", groups_happy)
+     groups_happy
 }
