@@ -375,7 +375,7 @@ fn print_grid(grid: &Grid<Tile>) -> String
     let mut s = String::new();
         for r in 0..grid.R {
             for c in 0..grid.C {
-                s += format!("{}", grid[(r, c)]);
+                s += &format!("{}", grid[(r, c)]);
             }
             s += "\n";
         }

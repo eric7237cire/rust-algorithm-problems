@@ -1,9 +1,5 @@
 use codejam::util::codejam::run_cases;
-use codejam::util::grid::Grid;
 use nalgebra::*;
-use rand::distributions::{Uniform};
-use rand::prelude::StdRng;
-use rand::SeedableRng;
 use std::collections::{HashMap, HashSet};
 use std::io::Write;
 use std::time::Instant;
@@ -213,7 +209,12 @@ impl Search
 #[cfg(test)]
 mod test_2017_round4_c
 {
-    use super::*;
+    use codejam::util::grid::Grid;
+use super::*;
+    use rand::distributions::{Distribution, Uniform};
+    use rand::prelude::StdRng;
+    use rand::SeedableRng;
+    
 
     #[test]
     fn test_spanning_tree_count()

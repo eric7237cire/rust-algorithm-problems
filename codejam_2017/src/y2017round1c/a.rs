@@ -1,4 +1,4 @@
-use codejam::util::input::*;
+
 //use std::u16;
 use std::f64;
 use codejam::util::codejam::run_cases;

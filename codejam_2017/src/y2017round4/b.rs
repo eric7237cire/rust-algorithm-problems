@@ -1,14 +1,12 @@
-use bit_set::BitSet;
-use bit_vec::BitVec;
-use codejam::algo::graph::flow2::Flow;
+
 use codejam::util::codejam::run_cases;
-use rand::{thread_rng, Rng};
+
 use std::cmp::{max};
 use std::io::Write;
 use std::mem;
 use std::usize;
 
-use byteorder::{ByteOrder, NativeEndian, WriteBytesExt};
+use byteorder::{ByteOrder, NativeEndian};
 use hamming::weight;
 use num_bigint::BigInt;
 use num_rational::{BigRational};
@@ -28,9 +26,9 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case in 1..=t {
-                let (S, C) = reader.read_tuple_2::<i16>();
+                let (s, c) = reader.read_tuple_2::<i16>();
 
-                let cards = (0..C)
+                let cards = (0..c)
                     .map(|_| {
                         let some_string = reader.read_string();
                         let mut sw = some_string.split_whitespace();
@@ -41,7 +39,7 @@ pub fn solve_all_cases()
                     })
                     .collect();
 
-                write!(buffer, "{}", solve(case, &cards, S)).unwrap();
+                write!(buffer, "{}", solve(case, &cards, s)).unwrap();
             }
         },
     );
@@ -68,7 +66,7 @@ fn apply_op(card: &(char, BigRational), num: &BigRational) -> BigRational
     }
 }
 
-fn solve(case_no: u32, cards: &Vec<(char, i16)>, S: i16) -> String
+fn solve(case_no: u32, cards: &Vec<(char, i16)>, s: i16) -> String
 {
     println!("Solving {}", case_no);
 
@@ -186,7 +184,7 @@ fn solve(case_no: u32, cards: &Vec<(char, i16)>, S: i16) -> String
 
     let mut memo: Vec<Option<MemoData>> = vec![None; 1 << cards.len()];
 
-    let seed = BigRational::from(BigInt::from(S));
+    let seed = BigRational::from(BigInt::from(s));
 
     for (c_idx, c) in cards.iter().enumerate() {
         let n = apply_op(c, &seed);

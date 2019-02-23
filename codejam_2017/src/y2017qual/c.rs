@@ -6,7 +6,7 @@ use std::io::Write;
 pub fn solve_all_cases()
 {
     run_cases(
-        &["C-small-practice", "C-large-practice"],
+        &["C-small-practice-1", "C-small-practice-2", "C-large-practice"],
         "y2017qual",
         |reader, buffer| {
             let t = reader.read_int();

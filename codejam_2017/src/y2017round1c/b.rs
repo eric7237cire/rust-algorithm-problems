@@ -1,4 +1,4 @@
-use codejam::util::input::*;
+
 use std::cmp::min;
 use std::io::Write;
 use self::Parent::*;

@@ -11,7 +11,7 @@ use codejam::algo::graph::flow::*;
 use codejam::algo::graph::*;
 use codejam::util::grid::constants::*;
 use codejam::util::grid::{Grid, GridCoord, GridRowColVec};
-use codejam::util::input::*;
+
 //use std::thread;
 use bimap::BiMap;
 use bit_vec::BitVec;
@@ -178,8 +178,8 @@ impl<L, R> FromIterator<(L, R)> for BiMap<L, R>
 fn solve<'a>(case_no: u32, grid: &mut Grid<Tile>, M_soldier_limit: usize) -> String
 {
     debug!(
-        "Solving case {}\nM={}\n{}\n",
-        case_no, M_soldier_limit, grid
+        "Solving case {}\nM={}\n",
+        case_no, M_soldier_limit
     );
 
     //original solider & turret index to location map
@@ -522,7 +522,7 @@ fn build_graph(
         }
     }
 
-    debug!("Built graph from\n{}\n  S={} T={}", grid, S, T);
+    debug!("Built graph from\n  S={} T={}", S, T);
     G
 }
 

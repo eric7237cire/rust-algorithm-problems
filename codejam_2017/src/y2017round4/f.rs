@@ -16,11 +16,11 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case in 1..=t {
-                let N = reader.read_int::<usize>();
+                let n = reader.read_int::<usize>();
                 let home = reader.read_array_3::<i64>();
                 let dest = reader.read_array_3::<i64>();
 
-                let teleporters: Vec<_> = (0..N).map(|_| reader.read_array_3::<i64>()).collect();
+                let teleporters: Vec<_> = (0..n).map(|_| reader.read_array_3::<i64>()).collect();
 
                 if case != 22 {
                     //continue;
@@ -62,10 +62,10 @@ fn get_longest_path_for_step(
     steps: usize,
 ) -> Vec<i64>
 {
-    let N = dist_matrix[0].len();
+    let n = dist_matrix[0].len();
 
-    let mut ans = vec![vec![-1; N]; N];
-    let mut new_ans = vec![vec![-1; N]; N];
+    let mut ans = vec![vec![-1; n]; n];
+    let mut new_ans = vec![vec![-1; n]; n];
 
     for step_idx in 0..dist_matrix.len() {
         if (1 << step_idx) & steps == 0 {
@@ -81,10 +81,10 @@ fn get_longest_path_for_step(
         // println!("Multiplying with {}", step_idx);
 
         //
-        for t1_idx in 0..N {
-            for t2_idx in 0..N {
+        for t1_idx in 0..n {
+            for t2_idx in 0..n {
                 let mut best = -1;
-                for v_idx in 0..N {
+                for v_idx in 0..n {
                     best = max(
                         best,
                         ans[t1_idx][v_idx] + dist_matrix[step_idx][v_idx][t2_idx],
@@ -106,9 +106,9 @@ fn get_longest_path_for_step(
     home_dist[t_idx]).collect()*/
 
     //return indexed by end point
-    (0..N)
+    (0..n)
         .map(|stop_idx| {
-            { (0..N).map(|start_idx| ans[start_idx][stop_idx] + home_dist[start_idx]) }
+            { (0..n).map(|start_idx| ans[start_idx][stop_idx] + home_dist[start_idx]) }
                 .max()
                 .unwrap()
         })
@@ -241,7 +241,7 @@ fn solve(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> Option<u64>
 
 /// Tests large observation that we only need to calculate U
 /// And validates iterative squaring approach to calculing max U distance per step
-fn solve_small_only_U(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> Option<u64>
+fn solve_small_only_u(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> Option<u64>
 {
     //let mut L: Vec<Vec<i64>> = Vec::new();
     //let mut U: Vec<Vec<i64>> = Vec::new();
@@ -330,8 +330,8 @@ fn solve_small_only_U(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> O
         initial.push(dist(home, t));
     }
 
-    let mut L = initial.clone();
-    let mut U = initial.clone();
+    let mut l = initial.clone();
+    let mut u = initial.clone();
 
     /*
     By definition, Lt,i+1 and Ut,i+1 are the distances from t to its closest and farthest points in Ri, respectively.
@@ -341,14 +341,14 @@ fn solve_small_only_U(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> O
     */
     for i in 1..10000 {
         if i < 68 {
-            println!("i {} max is {}", i, U.iter().max().unwrap());
+            println!("i {} max is {}", i, u.iter().max().unwrap());
         }
 
         let fast_umax = get_longest_path_for_step(&dist_matrix, &initial, i - 1);
 
         if i > 1 {
             let fast_umax_all = fast_umax.iter().max().unwrap();
-            let current_umax = U.iter().max().unwrap();
+            let current_umax = u.iter().max().unwrap();
 
             assert_eq!(*current_umax + 1, *fast_umax_all);
 
@@ -357,19 +357,19 @@ fn solve_small_only_U(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> O
             */
         }
 
-        let mut new_L = Vec::new();
-        let mut new_U = Vec::new();
+        let mut new_l = Vec::new();
+        let mut new_u = Vec::new();
 
         for (t_idx, t) in teleporters.iter().enumerate() {
             if i > 1 {
-                let current_umax = U[t_idx];
+                let current_umax = u[t_idx];
                 let fast_umax_t = fast_umax[t_idx];
                 assert_eq!(current_umax, fast_umax_t);
             }
 
             if
             //dist(&dest, t) >= L[t_idx] &&
-            i > 1 && dist(&dest, t) <= U[t_idx] {
+            i > 1 && dist(&dest, t) <= u[t_idx] {
                 return Some(i as u64);
             }
 
@@ -388,7 +388,7 @@ fn solve_small_only_U(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> O
                 }
                 //Greatest distance from teleporter u + distance of t to u;
                 //this is the furthest one could teleport using teleporter t
-                let maybe_high = U[u_idx] + dist(u, t);
+                let maybe_high = u[u_idx] + dist(u, t);
                 if high.is_none() || maybe_high > high.unwrap() {
                     high = Some(maybe_high);
                 }
@@ -402,12 +402,12 @@ fn solve_small_only_U(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> O
                 */
 
                 let dist_tu = dist(t, u);
-                let maybe_low = if dist_tu > U[u_idx] {
+                let maybe_low = if dist_tu > u[u_idx] {
                     //lowest distance is outside the outer sphere
-                    dist_tu - U[u_idx]
-                } else if dist_tu < L[u_idx] {
+                    dist_tu - u[u_idx]
+                } else if dist_tu < l[u_idx] {
                     //teleport to lower sphere
-                    L[u_idx] - dist_tu
+                    l[u_idx] - dist_tu
                 } else {
                     0
                 };
@@ -417,12 +417,12 @@ fn solve_small_only_U(home: &Point, dest: &Point, teleporters: &Vec<Point>) -> O
                 }
             }
 
-            new_L.push(low.unwrap());
-            new_U.push(high.unwrap());
+            new_l.push(low.unwrap());
+            new_u.push(high.unwrap());
         }
 
-        mem::swap(&mut L, &mut new_L);
-        mem::swap(&mut U, &mut new_U);
+        mem::swap(&mut l, &mut new_l);
+        mem::swap(&mut u, &mut new_u);
     }
 
     None

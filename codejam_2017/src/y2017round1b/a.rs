@@ -1,6 +1,5 @@
 use codejam::util::codejam::run_cases;
 use std::io::Write;
-use std::thread;
 
 /*
 velocity

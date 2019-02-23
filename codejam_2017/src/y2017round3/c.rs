@@ -58,24 +58,24 @@ impl Camp
         p1 == p2
     }
 }
-fn solve(case_no: u32, C: usize, tour_input: &[(usize, usize, usize)]) -> String
+fn solve(case_no: u32, c: usize, tour_input: &[(usize, usize, usize)]) -> String
 {
     debug!("\n\n\nSolving case {}", case_no);
 
     let tours: Vec<_> = tour_input
         .iter()
         .enumerate()
-        .map(|(i, &(E, L, D))| Tour {
+        .map(|(i, &(e, l, d))| Tour {
             start_camp: (i + 2) / 2,
-            stop_camp: E,
-            leave_time: L,
-            duration: D,
+            stop_camp: e,
+            leave_time: l,
+            duration: d,
         })
         .collect();
 
     debug!("Tours: {:?} ", tours);
 
-    let camps: Vec<_> = (1..=C)
+    let camps: Vec<_> = (1..=c)
         .map(|c| Camp {
             arrivals: tours
                 .iter()

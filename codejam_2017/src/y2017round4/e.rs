@@ -22,9 +22,9 @@ pub fn solve_all_cases()
         &["E-small-practice", "E-large-practice"],
         "y2017round4",
         |reader, buffer| {
-            let P = reader.read_int();
+            let p = reader.read_int();
             //suit/value
-            let premade_stacks: Vec<Vec<(u16, u16)>> = (0..P)
+            let premade_stacks: Vec<Vec<(u16, u16)>> = (0..p)
                 .map(|_| {
                     let nums = reader.read_num_line::<u16>();
                     let num_cards = nums[0] as usize;
@@ -37,12 +37,12 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case in 1..=t {
-                let (N, C) = reader.read_tuple_2::<usize>();
+                let (n, c) = reader.read_tuple_2::<usize>();
                 let stack_indexes = reader.read_num_line::<usize>();
                 let stacks = stack_indexes
                     .iter()
                     .map(|si| {
-                        assert_eq!(C, premade_stacks[*si].len());
+                        assert_eq!(c, premade_stacks[*si].len());
                         premade_stacks[*si].iter().cloned().collect::<VecDeque<_>>()
                     })
                     .collect();
@@ -72,36 +72,36 @@ pub fn solve_all_cases()
 
 fn solve(stacks: &Vec<VecDeque<(u16, u16)>>) -> bool
 {
-    let mut suitToCards: HashMap<u16, Vec<u16>> = HashMap::new();
-    let mut kingSuitToStack: BiMap<u16, usize> = BiMap::new();
-    let mut lastAceSuitToStack: HashMap<u16, usize> = HashMap::new();
+    let mut suit_to_cards: HashMap<u16, Vec<u16>> = HashMap::new();
+    let mut king_suit_to_stack: BiMap<u16, usize> = BiMap::new();
+    let mut last_ace_suit_to_stack: HashMap<u16, usize> = HashMap::new();
 
     for &(value, suit) in stacks.iter().flatten() {
-        suitToCards.entry(suit).or_insert(Vec::new()).push(value);
+        suit_to_cards.entry(suit).or_insert(Vec::new()).push(value);
     }
 
-    for cards in suitToCards.values_mut() {
+    for cards in suit_to_cards.values_mut() {
         cards.sort();
     }
 
     for (idx, stack) in stacks.iter().enumerate() {
         debug!("Before  Stack #{}: {:?}", idx, stack);
         for (card_idx, &(value, suit)) in stack.iter().enumerate() {
-            let suitCards = &suitToCards[&suit];
-            if card_idx == stack.len() - 1 && value == suitCards[suitCards.len() - 1] {
-                lastAceSuitToStack.insert(suit, idx);
+            let suit_cards = &suit_to_cards[&suit];
+            if card_idx == stack.len() - 1 && value == suit_cards[suit_cards.len() - 1] {
+                last_ace_suit_to_stack.insert(suit, idx);
             }
-            if suitCards.len() > 1 && value == suitCards[suitCards.len() - 2] {
-                kingSuitToStack.insert(suit, idx);
+            if suit_cards.len() > 1 && value == suit_cards[suit_cards.len() - 2] {
+                king_suit_to_stack.insert(suit, idx);
             }
         }
     }
 
-    if suitToCards.len() < stacks.len() {
+    if suit_to_cards.len() < stacks.len() {
         return true;
     }
 
-    if suitToCards.len() > stacks.len() {
+    if suit_to_cards.len() > stacks.len() {
         return false;
     }
 
@@ -111,7 +111,7 @@ fn solve(stacks: &Vec<VecDeque<(u16, u16)>>) -> bool
 
     //stack => suit; these stacks have a unique ace at the bottom
     // Let us construct a graph in which vertices are the suits for which the ace begins the game at the bottom of some stack
-    let vertices: BiMap<usize, u16> = lastAceSuitToStack
+    let vertices: BiMap<usize, u16> = last_ace_suit_to_stack
         .iter()
         .map(|(suit, stack_idx)| (*stack_idx, *suit))
         .collect();
@@ -125,7 +125,7 @@ fn solve(stacks: &Vec<VecDeque<(u16, u16)>>) -> bool
     //We say that a vertex (suit) s is a source if the ace is the only card in this suit,
     let sources: Vec<u16> = vertices
         .iter()
-        .filter(|(_, suit)| suitToCards[suit].len() == 1)
+        .filter(|(_, suit)| suit_to_cards[suit].len() == 1)
         .map(|(_, suit)| *suit)
         .collect();
 
@@ -136,7 +136,7 @@ fn solve(stacks: &Vec<VecDeque<(u16, u16)>>) -> bool
         .iter()
         .filter(|&(stack_idx, suit)| {
             stacks[*stack_idx].iter().any(|(search_card, search_suit)| {
-                suit != search_suit && suitToCards[search_suit].last().unwrap() == search_card
+                suit != search_suit && suit_to_cards[search_suit].last().unwrap() == search_card
             })
         })
         .map(|(_, suit)| *suit)
@@ -153,31 +153,31 @@ fn solve(stacks: &Vec<VecDeque<(u16, u16)>>) -> bool
         if the king of s2 is in the stack that has the ace of s1 at the bottom.
         */
 
-        if !kingSuitToStack.contains_right(stack_idx_1) {
+        if !king_suit_to_stack.contains_right(stack_idx_1) {
             continue;
         }
-        let kingSuit = kingSuitToStack.get_by_right(stack_idx_1).unwrap();
+        let king_suit = king_suit_to_stack.get_by_right(stack_idx_1).unwrap();
 
-        if !vertices.contains_right(&kingSuit) {
+        if !vertices.contains_right(&king_suit) {
             continue;
         }
 
-        let vertex_2_suit = vertices.get_by_right(&kingSuit).unwrap();
+        //let vertex_2_suit = vertices.get_by_right(&kingSuit).unwrap();
 
-        if kingSuit == ace_suit_1 {
+        if king_suit == ace_suit_1 {
             continue;
         }
 
         edges
             .entry(*ace_suit_1)
             .or_insert(Vec::new())
-            .push(*kingSuit);
+            .push(*king_suit);
     }
 
     println!("Starting DFS {}", sources.len());
     for source in sources {
         println!("DFS {}", source);
-        if BFS(&edges, &mut HashSet::new(), source, &target) {
+        if bfs(&edges, &mut HashSet::new(), source, &target) {
             return true;
         }
     }
@@ -185,7 +185,7 @@ fn solve(stacks: &Vec<VecDeque<(u16, u16)>>) -> bool
     false
 }
 
-fn BFS(
+fn bfs(
     edges: &HashMap<u16, Vec<u16>>,
     _visited: &mut HashSet<u16>,
     v: u16,
@@ -217,7 +217,7 @@ fn BFS(
     return false;
 }
 
-fn DFS(
+fn dfs(
     edges: &HashMap<u16, Vec<u16>>,
     visited: &mut HashSet<u16>,
     v: u16,
@@ -237,7 +237,7 @@ fn DFS(
         if visited.contains(w) {
             continue;
         }
-        found |= DFS(edges, visited, *w, targets);
+        found |= dfs(edges, visited, *w, targets);
 
         if found {
             break;

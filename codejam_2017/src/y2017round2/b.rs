@@ -1,6 +1,8 @@
-use codejam::util::input::*;
+
 use codejam::util::math::*;
 use std::cmp::max;
+use codejam::util::codejam::run_cases;
+use std::io::Write;
 
 /*
 custom algorithm / proof
@@ -9,21 +11,30 @@ minimization / optimization
 
 pub fn solve_all_cases()
 {
-    let mut reader: InputReader = Default::default();
-    let t = reader.read_int();
 
-    for case in 1..=t {
-        let (N, C, M) = reader.read_tuple_3::<u16>();
-        //P B
-        let tickets: Vec<_> = (0..M).map(|_| reader.read_tuple_2::<u16>()).collect();
+    run_cases(
+        &["B-small-practice", "B-large-practice"],
+        "y2008round2",
+        |reader, buffer| {
+            let t = reader.read_int();
 
-        print!("{}", solve(case, N, C, &tickets));
-    }
+            for case_no in 1..=t {
+                let (N, C, M) = reader.read_tuple_3::<u16>();
+                //P B
+                let tickets: Vec<_> = (0..M).map(|_| reader.read_tuple_2::<u16>()).collect();
+
+                println!("Solving case {}", case_no);
+
+                writeln!(buffer, "Case #{}: {:0>3}", case_no,
+                         solve( N, C, &tickets)).unwrap();
+            }
+        },
+    );
 }
 
-fn solve(case_no: u32, N: u16, C: u16, tickets: &Vec<(u16, u16)>) -> String
+
+fn solve( N: u16, C: u16, tickets: &Vec<(u16, u16)>) -> String
 {
-    debug!("Solving case {}", case_no);
 
     //first determine if a customer has multiple tickeets
     let max_tickets_per_customer: u16 = *tickets
@@ -82,7 +93,7 @@ fn solve(case_no: u32, N: u16, C: u16, tickets: &Vec<(u16, u16)>) -> String
     }
 
     format!(
-        "Case #{}: {} {}\n",
-        case_no, rides_needed, promotions_needed
+        "{} {}",
+        rides_needed, promotions_needed
     )
 }

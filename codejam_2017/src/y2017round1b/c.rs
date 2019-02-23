@@ -1,4 +1,4 @@
-use codejam::util::input::*;
+
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::f64;

@@ -1,7 +1,5 @@
-//use codejam::util::input::read_num_line;
 use codejam::util::codejam::run_cases;
 use std::io::Write;
-use std::thread;
 
 /*
 scan line
@@ -18,7 +16,6 @@ pub fn solve_all_cases()
         "y2008round1a",
         |reader, buffer| {
             let t = reader.read_int();
-            let mut children: Vec<thread::JoinHandle<_>> = vec![];
 
             for case_no in 1..=t {
                 //handle input / output
@@ -31,33 +28,27 @@ pub fn solve_all_cases()
                 for _ in 0..n {
                     q.push(reader.read_num_line());
                 }
-                children.push(thread::spawn(move || -> String {
-                    solve(case_no, n, p, &r, &q)
-                }));
-
-                if case_no != 1 {
-                    //        continue;
-                }
 
                 println!("Solving case {}", case_no);
 
-                for child in children {
-                    writeln!(buffer, "{}", child.join().unwrap()).unwrap();
-                }
+                writeln!(buffer, "Case #{}: {}", case_no,
+                         solve(case_no, n, p, &r, &q)
+                ).unwrap();
+
             }
         },
     );
 }
 
-fn solve(case_no: u32, N: u8, P: u8, R: &Vec<u32>, Q: &Vec<Vec<u32>>) -> String
+fn solve(case_no: u32, n: u8, p: u8, r: &Vec<u32>, q: &Vec<Vec<u32>>) -> String
 {
     debug!("\nStarting solve");
     let mut events: Vec<_> = Vec::new();
-    for i in 0..N as usize {
-        let required_amount = R[i];
+    for i in 0..n as usize {
+        let required_amount = r[i];
 
-        for p in 0..P as usize {
-            let package_size = Q[i][p];
+        for p in 0..p as usize {
+            let package_size = q[i][p];
 
             // problem is floating point
             //min_servings = math.ceil(package_size / (1.1 * required_amount) )
@@ -96,8 +87,8 @@ fn solve(case_no: u32, N: u8, P: u8, R: &Vec<u32>, Q: &Vec<Vec<u32>>) -> String
     // Code based on https://www.go-hero.net/jam/17/name/Nore
     events.sort();
     let mut cnt = 0;
-    let mut counts = vec![Vec::new(); N.into()];
-    let mut remv = vec![0; N as usize];
+    let mut counts = vec![Vec::new(); n.into()];
+    let mut remv = vec![0; n as usize];
     for (boundary, is_upper_bound, ingredient_index, package_size) in events {
         debug!(
             "Saw event Boundary={} {} ingredient={} package={}",
@@ -122,7 +113,7 @@ fn solve(case_no: u32, N: u8, P: u8, R: &Vec<u32>, Q: &Vec<Vec<u32>>) -> String
             let min_count_len = counts.iter().map(|c| c.len()).min().unwrap();
             if min_count_len > 0 {
                 cnt += 1;
-                for ii in 0..N as usize {
+                for ii in 0..n as usize {
                     let min_index = counts[ii]
                         .iter()
                         .enumerate()

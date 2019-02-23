@@ -1,5 +1,4 @@
 use codejam::util::codejam::run_cases;
-use codejam::util::input::*;
 use std::io::Write;
 
 /*

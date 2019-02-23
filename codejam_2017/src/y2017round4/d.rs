@@ -2,9 +2,9 @@ use codejam::algo::vectors::*;
 use codejam::util::codejam::run_cases;
 use num_bigint::BigInt;
 use num_traits::*;
-use rand::distributions::{ Uniform};
-use rand::prelude::{SliceRandom, StdRng};
+use rand::prelude::{ StdRng};
 use rand::{Rng, SeedableRng};
+use rand::seq::SliceRandom;
 use std::io::Write;
 
 /*
@@ -32,9 +32,9 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case in 1..=t {
-                let N = reader.read_int();
+                let n = reader.read_int();
 
-                let points = (0..N)
+                let points = (0..n)
                     .map(|_| reader.read_tuple_3())
                     .map(|tup| [tup.0, tup.1, tup.2])
                     .collect();
@@ -59,7 +59,7 @@ fn solve(case_no: u32, points: &Vec<Vector3<i64>>) -> String
     let mut rng: StdRng = SeedableRng::seed_from_u64(42);
 
     //speed up checks
-    rng.shuffle(&mut points);
+    points.shuffle(&mut rng);
 
     for i in 0..points.len() {
         //println!("Point {}={:#?}", i, points[i]);
@@ -195,6 +195,9 @@ fn check_coplanar(
 mod test_2017_round4_d
 {
     use super::*;
+    use rand::distributions::{Distribution, Uniform};
+    use rand::prelude::StdRng;
+    use rand::SeedableRng;
 
     #[test]
     fn test_plane_direction()

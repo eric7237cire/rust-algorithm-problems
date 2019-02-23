@@ -1,7 +1,6 @@
 use codejam::util::codejam::run_cases;
 use std::cmp;
 use std::io::Write;
-use std::thread;
 
 /*
 very hard ad hoc (code not mine, just translation)
