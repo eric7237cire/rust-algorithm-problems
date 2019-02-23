@@ -83,14 +83,14 @@ fn solve(case_no: u32, cards: &Vec<(char, i16)>, s: i16) -> String
             (*op == '+' && val >= &BigRational::zero())
                 || (*op == '-' && val <= &BigRational::zero())
         })
-        .fold(BigRational::zero(), |acc, (op, val)| &acc + val.abs());
+        .fold(BigRational::zero(), |acc, (_op, val)| &acc + val.abs());
 
     let sub_card: BigRational = cards
         .iter()
         .filter(|(op, val)| {
             (*op == '+' && val < &BigRational::zero()) || (*op == '-' && val > &BigRational::zero())
         })
-        .fold(BigRational::zero(), |acc, (op, val)| &acc + val.abs());
+        .fold(BigRational::zero(), |acc, (_op, val)| &acc + val.abs());
 
     let has_mul_zero = cards
         .iter()

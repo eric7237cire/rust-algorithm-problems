@@ -18,13 +18,13 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case_no in 1..=t {
-                let (_, K) = reader.read_tuple_2::<u8>();
-                let U = reader.read_int::<f64>();
-                let mut P = reader.read_num_line::<f64>();
+                let (_, k) = reader.read_tuple_2::<u8>();
+                let u = reader.read_int::<f64>();
+                let mut p = reader.read_num_line::<f64>();
 
                 println!("Solving case {}", case_no);
 
-                writeln!(buffer, "Case #{}: {:0>3}", case_no, solve(&mut P, U, K)).unwrap();
+                writeln!(buffer, "Case #{}: {:0>3}", case_no, solve(&mut p, u, k)).unwrap();
             }
         },
     );
@@ -32,7 +32,7 @@ pub fn solve_all_cases()
 }
 
 
-fn prob_at_least_k(P: &[f64], K: usize) -> f64
+fn prob_at_least_k(p: &[f64], k: usize) -> f64
 {
     /*effectively this is a 2d matrix
     given P is a set of independent events probability success
@@ -46,17 +46,17 @@ fn prob_at_least_k(P: &[f64], K: usize) -> f64
 
     Since we only need the previous row, we don't need to keep the entire matrix
     */
-    let mut dp = vec![0f64; K + 1];
+    let mut dp = vec![0f64; k + 1];
 
     //0 successful events = 100%
     dp[0] = 1f64;
-    for p in P {
+    for p in p {
         let prev = dp.clone();
-        for k in 1..=K {
+        for k in 1..=k {
             dp[k] = (1f64 - p) * prev[k] + p * prev[k - 1];
         }
     }
-    return dp[K];
+    return dp[k];
 }
 
 fn fmin(a: f64, b: f64) -> f64
@@ -71,22 +71,22 @@ fn fmin(a: f64, b: f64) -> f64
 #[test]
 fn prob1()
 {
-    let P = [0.5; 6];
-    let p = prob_at_least_k(&P, 3);
+    let pp = [0.5; 6];
+    let p = prob_at_least_k(&pp, 3);
     println!("Prob 3 heads of 6 coins: {:.5}", p);
-    let P = [0.5; 18];
-    let p = prob_at_least_k(&P, 12);
+    let pp = [0.5; 18];
+    let p = prob_at_least_k(&pp, 12);
     println!("Prob 12 heads of 18 coins: {:.5}", p);
 }
 
-fn solve(prob: &mut Vec<f64>, U: f64, K: u8) -> String
+fn solve(prob: &mut Vec<f64>, u: f64, k: u8) -> String
 {
     prob.sort_by(|&a, &b| a.partial_cmp(&b).unwrap());
 
     let mut best_ans = -1f64;
     for i in 0..prob.len() {
         let mut p_improved: Vec<_> = prob.clone();
-        let mut u_remaining = U;
+        let mut u_remaining = u;
 
         //distribute u to lowest
         for j in i..prob.len() {
@@ -129,11 +129,11 @@ fn solve(prob: &mut Vec<f64>, U: f64, K: u8) -> String
             }
         }
 
-        let at_least_k = prob_at_least_k(&p_improved, K.into());
+        let at_least_k = prob_at_least_k(&p_improved, k.into());
 
         debug!(
             "i={} probablity after distributing U {} = {:?}.  Overall success prob={} for K {}",
-            i, U, p_improved, at_least_k, K
+            i, u, p_improved, at_least_k, k
         );
 
         if at_least_k > best_ans {

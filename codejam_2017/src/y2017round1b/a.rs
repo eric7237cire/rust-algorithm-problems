@@ -54,7 +54,7 @@ pub fn solve_all_cases()
     );
 }
 
-fn solve(D: f64, horses: &mut Vec<Horse>) -> String
+fn solve(d: f64, horses: &mut Vec<Horse>) -> String
 {
     //let mut horses = horses.clone();
 
@@ -76,7 +76,7 @@ fn solve(D: f64, horses: &mut Vec<Horse>) -> String
         let inter_t = (cur.start_pos - next.start_pos) / (next.velocity - cur.velocity);
         let inter_p = cur.start_pos + cur.velocity * inter_t;
 
-        if inter_p >= D {
+        if inter_p >= d {
             debug!("other horse finishes before: {:?} {:?}", cur, next);
             horses.remove(cur_index + 1);
             continue;
@@ -89,8 +89,8 @@ fn solve(D: f64, horses: &mut Vec<Horse>) -> String
     let hs = horses.last().unwrap();
     debug!("After processing, horse is {:?}.  V={:3}", hs, hs.velocity);
 
-    let t = (D - hs.start_pos) / hs.velocity;
-    let min_v = D / t;
+    let t = (d - hs.start_pos) / hs.velocity;
+    let min_v = d / t;
     debug!(
         "After processing, horse is {:?}.  V={:3}.  V to intersect={:3}",
         hs, hs.velocity, min_v

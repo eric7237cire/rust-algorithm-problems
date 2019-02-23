@@ -22,31 +22,31 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case in 1..=t {
-                let (F, P) = reader.read_tuple_2();
-                let mut G = DiGraph::new();
-                for f in 1..=F {
-                    G.add_vertex(f);
+                let (f, p) = reader.read_tuple_2();
+                let mut g = DiGraph::new();
+                for f in 1..=f {
+                    g.add_vertex(f);
                 }
-                let P = (0..P)
+                let p = (0..p)
                     .map(|_| {
                         let (f1, f2) = reader.read_tuple_2();
-                        G.add_edge(f1, f2);
+                        g.add_edge(f1, f2);
                         (f1, f2)
                     })
                     .collect::<Vec<_>>();
 
-                write!(buffer, "{}", solve(case, &G, &P, F)).unwrap();
+                write!(buffer, "{}", solve(case, &g, &p, f)).unwrap();
             }
         },
     );
 }
 
-fn solve(case_no: u32, G: &DiGraph, P: &[(usize, usize)], F: usize) -> String
+fn solve(case_no: u32, g: &DiGraph, p: &[(usize, usize)], f: usize) -> String
 {
     debug!("\n\n\nSolving case {}", case_no);
 
     //Create an undirected graph with duplicates when u->v and v-> already exist in P
-    let mut g_undirected = G.clone();
+    let mut g_undirected = g.clone();
     for (u, v) in g_undirected.edges().collect::<Vec<_>>() {
         if g_undirected.has_edge(v, u) && v < u {
             g_undirected.add_edge_dups_ok(v, u);
@@ -58,7 +58,7 @@ fn solve(case_no: u32, G: &DiGraph, P: &[(usize, usize)], F: usize) -> String
 
     debug!(
         "P is\n{:?}\nUndirected Graph is\n{:?}\n",
-        P,
+        p,
         g_undirected.edges().collect::<Vec<_>>(),
     );
 
@@ -66,7 +66,7 @@ fn solve(case_no: u32, G: &DiGraph, P: &[(usize, usize)], F: usize) -> String
 
     let mut bfs_visited = BitSet::new();
 
-    for f in 1..=F {
+    for f in 1..=f {
         if bfs_visited.contains(f) {
             continue;
         }
@@ -74,48 +74,48 @@ fn solve(case_no: u32, G: &DiGraph, P: &[(usize, usize)], F: usize) -> String
         let cc = g_undirected.bfs(f).collect::<Vec<_>>();
         bfs_visited.extend(cc.clone());
 
-        let mut subG = g_undirected.subgraph(&cc);
+        let mut sub_g = g_undirected.subgraph(&cc);
         //for (u, v) in subG.edges().collect::<Vec<_>>() {}
-        debug!("CC {:?}\nsubG {:?}", cc, subG.edges().collect::<Vec<_>>());
+        debug!("CC {:?}\nsubG {:?}", cc, sub_g.edges().collect::<Vec<_>>());
 
         //spanning tree
-        let mut ST = DiGraph::new();
+        let mut st = DiGraph::new();
 
         let mut discovery_order = Vec::new();
 
-        dfs(&mut discovery_order, &mut ST, &subG, cc[0]);
+        dfs(&mut discovery_order, &mut st, &sub_g, cc[0]);
 
-        for st_edge in ST.edges() {
-            subG.remove_undirected_edge(st_edge.0, st_edge.1);
+        for st_edge in st.edges() {
+            sub_g.remove_undirected_edge(st_edge.0, st_edge.1);
         }
 
         debug!(
             "For sub graph {:?} spanning tree is {:?}",
-            subG.edges().collect::<Vec<_>>(),
-            ST.edges().collect::<Vec<_>>()
+            sub_g.edges().collect::<Vec<_>>(),
+            st.edges().collect::<Vec<_>>()
         );
 
         debug!("Discovery order is {:?} ", discovery_order);
 
         //Direct all edges in root-to-leaf direction
-        for subG_edge in subG.edges().collect::<Vec<_>>() {
+        for sub_g_edge in sub_g.edges().collect::<Vec<_>>() {
             let pos1 = discovery_order
                 .iter()
-                .position(|&d| d == subG_edge.0)
+                .position(|&d| d == sub_g_edge.0)
                 .unwrap();
             let pos2 = discovery_order
                 .iter()
-                .position(|&d| d == subG_edge.1)
+                .position(|&d| d == sub_g_edge.1)
                 .unwrap();
 
             if pos1 > pos2 {
-                subG.remove_edge(subG_edge.0, subG_edge.1);
+                sub_g.remove_edge(sub_g_edge.0, sub_g_edge.1);
             }
         }
 
         debug!(
             "For sub graph directed root->leaf {:?}",
-            subG.edges().collect::<Vec<_>>()
+            sub_g.edges().collect::<Vec<_>>()
         );
 
         //root is automatically balanced
@@ -123,15 +123,15 @@ fn solve(case_no: u32, G: &DiGraph, P: &[(usize, usize)], F: usize) -> String
         discovery_order.pop();
 
         for current_node in discovery_order {
-            let tree_children: Vec<_> = ST.edges_from(current_node).collect();
-            let tree_parents: Vec<_> = ST.edges_to(current_node).collect();
+            let tree_children: Vec<_> = st.edges_from(current_node).collect();
+            let tree_parents: Vec<_> = st.edges_to(current_node).collect();
             assert_eq!(tree_parents.len(), 1);
             let tree_parent = tree_parents[0];
 
             let mut balanced_value: i64 = 0;
 
             //These are edges not in the spanning tree that we assign 1 to
-            for v in subG.edges_to(current_node) {
+            for v in sub_g.edges_to(current_node) {
                 //non_tree_edges_ancestor {
                 /*Direct all edges in root-to-leaf direction
                  (we reverse or split edges after solving, as explained above).
@@ -143,7 +143,7 @@ fn solve(case_no: u32, G: &DiGraph, P: &[(usize, usize)], F: usize) -> String
             }
 
             //These are previously seen edges not in the spanning tree that we need to account for
-            for _ in subG.edges_from(current_node) {
+            for _ in sub_g.edges_from(current_node) {
                 //these have already been assigned
                 balanced_value -= 1;
             }
@@ -169,7 +169,7 @@ fn solve(case_no: u32, G: &DiGraph, P: &[(usize, usize)], F: usize) -> String
     }
 
     let mut ans: Vec<i64> = Vec::new();
-    for fe in P {
+    for fe in p {
         if let Some(pos) = edge_values.iter().position(|&e| e.0 == fe.0 && e.1 == fe.1) {
             ans.push(edge_values[pos].2);
             edge_values.remove(pos);
@@ -205,15 +205,15 @@ fn solve(case_no: u32, G: &DiGraph, P: &[(usize, usize)], F: usize) -> String
     )
 }
 
-fn dfs(discovery_order: &mut Vec<usize>, ST: &mut DiGraph, subG: &DiGraph, u: usize)
+fn dfs(discovery_order: &mut Vec<usize>, st: &mut DiGraph, sub_g: &DiGraph, u: usize)
 {
     discovery_order.push(u);
-    for v in subG.edges_from(u) {
-        if !ST.has_vertex(v) {
+    for v in sub_g.edges_from(u) {
+        if !st.has_vertex(v) {
             //root to leaf direction
-            ST.add_edge(u, v);
+            st.add_edge(u, v);
 
-            dfs(discovery_order, ST, subG, v);
+            dfs(discovery_order, st, sub_g, v);
         }
     }
 }

@@ -11,8 +11,8 @@ dijkstras ; creating nodes based on other state
 */
 struct Horse
 {
-    E: u32, //the maximum total distance, in kilometers, the horse in the i-th city can go and
-    S: u16, // Si, the constant speed, in kilometers per hour, at which the horse travels.
+    e: u32, //the maximum total distance, in kilometers, the horse in the i-th city can go and
+s: u16, // Si, the constant speed, in kilometers per hour, at which the horse travels.
 }
 
 type Distance = u32;
@@ -31,7 +31,7 @@ pub fn solve_all_cases()
 
         let horses: Vec<_> = (0..n)
             .map(|_| reader.read_tuple_2::<u32>())
-            .map(|tp| Horse { E: tp.0, S: tp.1 as u16 })
+            .map(|tp| Horse { e: tp.0, s: tp.1 as u16 })
             .collect();
         let city_dist: Vec<_> = (0..n)
             .map(|_| {
@@ -64,17 +64,17 @@ struct Node
 
 impl Node
 {
-    fn split_index(N: CityIndex, city_horse_index: CityIndex) -> (CityIndex, CityIndex)
+    fn split_index(n: CityIndex, city_horse_index: CityIndex) -> (CityIndex, CityIndex)
     {
-        let city = city_horse_index / N;
-        let horse = city_horse_index % N;
+        let city = city_horse_index / n;
+        let horse = city_horse_index % n;
         (city, horse)
     }
 
-    fn to_index(N: CityIndex, city: CityIndex, horse: CityIndex) -> CityIndex
+    fn to_index(n: CityIndex, city: CityIndex, horse: CityIndex) -> CityIndex
     {
-        assert!(horse < N);
-        city * N + horse
+        assert!(horse < n);
+        city * n + horse
     }
 }
 
@@ -138,16 +138,16 @@ fn solve_query(
 {
     debug!("Solving query from {} to {}", start_city + 1, stop_city + 1);
 
-    let N = horses.len() as CityIndex;
-    let NODE_COUNT = N * N;
+    let n = horses.len() as CityIndex;
+    let node_count = n * n;
 
     // dist[node] = current shortest distance from `start` to `node`
-    let mut shortest_time: Vec<_> = (0..NODE_COUNT).map(|_| f64::MAX).collect();
-    let mut prev: Vec<Option<CityIndex>> = vec![None; NODE_COUNT];
+    let mut shortest_time: Vec<_> = (0..node_count).map(|_| f64::MAX).collect();
+    let mut prev: Vec<Option<CityIndex>> = vec![None; node_count];
 
     let mut heap = BinaryHeap::new();
 
-    let start = Node::to_index(N, start_city, start_city);
+    let start = Node::to_index(n, start_city, start_city);
 
     // We're at `start`, with a zero time
     shortest_time[start] = 0f64;
@@ -162,7 +162,7 @@ fn solve_query(
             time,
             city_horse_index,
         } = current_node;
-        let (city_index, horse_index) = Node::split_index(N, city_horse_index);
+        let (city_index, horse_index) = Node::split_index(n, city_horse_index);
 
         if city_index == stop_city {
             return time;
@@ -178,16 +178,16 @@ fn solve_query(
         //follow prev nodes to find how long we have gone
         let mut dist_travelled_with_current_horse = 0;
         let mut p = city_horse_index;
-        while Node::split_index(N, p).0 != horse_index {
-            let (p_city_index, _p_horse_index) = Node::split_index(N, p);
+        while Node::split_index(n, p).0 != horse_index {
+            let (p_city_index, _p_horse_index) = Node::split_index(n, p);
             let pp = prev[p].unwrap();
-            let (pp_city_index, _pp_horse_index) = Node::split_index(N, pp);
+            let (pp_city_index, _pp_horse_index) = Node::split_index(n, pp);
             dist_travelled_with_current_horse += city_dist[pp_city_index][p_city_index].unwrap();
             p = pp;
         }
 
         let dis_remaining_with_current_horse =
-            horses[horse_index].E - dist_travelled_with_current_horse;
+            horses[horse_index].e - dist_travelled_with_current_horse;
 
         // For each node we can reach, see if we can find a way with
         // a lower cost going through this node
@@ -202,7 +202,7 @@ fn solve_query(
                 continue;
             }
 
-            let time_taken = time + dist as f64 / horses[horse_index].S as f64;
+            let time_taken = time + dist as f64 / horses[horse_index].s as f64;
 
             for change_horses in 0..2 {
                 let next_horse_index = if change_horses == 0 {
@@ -213,7 +213,7 @@ fn solve_query(
 
                 let next = Node {
                     time: time_taken,
-                    city_horse_index: Node::to_index(N, next_city_index, next_horse_index),
+                    city_horse_index: Node::to_index(n, next_city_index, next_horse_index),
                 };
 
                 // If so, add it to the frontier and continue

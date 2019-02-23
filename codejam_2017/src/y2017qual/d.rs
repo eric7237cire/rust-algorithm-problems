@@ -56,7 +56,7 @@ pub fn solve_all_cases()
 
                 println!("Solving case {}", case_no);
 
-                writeln!(
+                write!(
                     buffer,
                     "Case #{}: {}",
                     case_no,

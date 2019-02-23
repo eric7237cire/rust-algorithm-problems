@@ -20,9 +20,9 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case in 1..=t {
-                let G = reader.read_string();
+                let g = reader.read_string();
 
-                write!(buffer, "{}", solve(case, &G, &mut memo)).unwrap();
+                write!(buffer, "{}", solve(case, &g, &mut memo)).unwrap();
             }
         },
     );
@@ -107,11 +107,11 @@ impl Memo
         }
     }
 }
-fn solve(case_no: u32, G: &str, memo: &mut Memo) -> String
+fn solve(case_no: u32, g: &str, memo: &mut Memo) -> String
 {
     debug!("Solving case {}", case_no);
 
-    let digits = G
+    let digits = g
         .chars()
         .filter_map(|c| c.to_digit(10))
         .map(|d| d as u8)

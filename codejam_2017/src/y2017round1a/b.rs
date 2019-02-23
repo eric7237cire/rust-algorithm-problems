@@ -13,7 +13,7 @@ pub fn solve_all_cases()
 {
     run_cases(
         &["B-small-practice", "B-large-practice"],
-        "y2008round1a",
+        "y2017round1a",
         |reader, buffer| {
             let t = reader.read_int();
 
@@ -32,7 +32,7 @@ pub fn solve_all_cases()
                 println!("Solving case {}", case_no);
 
                 writeln!(buffer, "Case #{}: {}", case_no,
-                         solve(case_no, n, p, &r, &q)
+                         solve( n, p, &r, &q)
                 ).unwrap();
 
             }
@@ -40,7 +40,7 @@ pub fn solve_all_cases()
     );
 }
 
-fn solve(case_no: u32, n: u8, p: u8, r: &Vec<u32>, q: &Vec<Vec<u32>>) -> String
+fn solve(n: u8, p: u8, r: &Vec<u32>, q: &Vec<Vec<u32>>) -> i32
 {
     debug!("\nStarting solve");
     let mut events: Vec<_> = Vec::new();
@@ -127,5 +127,5 @@ fn solve(case_no: u32, n: u8, p: u8, r: &Vec<u32>, q: &Vec<Vec<u32>>) -> String
         }
     }
 
-    format!("Case #{}: {}\n", case_no, cnt)
+    cnt
 }

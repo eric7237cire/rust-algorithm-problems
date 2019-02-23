@@ -228,7 +228,7 @@ impl DfsDice
         return false;
     }
 }
-
+/*
 fn add_value_to_flow(flow: &mut Flow, value_to_add: usize, value_to_dice: &Vec<Vec<usize>>)
 {
     flow.add_edge(flow.source, value_to_add, 1);
@@ -240,7 +240,8 @@ fn add_value_to_flow(flow: &mut Flow, value_to_add: usize, value_to_dice: &Vec<V
 
     //debug_print_flow(flow);
 }
-
+*/
+/*
 fn debug_print_flow(flow: &Flow)
 {
     for (idx, edge) in flow.E.iter().enumerate() {
@@ -259,7 +260,8 @@ fn debug_print_flow(flow: &Flow)
         assert_eq!(flow.E[idx ^ 1].cap, edge.cap);
     }
 }
-
+*/
+/*
 fn remove_value_from_flow(flow: &mut Flow, value_to_remove: usize)
 {
     //assert_eq!(flow.V[interval_start].len(), 1);
@@ -333,8 +335,9 @@ fn remove_value_from_flow(flow: &mut Flow, value_to_remove: usize)
 
     //debug_print_flow(flow);
 }
-
-/// Very elegant DFS solution, a bit slow though ~2 minutes
+*/
+// Very elegant DFS solution, a bit slow though ~2 minutes
+/*
 fn solve4(case_no: u32, dice: &Vec<Vec<i32>>) -> String
 {
     println!("Solving case {}", case_no);
@@ -381,9 +384,9 @@ fn solve4(case_no: u32, dice: &Vec<Vec<i32>>) -> String
 
     format!("Case #{}: {}\n", case_no, ans)
 }
-
-/// My solution, too slow for large, the augment takes too long
-fn solve3(case_no: u32, dice: &Vec<Vec<i32>>) -> String
+*/
+// My solution, too slow for large, the augment takes too long
+/*fn solve3(case_no: u32, dice: &Vec<Vec<i32>>) -> String
 {
     println!("Solving case {}", case_no);
     let mut unique_dice_values: Vec<i32> = Vec::new();
@@ -487,7 +490,8 @@ fn solve3(case_no: u32, dice: &Vec<Vec<i32>>) -> String
 
     format!("Case #{}: {}\n", case_no, ans)
 }
-
+*/
+/*
 fn solve_brute_force(case_no: u32, dice: &Vec<(u32, u16)>) -> String
 {
     let mut all_values = dice.clone();
@@ -536,3 +540,4 @@ fn solve_brute_force(case_no: u32, dice: &Vec<(u32, u16)>) -> String
 
     format!("Case #{}: {}\n", case_no, longest)
 }
+*/

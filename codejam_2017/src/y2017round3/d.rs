@@ -607,7 +607,6 @@ mod test_round3_d
     use super::*;
     use codejam::util::grid::constants::*;
     use codejam::util::grid::Grid;
-    use codejam::util::grid::*;
     use codejam::util::vector_2d::Vector2d;
     use rand::distributions::{Distribution, Uniform};
     use rand::prelude::StdRng;

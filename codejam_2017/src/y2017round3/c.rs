@@ -16,13 +16,13 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case in 1..=t {
-                let C = reader.read_int();
+                let c = reader.read_int();
 
-                let tours = (0..2 * C)
+                let tours = (0..2 * c)
                     .map(|_| reader.read_tuple_3())
                     .collect::<Vec<_>>();
 
-                write!(buffer, "{}", solve(case, C, &tours)).unwrap();
+                write!(buffer, "{}", solve(case, c, &tours)).unwrap();
             }
         },
     );

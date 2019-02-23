@@ -15,8 +15,8 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case_no in 1..=t {
-                let (_, P) = reader.read_tuple_2::<usize>();
-                let mut G: Vec<_> = reader.read_num_line::<usize>();
+                let (_, p) = reader.read_tuple_2::<usize>();
+                let mut g: Vec<_> = reader.read_num_line::<usize>();
 
                 if case_no != 1 {
                     //        continue;
@@ -24,56 +24,56 @@ pub fn solve_all_cases()
 
                 println!("Solving case {}", case_no);
 
-                writeln!(buffer, "Case #{}: {:.6}", case_no, solve(&mut G, P)).unwrap();
+                writeln!(buffer, "Case #{}: {:.6}", case_no, solve(&mut g, p)).unwrap();
             }
         },
     );
 }
 
-fn solve(G: &mut Vec<usize>, P: usize) -> String
+fn solve(g: &mut Vec<usize>, p: usize) -> String
 {
-    for g in G.iter_mut() {
-        *g %= P;
+    for g in g.iter_mut() {
+        *g %= p;
     }
 
-    let mut G_count = (0..P)
-        .map(|i| G.iter().filter(|&&g| g == i).count())
+    let mut g_count = (0..p)
+        .map(|i| g.iter().filter(|&&g| g == i).count())
         .collect::<Vec<_>>();
 
-    debug!("P={} G_count={:?}", P, G_count);
+    debug!("P={} G_count={:?}", p, g_count);
 
     //groups are listed by their mod, but we need a 2nd index with how many leftovers they can consume
-    let NEED_INDEX = (0..P).map(|g| (P - g) % P).collect::<Vec<_>>();
+    let need_index = (0..p).map(|g| (p - g) % p).collect::<Vec<_>>();
     let mut leftover = 0usize;
     let mut groups_happy = 0;
-    'outer: for _ in 0..G.len() {
+    'outer: for _ in 0..g.len() {
         //state machine
         if leftover == 0 {
             groups_happy += 1;
 
             //maintaining 0 state is important, so we need to short circuit any cases
             //where we have the group than can consume 100% of the leftovers
-            for (need_idx, &g_idx) in NEED_INDEX.iter().enumerate() {
-                if G_count[g_idx] > 0 && G_count[NEED_INDEX[(P - need_idx) % P]] > 0 {
-                    G_count[g_idx] -= 1;
-                    leftover = (P - need_idx) % P;
+            for (need_idx, &g_idx) in need_index.iter().enumerate() {
+                if g_count[g_idx] > 0 && g_count[need_index[(p - need_idx) % p]] > 0 {
+                    g_count[g_idx] -= 1;
+                    leftover = (p - need_idx) % p;
                     continue 'outer;
                 }
             }
         }
 
         //if we can make leftovers 0, then do it
-        if G_count[NEED_INDEX[leftover]] > 0 {
-            G_count[NEED_INDEX[leftover]] -= 1;
+        if g_count[need_index[leftover]] > 0 {
+            g_count[need_index[leftover]] -= 1;
             leftover = 0;
             continue;
         }
 
         //fall through case, just take anything
-        for (need_idx, &g_idx) in NEED_INDEX.iter().enumerate() {
-            if G_count[g_idx] > 0 {
-                G_count[g_idx] -= 1;
-                leftover = (leftover + P - need_idx) % P;
+        for (need_idx, &g_idx) in need_index.iter().enumerate() {
+            if g_count[g_idx] > 0 {
+                g_count[g_idx] -= 1;
+                leftover = (leftover + p - need_idx) % p;
                 break;
             }
         }

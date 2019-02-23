@@ -19,29 +19,29 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case_no in 1..=t {
-                let (N, C, M) = reader.read_tuple_3::<u16>();
+                let (n, c,m) = reader.read_tuple_3::<u16>();
                 //P B
-                let tickets: Vec<_> = (0..M).map(|_| reader.read_tuple_2::<u16>()).collect();
+                let tickets: Vec<_> = (0..m).map(|_| reader.read_tuple_2::<u16>()).collect();
 
                 println!("Solving case {}", case_no);
 
                 writeln!(buffer, "Case #{}: {:0>3}", case_no,
-                         solve( N, C, &tickets)).unwrap();
+                         solve( n, c, &tickets)).unwrap();
             }
         },
     );
 }
 
 
-fn solve( N: u16, C: u16, tickets: &Vec<(u16, u16)>) -> String
+fn solve( n: u16, c: u16, tickets: &Vec<(u16, u16)>) -> String
 {
 
     //first determine if a customer has multiple tickeets
     let max_tickets_per_customer: u16 = *tickets
         .iter()
-        .fold(&mut vec![0; C as usize], |acc, &(_P, B)| {
+        .fold(&mut vec![0; c as usize], |acc, &(_p, b)| {
             {
-                acc[B as usize - 1] += 1;
+                acc[b as usize - 1] += 1;
             }
             acc
         })
@@ -50,13 +50,13 @@ fn solve( N: u16, C: u16, tickets: &Vec<(u16, u16)>) -> String
         .unwrap();
     debug!("Max tickets per customer: {}", max_tickets_per_customer);
 
-    let mut tickets_per_position: Vec<u16> = vec![0; N as usize];
+    let mut tickets_per_position: Vec<u16> = vec![0; n as usize];
 
     tickets
         .iter()
-        .fold(&mut tickets_per_position, |acc, &(P, _B)| {
+        .fold(&mut tickets_per_position, |acc, &(p, _b)| {
             {
-                acc[P as usize - 1] += 1;
+                acc[p as usize - 1] += 1;
             }
             acc
         });
@@ -65,7 +65,7 @@ fn solve( N: u16, C: u16, tickets: &Vec<(u16, u16)>) -> String
     let ticket_pos_list: Vec<(u16, u16)> = tickets_per_position
         .iter()
         .enumerate()
-        .filter(|(_P, Count)| **Count > 0)
+        .filter(|(_p, count)| **count > 0)
         .map(|(a, b)| (a as u16, *b))
         .collect();
 

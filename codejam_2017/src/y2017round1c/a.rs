@@ -12,8 +12,8 @@ brute force search
 #[derive(Debug)] //,PartialEq,Eq,PartialOrd,Ord)]
 struct Pancake
 {
-    R: u32,
-    H: u32,
+    r: u32,
+    h: u32,
     area_top: f64,
     area_sides: f64,
 }
@@ -27,12 +27,12 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case_no in 1..=t {
-                let (N, K) = reader.read_tuple_2::<u16>();
-                let mut pancakes: Vec<_> = (0..N)
+                let (n, k) = reader.read_tuple_2::<u16>();
+                let mut pancakes: Vec<_> = (0..n)
                     .map(|_| reader.read_tuple_2::<u32>())
                     .map(|tp| Pancake {
-                        R: tp.0,
-                        H: tp.1,
+                        r: tp.0,
+                        h: tp.1,
                         area_top: 0f64,
                         area_sides: 0f64,
                     })
@@ -41,25 +41,25 @@ pub fn solve_all_cases()
 
                 println!("Solving case {}", case_no);
 
-                writeln!(buffer, "Case #{}: {:0>3}", case_no, solve(&mut pancakes, K)).unwrap();
+                writeln!(buffer, "Case #{}: {:0>3}", case_no, solve(&mut pancakes, k)).unwrap();
             }
         },
     );
 
 }
 
-fn solve(pancakes: &mut Vec<Pancake>, K: u16) -> String
+fn solve(pancakes: &mut Vec<Pancake>, k: u16) -> String
 {
-    pancakes.sort_unstable_by(|a, b| b.R.cmp(&a.R).then(b.H.cmp(&a.H)));
+    pancakes.sort_unstable_by(|a, b| b.r.cmp(&a.r).then(b.h.cmp(&a.h)));
 
     //Precompute cylindar side surface area & top area
     for p in pancakes.iter_mut() {
-        p.area_top = (p.R as u64).pow(2) as f64 * f64::consts::PI;
-        p.area_sides = 2f64 * f64::consts::PI * p.R as f64 * p.H as f64;
+        p.area_top = (p.r as u64).pow(2) as f64 * f64::consts::PI;
+        p.area_sides = 2f64 * f64::consts::PI * p.r as f64 * p.h as f64;
     }
 
     //try all bottom pancakes, this uniquely determines the top area
-    let max_syrup: f64 = (0..pancakes.len() as u16 - K + 1)
+    let max_syrup: f64 = (0..pancakes.len() as u16 - k + 1)
         .map(|bottom_pancake_index| {
             //get max K-1 sides
             let mut side_areas: Vec<f64> = pancakes
@@ -71,7 +71,7 @@ fn solve(pancakes: &mut Vec<Pancake>, K: u16) -> String
             side_areas.sort_unstable_by(|a, b| b.partial_cmp(a).unwrap());
 
             //return area which is the heighest K-1 pancakes
-            side_areas.iter().take(K as usize - 1).sum::<f64>()
+            side_areas.iter().take(k as usize - 1).sum::<f64>()
                 + pancakes[bottom_pancake_index as usize].area_sides
                 + pancakes[bottom_pancake_index as usize].area_top
         })

@@ -173,7 +173,7 @@ impl Search
                 continue;
             }
             if !self.mp.contains_key(&cnt) {
-                let mut z: Vec<String> = (0..=v)
+                let z: Vec<String> = (0..=v)
                     .map(|i| {
                         (0..=v)
                             .map(|j| {

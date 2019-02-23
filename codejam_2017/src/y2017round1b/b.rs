@@ -273,17 +273,17 @@ fn solution(counts: &mut Counts) -> Option<String>
         let pc = DOUBLE_COLORS_PAIRS[idx];
         counts.add_color(pc, 1);
     }
-    let N = counts.total;
+    let n = counts.total;
     let color1 = counts.max_color();
 
-    if counts.get_count(color1) > N / 2
+    if counts.get_count(color1) > n / 2
     //floor N/2
     {
         debug!(
             "Count of color {} too high {}.  N={}",
             color1,
             counts.get_count(color1),
-            N
+            n
         );
         return None;
     }
@@ -293,7 +293,7 @@ fn solution(counts: &mut Counts) -> Option<String>
 
     let mut pass1: Vec<Colors> = Vec::new();
 
-    let pass1_size = N / 2 + N % 2;
+    let pass1_size = n / 2 + n % 2;
     for _ in 0..counts.get_count(color1) {
         pass1.push(color1);
         counts.remove_color(color1, 1);
@@ -319,12 +319,12 @@ fn solution(counts: &mut Counts) -> Option<String>
     assert_eq!(pass1.len(), pass1_size as usize);
     assert_eq!(
         pass2.len(),
-        N as usize - pass1_size as usize,
+        n as usize - pass1_size as usize,
         "pass 2 wrong size"
     );
     sol.extend(pass1.iter().interleave(pass2.iter()).map(|c| c.to_char()));
 
-    assert_eq!(sol.len(), N as usize);
+    assert_eq!(sol.len(), n as usize);
 
     for (idx, s) in chains.iter().enumerate() {
         if s.len() <= 0 {

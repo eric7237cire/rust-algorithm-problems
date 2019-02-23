@@ -216,7 +216,7 @@ fn bfs(
 
     return false;
 }
-
+/*
 fn dfs(
     edges: &HashMap<u16, Vec<u16>>,
     visited: &mut HashSet<u16>,
@@ -246,3 +246,4 @@ fn dfs(
 
     found
 }
+*/

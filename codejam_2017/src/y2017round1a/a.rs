@@ -11,14 +11,14 @@ pub fn solve_all_cases()
 {
     run_cases(
         &["A-small-practice", "A-large-practice"],
-        "y2008round1a",
+        "y2017round1a",
         |reader, buffer| {
             let t = reader.read_int();
 
             for case_no in 1..=t {
 
                 //handle input / output
-                let (r, c) = reader.read_tuple_2();
+                let (r, _c) = reader.read_tuple_2();
 
                 let mut grid: Vec<Vec<char>> = Vec::new();
 
@@ -28,7 +28,7 @@ pub fn solve_all_cases()
                 }
 
 
-                writeln!(buffer, "Case #{}: {:.6}", case_no, solve( &mut grid)).unwrap();
+                write!(buffer, "Case #{}:{}", case_no, solve( &mut grid)).unwrap();
             }
         });
 
@@ -92,6 +92,7 @@ fn solve( grid: &mut Vec<Vec<char>>) -> String
         for c in 0..n_cols {
             ans += &grid[r][c].to_string();
         }
+        ans += "\n"
     }
     ans
 }
