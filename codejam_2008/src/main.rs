@@ -90,7 +90,6 @@ fn main()
     init_log();
     y2008round3::a::solve_all_cases();
 
-
     /*   run_y2008_round_qual();
     run_y2008_round_practice();
     run_y2008_round_beta();*/
