@@ -94,6 +94,7 @@ fn solve(path: &[(Vec<char>, u32)]) -> i64
                                 //x1*y2 - x2*y1
                                 //x(y2-y1)
 
+                                //polygon formula
                                 area += cur.c() * (nxt.r() - cur.r());
                             }
                             EAST | WEST => {
@@ -113,7 +114,7 @@ fn solve(path: &[(Vec<char>, u32)]) -> i64
                             }
                             _ => panic!("Hmm"),
                         }
-                        //area += -cur.r() * nxt.r();
+
                         cur = nxt;
                     }
                     _ => panic!("hmmm"),
