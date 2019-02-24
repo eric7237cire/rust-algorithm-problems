@@ -223,6 +223,16 @@ impl<N: Copy + Mul<Output=N>> Mul<N> for Vector2d<N>
 }
 
 
+impl<N: Copy + Mul<Output=N>> Mul<N> for &Vector2d<N>
+{
+    type Output = Vector2d<N>;
+
+    fn mul(self, rhs: N) -> Vector2d<N>
+    {
+        Vector2d::with_val(self.data[0] * rhs, self.data[1] * rhs)
+    }
+}
+
 
 #[cfg(test)]
 mod test_vector2d

@@ -5,6 +5,8 @@ use std::io::Write;
 use codejam::util::grid::Grid;
 use std::usize;
 use std::cmp::min;
+use std::collections::BinaryHeap;
+use bit_set::BitSet;
 
 /*
 Polygons
@@ -24,18 +26,26 @@ pub fn solve_all_cases()
 
                 let mut grid = Grid::new(n_rows,n_cols);
 
+                let mut start : Vector2d<isize> = Default::default();
+                let mut stop : Vector2d<isize> = Default::default();
+
                 for r in 0..n_rows {
                     for (c, ch) in reader.read_chars(n_cols).into_iter().enumerate() {
                         grid[ (r,c) ] = ch;
+                        if ch == 'X' {
+                            stop = Vector2d::with_val(r as isize, c as isize);
+                        } else if ch == 'O' {
+                            start = Vector2d::with_val(r as isize, c as isize);
+                        }
                     }
                 }
 
                 if case_no != 1 {
-                    continue;
+                   // continue;
                 }
                 println!("Solving case {}", case_no);
 
-                writeln!(buffer, "Case #{}: {}", case_no, if let Some(ans) = solve(&grid) { ans.to_string() } else {
+                writeln!(buffer, "Case #{}: {}", case_no, if let Some(ans) = solve(&grid, &start, &stop) { ans.to_string() } else {
                     "THE CAKE IS A LIE".to_string()
                 }).unwrap();
             }
@@ -52,7 +62,11 @@ X indicates the cake's position.
 
 const DIRECTIONS: [Vector2d<isize>; 4] = [NORTH, EAST, SOUTH, WEST];
 
-fn solve(grid: &Grid<char>) -> Option<u32>
+const CLOSEST_WALL_INDEX:usize = 4;
+
+
+
+fn solve(grid: &Grid<char>, start : &Vector2d<isize>, stop : &Vector2d<isize>) -> Option<isize>
 {
     debug!("Grid\n{:#.4?}\n", grid);
 
@@ -63,45 +77,30 @@ fn solve(grid: &Grid<char>) -> Option<u32>
         c[4] = usize::MAX;
     }
 
-    for r in 0..grid.R  {
-        for c in (0..grid.C).rev()  {
-            let coord = Vector2d::with_val(r as isize,c as isize);
-            for (dir_idx, dir) in [NORTH, EAST].iter().enumerate() {
+    for rr in 0..grid.R  {
+        for cc in 0..grid.C  {
+            //start from top/left corner or bottom/right corner.
+            for &(r,c, dir_start) in [ (rr, grid.C-1-cc, 0), (grid.R - 1- rr, cc, 2) ].iter() {
+                let coord = Vector2d::with_val(r as isize, c as isize);
+                for (dir_idx, dir) in DIRECTIONS.iter().enumerate().skip(dir_start).take(2) {
+                    for &dd_idx in [dir_idx, CLOSEST_WALL_INDEX].iter() {
+                        let val = if grid[&coord] == '#' {
+                            0
+                        } else if let Some(d) = nearest_dir.get_value(&(coord + dir)) {
+                            1 + d[dd_idx]
+                        } else {
+                            1
+                        };
+                        let m_val = nearest_dir.data[r * grid.C + c].get_mut(dd_idx).unwrap();
+                        if dd_idx == CLOSEST_WALL_INDEX {
+                            *m_val = min(*m_val, val);
+                        } else {
+                            *m_val = val;
+                        }
 
-                for &dd_idx in [dir_idx, 4].iter() {
-                    nearest_dir.data[r * grid.C + c][dd_idx] = if grid[&coord] == '#' {
-                        0
-                    } else if let Some(d) = nearest_dir.get_value(&(coord + dir)) {
-                        1 + d[dd_idx]
-                    } else {
-                        1
-                    };
+                    }
                 }
-
             }
-
-
-        }
-    }
-
-    for r in (0..grid.R).rev()  {
-        for c in 0..grid.C  {
-            let coord = Vector2d::with_val(r as isize,c as isize);
-            for (dir_idx, dir) in [SOUTH, WEST].iter().enumerate() {
-
-                for &dd_idx in [dir_idx, 4].iter() {
-                    nearest_dir.data[r * grid.C + c][dd_idx] = if grid[&coord] == '#' {
-                        0
-                    } else if let Some(d) = nearest_dir.get_value(&(coord + dir)) {
-                        1 + d[dd_idx]
-                    } else {
-                        1
-                    };
-                }
-
-            }
-
-
         }
     }
 
@@ -111,5 +110,41 @@ fn solve(grid: &Grid<char>) -> Option<u32>
         }
     }
 
-    Some(3)
+
+    let mut pq:BinaryHeap< (isize, Vector2d<isize>)> = BinaryHeap::new();
+    let mut visited = BitSet::new();
+    pq.push((0, start.clone()));
+
+    while let Some(node) = pq.pop() {
+        let cur = node.1;
+        let idx = cur.r() as usize * grid.C + cur.c() as usize;
+        debug!("Cur is {:?} idx is {}", cur, idx);
+
+        let cost = node.0;
+        if visited.contains(idx) {
+            continue;
+        }
+        if &cur == stop {
+            return Some(-cost);
+        }
+        visited.insert(idx);
+
+        for (dir_idx, dir) in DIRECTIONS.iter().enumerate() {
+            //walk
+            let d = nearest_dir[idx][dir_idx];
+            if d > 0 && grid.get_value(&(cur+dir)).is_some() {
+                debug!("Walking Cur is {:?} adding {:?} for dir {}",
+                cur, cur + dir, dir_idx);
+
+                pq.push( (cost - 1, cur + dir));
+            }
+            if d > 1 {
+                debug!("Cur is {:?} adding {:?} for dir {}",
+                cur, cur + &(dir * (d - 1) as isize), dir_idx);
+                pq.push( (cost - nearest_dir[idx][CLOSEST_WALL_INDEX] as isize, cur + &(dir * (d - 1) as isize)));
+            }
+        }
+    }
+
+    None
 }
