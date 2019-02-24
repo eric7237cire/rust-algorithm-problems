@@ -5,7 +5,9 @@ use std::io::Write;
 use std::usize;
 
 /*
-
+Bipartite matching (fast, non recursive implementation)
+Maximum independent set
+Grid
 */
 pub fn solve_all_cases()
 {
@@ -64,9 +66,11 @@ fn vec_comp_to_index(r: isize, c: isize, n_cols: usize) -> usize
 
 fn solve(chairs: &BitVec, n_rows: usize, n_cols: usize) -> usize
 {
-    let adj_vecs: [Vector2d<isize>; 4] = [
+    let adj_vecs: [Vector2d<isize>; 6] = [
         Vector2d::with_val(-1, -1),
         Vector2d::with_val(0, -1),
+        Vector2d::with_val(1, -1),
+        Vector2d::with_val(1, 1),
         Vector2d::with_val(0, 1),
         Vector2d::with_val(-1, 1),
     ];
@@ -155,7 +159,7 @@ fn solve(chairs: &BitVec, n_rows: usize, n_cols: usize) -> usize
                         next_right_index = pnext;
                     }
                     match_left[next_left_index] = next_right_index;
-                    // found = true;
+
                     break 'bfs;
                 } else if !used_first[match_right[adj_right_index]] {
                     //Need to find a new matching for this value, put its left index on queue
@@ -171,7 +175,7 @@ fn solve(chairs: &BitVec, n_rows: usize, n_cols: usize) -> usize
             }
         }
 
-        //Reset all dice values in queue
+        //Reset all values in queue
         for qj in queue.iter().take(queue_tail) {
             used_first.set(*qj, false);
         }
