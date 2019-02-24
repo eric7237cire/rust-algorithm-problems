@@ -9,7 +9,9 @@ use std::collections::BinaryHeap;
 use bit_set::BitSet;
 
 /*
-Polygons
+Grid
+Dijkstras / priority queue (using negative to make it a min queue)
+
 */
 pub fn solve_all_cases()
 {
@@ -130,14 +132,16 @@ fn solve(grid: &Grid<char>, start : &Vector2d<isize>, stop : &Vector2d<isize>) -
         visited.insert(idx);
 
         for (dir_idx, dir) in DIRECTIONS.iter().enumerate() {
-            //walk
+
             let d = nearest_dir[idx][dir_idx];
+            //either we walk
             if d > 0 && grid.get_value(&(cur+dir)).is_some() {
                 debug!("Walking Cur is {:?} adding {:?} for dir {}",
                 cur, cur + dir, dir_idx);
 
                 pq.push( (cost - 1, cur + dir));
             }
+            //or shoot a portal and go to the closest wall to teleport to it
             if d > 1 {
                 debug!("Cur is {:?} adding {:?} for dir {}",
                 cur, cur + &(dir * (d - 1) as isize), dir_idx);
