@@ -13,7 +13,7 @@ pub struct Grid<T>
     pub C: usize,
 }
 
-pub type GridRowColVec = Vector2d<i64>;
+pub type GridRowColVec = Vector2d<isize>;
 pub type GridCoord = Vector2d<usize>;
 
 //pub struct GridConsts {}
@@ -27,7 +27,7 @@ pub mod constants
     pub const SOUTH: GridRowColVec = Vector2d { data: [1, 0] };
     pub const WEST: GridRowColVec = Vector2d { data: [0, -1] };
 
-    pub const DIRECTIONS: [Vector2d<i64>; 4] = [NORTH, EAST, SOUTH, WEST];
+    pub const DIRECTIONS: [Vector2d<isize>; 4] = [NORTH, EAST, SOUTH, WEST];
 
 
 }
@@ -47,6 +47,26 @@ impl<T> Grid<T>
             g.data.push(Default::default());
         }
         g
+    }
+
+    pub fn get_val_usize<'a>(&'a self, row: usize, col: usize)
+        -> Option<&'a T>
+    {
+        if row >= self.R || col >= self.C  {
+            return None;
+        }
+
+        Some(&self.data[row * self.C + col])
+    }
+
+    pub fn get_val<'a>(&'a self, row: isize, col: isize)
+        -> Option<&'a T>
+    {
+        if row < 0 || col < 0 || row as usize >= self.R || col as usize >= self.C  {
+            return None;
+        }
+
+        Some(&self.data[ row as usize * self.C + col as usize])
     }
 
     pub fn get_value<'a, N: Integer+Copy+NumCast>(&'a self, row_col_index: &Vector2d<N>)
@@ -184,6 +204,17 @@ impl<T> Index<&Vector2d<i64>> for Grid<T>
         }*/
 
         &self.data[ (row_col_index.data[0] * self.C as i64 + row_col_index.data[1] ) as usize ]
+    }
+}
+
+impl<T> Index<&Vector2d<isize>> for Grid<T>
+{
+    type Output = T;
+
+    fn index<'a>(&'a self, row_col_index: &Vector2d<isize>) -> &'a T
+    {
+
+        &self.data[ (row_col_index.data[0] * self.C as isize + row_col_index.data[1] ) as usize ]
     }
 }
 //set a cell

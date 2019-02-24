@@ -3,7 +3,7 @@ use codejam::util::grid::constants::*;
 use codejam::util::vector_2d::Vector2d;
 use std::cmp::max;
 use std::cmp::min;
-use std::i64;
+use std::isize;
 use std::io::Write;
 use itertools::Itertools;
 
@@ -46,21 +46,21 @@ pub fn solve_all_cases()
 }
 
 const GRID_WIDTH: usize = 6100;
-const COORD_OFFSET: i64 = 3001;
+const COORD_OFFSET: isize = 3001;
 
-const DIRECTIONS: [Vector2d<i64>; 4] = [NORTH, EAST, SOUTH, WEST];
+const DIRECTIONS: [Vector2d<isize>; 4] = [NORTH, EAST, SOUTH, WEST];
 
-fn solve(path: &[(Vec<char>, u32)]) -> i64
+fn solve(path: &[(Vec<char>, u32)]) -> isize
 {
     //index is a row
-    let mut col_rng: Vec<[i64; 2]> = vec![[i64::MAX, i64::MIN]; GRID_WIDTH];
+    let mut col_rng: Vec<[isize; 2]> = vec![[isize::MAX, isize::MIN]; GRID_WIDTH];
 
     //index is a column
-    let mut row_rng: Vec<[i64; 2]> = vec![[i64::MAX, i64::MIN]; GRID_WIDTH];
+    let mut row_rng: Vec<[isize; 2]> = vec![[isize::MAX, isize::MIN]; GRID_WIDTH];
 
     let mut head: usize = 0;
-    let mut cur: Vector2d<i64> = Default::default();
-    let mut area: i64 = 0;
+    let mut cur: Vector2d<isize> = Default::default();
+    let mut area: isize = 0;
 
 
 
@@ -90,7 +90,7 @@ fn solve(path: &[(Vec<char>, u32)]) -> i64
                                 cc[0] = min(cc[0], cur.c());
                                 cc[1] = max(cc[1], cur.c());
 
-                                debug!("Col range of {} {} is {:?}", idx, idx as i64-COORD_OFFSET, cc);
+                                debug!("Col range of {} {} is {:?}", idx, idx as isize-COORD_OFFSET, cc);
                                 //x1*y2 - x2*y1
                                 //x(y2-y1)
 
@@ -108,7 +108,7 @@ fn solve(path: &[(Vec<char>, u32)]) -> i64
 
                                 //y(x1-x2)
 
-                                debug!("Col range of {} {} is {:?}", idx, idx as i64-COORD_OFFSET, rr);
+                                debug!("Col range of {} {} is {:?}", idx, idx as isize-COORD_OFFSET, rr);
 
                                 area += cur.r() * (cur.c() - nxt.c());
                             }
@@ -127,9 +127,9 @@ fn solve(path: &[(Vec<char>, u32)]) -> i64
 
     let mut ans = 0;
     for col in 0..GRID_WIDTH {
-        let col_with_offset = (col as i64) - COORD_OFFSET;
+        let col_with_offset = (col as isize) - COORD_OFFSET;
         for row in 0..GRID_WIDTH {
-            let row_with_offset = (row as i64) - COORD_OFFSET;
+            let row_with_offset = (row as isize) - COORD_OFFSET;
 
             //basically any square that has had movement above/below or left/right is in the area
             //including the pockets

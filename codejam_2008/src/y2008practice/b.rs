@@ -8,7 +8,7 @@ use std::char::from_digit;
 use std::cmp::max;
 use std::cmp::min;
 use std::collections::HashMap;
-use std::i64;
+use std::isize;
 use std::io::Write;
 
 /*
@@ -44,11 +44,11 @@ fn solve(forward_path: &str, back_path: &str) -> String
 
     let directions = [NORTH, SOUTH, WEST, EAST];
 
-    let get_dir_index = |dir: &Vector2d<i64>| directions.iter().position(|dd| dd == dir).unwrap();
+    let get_dir_index = |dir: &Vector2d<isize>| directions.iter().position(|dd| dd == dir).unwrap();
 
-    let mut square_state: HashMap<Vector2d<i64>, BitVec64> = HashMap::new();
+    let mut square_state: HashMap<Vector2d<isize>, BitVec64> = HashMap::new();
 
-    let mut handle_step = |step: char, dir: &mut Vector2d<i64>, pos: &mut Vector2d<i64>| {
+    let mut handle_step = |step: char, dir: &mut Vector2d<isize>, pos: &mut Vector2d<isize>| {
         debug!("Read a step {}", step);
         match step {
             'W' => {
@@ -74,7 +74,7 @@ fn solve(forward_path: &str, back_path: &str) -> String
         debug!("Current pos {:?}, direction {:?}", pos, dir);
     };
 
-    let mut handle_path = |path: &str, initial_dir: Vector2d<i64>, initial_pos: Vector2d<i64>| {
+    let mut handle_path = |path: &str, initial_dir: Vector2d<isize>, initial_pos: Vector2d<isize>| {
         let mut dir = initial_dir;
         let mut pos = initial_pos;
         for ch in path.chars() {
@@ -95,10 +95,10 @@ fn solve(forward_path: &str, back_path: &str) -> String
     square_state.remove(&zeropos);
     square_state.remove(&exit_pos);
 
-    let mut min_row = i64::MAX;
-    let mut max_row = i64::MIN;
-    let mut min_col = i64::MAX;
-    let mut max_col = i64::MIN;
+    let mut min_row = isize::MAX;
+    let mut max_row = isize::MIN;
+    let mut min_col = isize::MAX;
+    let mut max_col = isize::MIN;
     for pos in square_state.keys() {
         min_row = min(pos.r(), min_row);
         max_row = max(pos.r(), max_row);
