@@ -182,6 +182,21 @@ impl<N: Add<Output=N> + Copy> Add<&Vector2d<N>> for Vector2d<N>
     }
 }
 
+
+impl<N: Add<Output=N> + Copy> Add<Vector2d<N>> for Vector2d<N>
+{
+    type Output = Self;
+
+    fn add(self, rhs: Vector2d<N>) -> Self
+    {
+        let lhs =  self;
+
+        Vector2d::with_val(
+            lhs.data[0] + rhs.data[0],
+            lhs.data[1] + rhs.data[1],
+        )
+    }
+}
 /*
 impl<N: Copy + AddAssign> AddAssign<&Vector2d<N>> for &mut Vector2d<N>
 {

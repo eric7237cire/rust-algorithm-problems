@@ -12,10 +12,7 @@ Grid
 pub fn solve_all_cases()
 {
     run_cases(
-        &[
-            "C-small-practice",
-               "C-large-practice"
-        ],
+        &["C-small-practice", "C-large-practice"],
         "y2008round3",
         |reader, buffer| {
             let t = reader.read_int();
@@ -82,7 +79,7 @@ fn solve(chairs: &BitVec, n_rows: usize, n_cols: usize) -> usize
     let left_n_cols = left_size / n_rows;
 
     assert_eq!(left_n_cols, n_cols / 2 + n_cols % 2);
-    assert_eq!(right_n_cols, n_cols / 2 );
+    assert_eq!(right_n_cols, n_cols / 2);
     assert_eq!(left_n_cols + right_n_cols, n_cols);
     assert_eq!(left_size + right_size, chairs.len());
 
