@@ -52,7 +52,10 @@ const DIRECTIONS: [Vector2d<i64>; 4] = [NORTH, EAST, SOUTH, WEST];
 
 fn solve(path: &[(Vec<char>, u32)]) -> i64
 {
+    //index is a row
     let mut col_rng: Vec<[i64; 2]> = vec![[i64::MAX, i64::MIN]; GRID_WIDTH];
+
+    //index is a column
     let mut row_rng: Vec<[i64; 2]> = vec![[i64::MAX, i64::MIN]; GRID_WIDTH];
 
     let mut head: usize = 0;
@@ -82,10 +85,12 @@ fn solve(path: &[(Vec<char>, u32)]) -> i64
                                 assert_eq!(cur.c(), nxt.c());
 
                                 idx = (min(cur.r(), nxt.r()) + COORD_OFFSET) as usize;
-                                col_rng[idx][0] = min(col_rng[idx][0], cur.c());
-                                col_rng[idx][1] = max(col_rng[idx][1], cur.c());
+                                let cc = col_rng.get_mut(idx).unwrap();
 
-                                debug!("Col range of {} {} is {:?}", idx, idx as i64-COORD_OFFSET, col_rng[idx]);
+                                cc[0] = min(cc[0], cur.c());
+                                cc[1] = max(cc[1], cur.c());
+
+                                debug!("Col range of {} {} is {:?}", idx, idx as i64-COORD_OFFSET, cc);
                                 //x1*y2 - x2*y1
                                 //x(y2-y1)
 
@@ -120,13 +125,15 @@ fn solve(path: &[(Vec<char>, u32)]) -> i64
     assert_eq!(cur, Vector2d::with_val(0, 0));
 
     let mut ans = 0;
-    for i in 0..GRID_WIDTH {
-        let ii = (i as i64) - COORD_OFFSET;
-        for j in 0..GRID_WIDTH {
-            let jj = (j as i64) - COORD_OFFSET;
+    for col in 0..GRID_WIDTH {
+        let col_with_offset = (col as i64) - COORD_OFFSET;
+        for row in 0..GRID_WIDTH {
+            let row_with_offset = (row as i64) - COORD_OFFSET;
 
-            if (jj >= row_rng[i][0] && jj < row_rng[i][1])
-                || (ii >= col_rng[j][0] && ii < col_rng[j][1])
+            //basically any square that has had movement above/below or left/right is in the area
+            //including the pockets
+            if (row_with_offset >= row_rng[col][0] && row_with_offset < row_rng[col][1])
+                || (col_with_offset >= col_rng[row][0] && col_with_offset < col_rng[row][1])
             {
                 ans += 1;
             }
