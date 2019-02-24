@@ -5,6 +5,7 @@ use std::cmp::max;
 use std::cmp::min;
 use std::i64;
 use std::io::Write;
+use itertools::Itertools;
 
 /*
 Polygons
@@ -12,7 +13,9 @@ Polygons
 pub fn solve_all_cases()
 {
     run_cases(
-        &["A-small-practice", "A-large-practice"],
+        &["A-small-practice",
+            "A-large-practice"
+        ],
         "y2008round3",
         |reader, buffer| {
             let t = reader.read_int();
@@ -56,7 +59,11 @@ fn solve(path: &[(Vec<char>, u32)]) -> i64
     let mut cur: Vector2d<i64> = Default::default();
     let mut area: i64 = 0;
 
+
+
     for (s, t) in path.iter() {
+        debug!("S = {} repeat = {}", s.iter().join(""), t);
+
         let t = *t;
         for _rep in 0..t {
             for ch in s.iter() {
@@ -72,20 +79,36 @@ fn solve(path: &[(Vec<char>, u32)]) -> i64
                         let idx;
                         match DIRECTIONS[head] {
                             NORTH | SOUTH => {
+                                assert_eq!(cur.c(), nxt.c());
+
                                 idx = (min(cur.r(), nxt.r()) + COORD_OFFSET) as usize;
                                 col_rng[idx][0] = min(col_rng[idx][0], cur.c());
                                 col_rng[idx][1] = max(col_rng[idx][1], cur.c());
+
+                                debug!("Col range of {} {} is {:?}", idx, idx as i64-COORD_OFFSET, col_rng[idx]);
+                                //x1*y2 - x2*y1
+                                //x(y2-y1)
+
+                                area += cur.c() * (nxt.r() - cur.r());
                             }
                             EAST | WEST => {
+                                assert_eq!(cur.r(), nxt.r());
+
                                 idx = (min(cur.c(), nxt.c()) + COORD_OFFSET) as usize;
                                 let rr = row_rng.get_mut(idx).unwrap();
 
                                 rr[0] = min(rr[0], cur.r());
                                 rr[1] = max(rr[1], cur.r());
+
+                                //y(x1-x2)
+
+                                debug!("Col range of {} {} is {:?}", idx, idx as i64-COORD_OFFSET, rr);
+
+                                area += cur.r() * (cur.c() - nxt.c());
                             }
                             _ => panic!("Hmm"),
                         }
-                        area += -cur.r() * nxt.r();
+                        //area += -cur.r() * nxt.r();
                         cur = nxt;
                     }
                     _ => panic!("hmmm"),
