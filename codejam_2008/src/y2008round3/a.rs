@@ -1,11 +1,11 @@
 use codejam::util::codejam::run_cases;
 use codejam::util::grid::constants::*;
 use codejam::util::vector_2d::Vector2d;
+use itertools::Itertools;
 use std::cmp::max;
 use std::cmp::min;
-use std::isize;
 use std::io::Write;
-use itertools::Itertools;
+use std::isize;
 
 /*
 Polygons
@@ -13,9 +13,7 @@ Polygons
 pub fn solve_all_cases()
 {
     run_cases(
-        &["A-small-practice",
-            "A-large-practice"
-        ],
+        &["A-small-practice", "A-large-practice"],
         "y2008round3",
         |reader, buffer| {
             let t = reader.read_int();
@@ -62,8 +60,6 @@ fn solve(path: &[(Vec<char>, u32)]) -> isize
     let mut cur: Vector2d<isize> = Default::default();
     let mut area: isize = 0;
 
-
-
     for (s, t) in path.iter() {
         debug!("S = {} repeat = {}", s.iter().join(""), t);
 
@@ -90,7 +86,12 @@ fn solve(path: &[(Vec<char>, u32)]) -> isize
                                 cc[0] = min(cc[0], cur.c());
                                 cc[1] = max(cc[1], cur.c());
 
-                                debug!("Col range of {} {} is {:?}", idx, idx as isize-COORD_OFFSET, cc);
+                                debug!(
+                                    "Col range of {} {} is {:?}",
+                                    idx,
+                                    idx as isize - COORD_OFFSET,
+                                    cc
+                                );
                                 //x1*y2 - x2*y1
                                 //x(y2-y1)
 
@@ -108,7 +109,12 @@ fn solve(path: &[(Vec<char>, u32)]) -> isize
 
                                 //y(x1-x2)
 
-                                debug!("Col range of {} {} is {:?}", idx, idx as isize-COORD_OFFSET, rr);
+                                debug!(
+                                    "Col range of {} {} is {:?}",
+                                    idx,
+                                    idx as isize - COORD_OFFSET,
+                                    rr
+                                );
 
                                 area += cur.r() * (cur.c() - nxt.c());
                             }
