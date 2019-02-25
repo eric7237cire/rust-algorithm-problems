@@ -12,7 +12,7 @@ Modular multiplicative inverse
 binary exponentiation algorithm
 Fermat's little theorem
 Lattice walk
-
+Lucas's theorem
 */
 pub fn solve_all_cases()
 {
@@ -95,7 +95,7 @@ fn solve(
     debug!("Rocks {:?}", rocks);
 
     let mut ans = 0;
-    //always include target
+    //always include start & target, so subset -2
     for subset in 0..1 << (rocks.len() - 2) {
         let bs = BitVec64::with_val(subset);
         let sign = if bs.pop_count() % 2 == 0 { 1 } else { -1 };
@@ -117,9 +117,9 @@ fn solve(
                 let m = rocks[cur].r() - rocks[last].r();
                 let n = rocks[cur].c() - rocks[last].c();
                 last = cur;
-                n_choose_k_mod(m + n, n, 10007, fac, inv)
+                n_choose_k_mod(m + n, n, MODULUS, fac, inv)
             })
-            .fold(1, |acc, w| (acc * w) % 10007);
+            .fold(1, |acc, w| (acc * w) % MODULUS);
 
         debug!("Rocks {:0>width$b} ways {} sign {}", bs.data, ways, sign, width=rocks.len());
         ans += 10007 + sign * ways as isize;
@@ -127,6 +127,7 @@ fn solve(
     ans % 10007
 }
 
+//Uses lucas theorum and modular inversese
 fn n_choose_k_mod(
     n: usize,
     k: usize,
@@ -139,21 +140,18 @@ fn n_choose_k_mod(
     let mut k = k;
 
     let mut product = 1;
-    //let p = BigUint::from(p);
     while k > 0 {
         let key = (n % p, k % p);
 
-        //n! / (k! * (n-k)!)
 
-
-        if k % p > n % p {
+        if key.1 > key.0 {
             product *= 0;
-
         }
-        else if k % p == 0 || key.0 == key.1 {
+        else if key.1 == 0 || key.0 == key.1 {
             product *= 1;
         }
         else {
+            //n! / (k! * (n-k)!)
             let n_fact = fac[n % p];
             let k_fact = inv[fac[k % p]];
             let n_sub_k_fact = inv[fac[neg_mod(n,k,p)]];
@@ -175,9 +173,7 @@ fn n_choose_k_mod(
         k /= p;
     }
 
-    let ans = product;
-    //memo.insert(key, ans);
-    ans
+    product
 }
 
 fn change_basis(rc: &Vector2d<isize>) -> Option<Vector2d<usize>>
