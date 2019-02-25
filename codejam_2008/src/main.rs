@@ -1,5 +1,3 @@
-//#![allow(non_snake_case)]
-
 mod y2008beta;
 mod y2008practice;
 mod y2008qual;
@@ -10,9 +8,6 @@ mod y2008round2;
 mod y2008round3;
 
 extern crate codejam;
-
-/*#[macro_use]
-extern crate itertools;*/
 
 #[macro_use]
 extern crate log;
@@ -90,7 +85,7 @@ pub fn run_y2008_round3()
 fn main()
 {
     init_log();
-    y2008round3::c::solve_all_cases();
+    y2008round3::d::solve_all_cases();
 
     /*   run_y2008_round_qual();
     run_y2008_round_practice();
