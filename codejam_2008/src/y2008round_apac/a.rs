@@ -7,7 +7,8 @@ use std::io::Write;
 use std::isize;
 
 /*
-
+Geometry
+Ranges
 */
 pub fn solve_all_cases()
 {
@@ -78,6 +79,7 @@ fn solve(known: &[(Vector2d<isize>, bool)], unknown: &[Vector2d<isize>]) -> Stri
         }
 
         for nb in non_birds.iter() {
+            //Does considering this unknown bird as a bird cause a contradiction?
             if min(row_range[0], u.r()) <= nb.r()
                 && nb.r() <= max(row_range[1], u.r())
                 && min(col_range[0], u.c()) <= nb.c()
@@ -88,6 +90,7 @@ fn solve(known: &[(Vector2d<isize>, bool)], unknown: &[Vector2d<isize>]) -> Stri
             }
         }
 
+        //We don't know s**t
         ans.push(None);
     }
 
