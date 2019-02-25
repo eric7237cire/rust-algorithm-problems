@@ -31,8 +31,8 @@ pub fn solve_all_cases()
                     })
                     .collect();
 
-                if case_no != 4 {
-                    //continue;
+                if case_no != 21 {
+                   // continue;
                 }
                 println!("Solving case {}", case_no);
 
@@ -85,10 +85,13 @@ fn solve(rocks_orig: &[Vector2d<isize>], n_rows: isize, n_cols: isize) -> isize
             .map(|(_, rock)| *rock)
             .collect();
 
-        rocks_subset.push(start);
-        rocks_subset.push(target);
+        //rocks_subset.push(start);
+        //rocks_subset.push(target);
 
         rocks_subset.sort_by(|a, b| a.c().cmp(&b.c()).then_with(|| b.r().cmp(&a.r())));
+
+        rocks_subset.insert(0, start);
+        rocks_subset.push(target);
 
         let ways: usize = rocks_subset
             .windows(2)
@@ -102,6 +105,7 @@ fn solve(rocks_orig: &[Vector2d<isize>], n_rows: isize, n_cols: isize) -> isize
             })
             .fold(1, |acc, w| (acc * w) % 10007);
 
+        debug!("Rocks {:?} ways {} sign {}", rocks_subset, ways, sign);
         ans += 10007 + sign * ways as isize;
     }
     ans % 10007
