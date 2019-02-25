@@ -9,7 +9,12 @@ use std::io::Write;
 use std::usize;
 
 /*
-Change of base
+Linear change of basis
+Modular multiplicative inverse
+binary exponentiation algorithm
+Fermat's little theorem
+Lattice walk
+
 */
 pub fn solve_all_cases()
 {
@@ -216,12 +221,45 @@ fn binpow(a: usize, b: usize, modulus: usize) -> usize
     return res;
 }
 
+//https://stackoverflow.com/questions/9727962/fast-way-to-calculate-n-mod-m-where-m-is-prime
+fn factorial_mod(n: usize, modulus: usize) -> usize
+{
+    let mut ans:isize = 1;
+    if n <= modulus / 2 {
+        //#calculate the factorial normally (right argument of range() is exclusive)
+        for i in 1..=n {
+            ans = (ans * i as isize) % modulus as isize;
+        }
+    } else {
+        //Fancypants method for large n
+        for i in n + 1..modulus {
+            ans = (ans * i as isize) % modulus as isize;
+        }
+        ans = compute_modular_inverse_1(ans as usize, modulus) as isize;
+        ans = -1 * ans + modulus as isize;
+    }
+    return (ans % modulus as isize) as usize;
+}
+
 #[cfg(test)]
 mod test_endless_knight
 {
     use super::*;
     use num_integer::binomial;
 
+
+    #[test]
+    fn test_factorial_mod()
+    {
+        let prime = 10007;
+        let pu = BigUint::from(prime);
+        let mut f = BigUint::from(1usize);
+
+        for i in 2..=23 {
+            f *= BigUint::from(i);
+            assert_eq!( biguint_to_usize( &(&f % &pu)), factorial_mod(i, prime));
+        }
+    }
     #[test]
     fn test_modular_inverse()
     {
