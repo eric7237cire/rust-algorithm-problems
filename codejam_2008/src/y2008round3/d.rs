@@ -32,7 +32,7 @@ pub fn solve_all_cases()
                     .collect();
 
                 if case_no != 4 {
-                    continue;
+                    //continue;
                 }
                 println!("Solving case {}", case_no);
 
@@ -144,7 +144,7 @@ fn change_basis(rc: &Vector2d<isize>) -> Option<Vector2d<usize>>
     let r = 2 * rc.r() - rc.c();
     let c = 2 * rc.c() - rc.r();
 
-    if r % 3 != 0 || c % 3 != 0 {
+    if r % 3 != 0 || c % 3 != 0 || r < 0 || c < 0 {
         None
     } else {
         Some(Vector2d::with_val(r as usize / 3, c as usize / 3))
