@@ -2,9 +2,7 @@ use codejam::util::bitvec64::BitVec64;
 use codejam::util::codejam::run_cases;
 use codejam::util::vector_2d::Vector2d;
 use num_bigint::BigUint;
-use num_integer::binomial;
-use num_traits::identities::Zero;
-use std::collections::HashMap;
+//use num_integer::binomial;
 use std::io::Write;
 use std::usize;
 
@@ -18,8 +16,13 @@ Lattice walk
 */
 pub fn solve_all_cases()
 {
+    let fac = compute_modular_factorial(MODULUS);
+    let inv = compute_modular_inverse(MODULUS);
+
     run_cases(
-        &["D-small-practice", "D-large-practice"],
+        &["D-small-practice",
+            "D-large-practice"
+        ],
         "y2008round3",
         |reader, buffer| {
             let t = reader.read_int();
@@ -34,8 +37,8 @@ pub fn solve_all_cases()
                     })
                     .collect();
 
-                if case_no != 40 {
-                    //continue;
+                if case_no != 21 {
+                   // continue;
                 }
                 println!("Solving case {}", case_no);
 
@@ -43,7 +46,7 @@ pub fn solve_all_cases()
                     buffer,
                     "Case #{}: {}",
                     case_no,
-                    solve(rocks.as_slice(), n_rows, n_cols)
+                    solve(rocks.as_slice(), n_rows, n_cols, &fac, &inv)
                 )
                 .unwrap();
             }
@@ -51,7 +54,15 @@ pub fn solve_all_cases()
     );
 }
 
-fn solve(rocks_orig: &[Vector2d<isize>], n_rows: isize, n_cols: isize) -> isize
+const MODULUS: usize = 10007;
+
+fn solve(
+    rocks_orig: &[Vector2d<isize>],
+    n_rows: isize,
+    n_cols: isize,
+    fac: &[usize],
+    inv: &[usize],
+) -> isize
 {
     let target = change_basis(&Vector2d::with_val(n_rows - 1, n_cols - 1));
 
@@ -66,12 +77,10 @@ fn solve(rocks_orig: &[Vector2d<isize>], n_rows: isize, n_cols: isize) -> isize
 
     let mut rocks = Vec::new();
 
-    let mut memo: HashMap<(usize, usize), usize> = HashMap::new();
-
     for r in rocks_orig.iter() {
         if let Some(rock) = change_basis(r) {
             //exceeds destination
-            if rock.r() >= n_rows as usize || rock.c() >= n_cols as usize {
+            if rock.r() > target.r() || rock.c() > target.c() {
                 continue;
             }
             rocks.push(rock);
@@ -82,6 +91,8 @@ fn solve(rocks_orig: &[Vector2d<isize>], n_rows: isize, n_cols: isize) -> isize
 
     rocks.insert(0, start);
     rocks.push(target);
+
+    debug!("Rocks {:?}", rocks);
 
     let mut ans = 0;
     //always include target
@@ -98,26 +109,32 @@ fn solve(rocks_orig: &[Vector2d<isize>], n_rows: isize, n_cols: isize) -> isize
                     last = cur;
                     return 0;
                 }
+                assert!(cur != last);
+                assert!(rocks[cur].c() >= rocks[last].c(),
+                        "cur {} last {} {:?} {:?}", cur, last, rocks[cur],
+                rocks[last]);
+
                 let m = rocks[cur].r() - rocks[last].r();
                 let n = rocks[cur].c() - rocks[last].c();
                 last = cur;
-                n_choose_k_mod(m + n, n, 10007, &mut memo)
+                n_choose_k_mod(m + n, n, 10007, fac, inv)
             })
             .fold(1, |acc, w| (acc * w) % 10007);
 
-        // debug!("Rocks {:?} ways {} sign {}", rocks_subset, ways, sign);
+        debug!("Rocks {:0>width$b} ways {} sign {}", bs.data, ways, sign, width=rocks.len());
         ans += 10007 + sign * ways as isize;
     }
     ans % 10007
 }
 
-fn n_choose_k_mod(n: usize, k: usize, p: usize, memo: &mut HashMap<(usize, usize), usize>)
-    -> usize
+fn n_choose_k_mod(
+    n: usize,
+    k: usize,
+    p: usize,
+    fac: &[usize],
+    inv: &[usize]
+) -> usize
 {
-    let key = (n, k);
-    if memo.contains_key(&key) {
-        return memo[&key];
-    }
     let mut n = n;
     let mut k = k;
 
@@ -126,14 +143,30 @@ fn n_choose_k_mod(n: usize, k: usize, p: usize, memo: &mut HashMap<(usize, usize
     while k > 0 {
         let key = (n % p, k % p);
 
-        if memo.contains_key(&key) {
-            product *= memo[&key];
-        } else {
+        //n! / (k! * (n-k)!)
+
+
+        if k % p > n % p {
+            product *= 0;
+
+        }
+        else if k % p == 0 || key.0 == key.1 {
+            product *= 1;
+        }
+        else {
+            let n_fact = fac[n % p];
+            let k_fact = inv[fac[k % p]];
+            let n_sub_k_fact = inv[fac[neg_mod(n,k,p)]];
+
+            let pp = (n_fact * k_fact * n_sub_k_fact) % p;
+            product *= pp;
+
+/*
             let b = biguint_to_usize(
                 &(binomial(BigUint::from(key.0), BigUint::from(key.1)) % BigUint::from(p)),
             );
-            product *= b;
-            memo.insert(key, b);
+
+            assert_eq!(b, pp, "{} choose {}", key.0, key.1);*/
         }
 
         product %= p;
@@ -143,7 +176,7 @@ fn n_choose_k_mod(n: usize, k: usize, p: usize, memo: &mut HashMap<(usize, usize
     }
 
     let ans = product;
-    memo.insert(key, ans);
+    //memo.insert(key, ans);
     ans
 }
 
@@ -174,6 +207,7 @@ fn change_basis(rc: &Vector2d<isize>) -> Option<Vector2d<usize>>
     }
 }
 
+#[allow(dead_code)]
 fn biguint_to_usize(bu: &BigUint) -> usize
 {
     let mut ans = 0usize;
@@ -186,16 +220,31 @@ fn biguint_to_usize(bu: &BigUint) -> usize
 }
 
 //https://cp-algorithms.com/algebra/module-inverse.html
+///Modular inverse 1..m
 fn compute_modular_inverse(m: usize) -> Vec<usize>
 {
     //https://cp-algorithms.com/algebra/module-inverse.html
-    let mut inv = vec![0; m + 1];
+    let mut inv = vec![0; m ];
 
+   // inv[0] = 1;
     inv[1] = 1;
     for i in 2..m {
         inv[i] = (m - (m / i) * inv[m % i] % m) % m;
     }
     inv
+}
+
+///(1..m)
+fn compute_modular_factorial(m: usize) -> Vec<usize>
+{
+    //https://cp-algorithms.com/algebra/module-inverse.html
+    let mut fac = vec![0; m + 1];
+
+    fac[1] = 1;
+    for i in 2..m {
+        fac[i] = (fac[i - 1] * i) % m;
+    }
+    fac
 }
 
 //https://cp-algorithms.com/algebra/module-inverse.html
@@ -206,6 +255,7 @@ fn compute_modular_inverse_1(a: usize, modulus: usize) -> usize
 
 ///Binary power a^b % modulus
 /// Modulus must be prime
+#[allow(dead_code)]
 fn binpow(a: usize, b: usize, modulus: usize) -> usize
 {
     let mut a = a % modulus;
@@ -222,14 +272,18 @@ fn binpow(a: usize, b: usize, modulus: usize) -> usize
 }
 
 //https://stackoverflow.com/questions/9727962/fast-way-to-calculate-n-mod-m-where-m-is-prime
+#[allow(dead_code)]
 fn factorial_mod(n: usize, modulus: usize) -> usize
 {
-    let mut ans:isize = 1;
+    let mut ans: isize = 1;
     if n <= modulus / 2 {
         //#calculate the factorial normally (right argument of range() is exclusive)
         for i in 1..=n {
             ans = (ans * i as isize) % modulus as isize;
         }
+    } else if n >= modulus {
+        //because 1*2*...*modulus*...*n === 0
+        return 0;
     } else {
         //Fancypants method for large n
         for i in n + 1..modulus {
@@ -241,25 +295,79 @@ fn factorial_mod(n: usize, modulus: usize) -> usize
     return (ans % modulus as isize) as usize;
 }
 
+/// (a-b) % m
+fn neg_mod(a: usize, b: usize, m: usize) -> usize
+{
+    let mut a_sub_b = a as isize - b as isize;
+    a_sub_b %= m as isize;
+    if a_sub_b < 0 {
+        a_sub_b += m as isize;
+    }
+    a_sub_b as usize
+}
+
 #[cfg(test)]
 mod test_endless_knight
 {
     use super::*;
     use num_integer::binomial;
 
+    #[test]
+    fn test_n_choose_k()
+    {
+        let modulus = 79 ; //1033; //10007;
+        let fac = compute_modular_factorial(modulus);
+        let inv = compute_modular_inverse(modulus);
+        let p = BigUint::from(modulus);
+
+        //let check_fac
+
+        for n in 1..modulus {
+
+            for k in 2..n {
+                println!("N= {} K={}", n,k);
+                let check = biguint_to_usize(&(binomial(BigUint::from(n),
+                                                        BigUint::from(k)) % &p));
+
+                let n_fact = fac[n ];
+                let k_fact = inv[ fac[k] ];
+                let n_sub_k_fact = inv[ fac[n - k] ];
+
+                assert_eq!(n_fact, factorial_mod(n, modulus));
+                assert_eq!(k_fact, compute_modular_inverse_1(factorial_mod(k, modulus),modulus ), "k_fact wrong");
+                assert_eq!(n_sub_k_fact, compute_modular_inverse_1(factorial_mod(n-k, modulus),modulus ));
+
+                assert_eq!((n_fact * k_fact * n_sub_k_fact) % modulus, check);
+            }
+        }
+    }
 
     #[test]
     fn test_factorial_mod()
     {
-        let prime = 10007;
-        let pu = BigUint::from(prime);
-        let mut f = BigUint::from(1usize);
+        for &prime in [7, 10007].iter() {
+            let pu = BigUint::from(prime);
+            let mut f = BigUint::from(1usize);
 
-        for i in 2..=23 {
-            f *= BigUint::from(i);
-            assert_eq!( biguint_to_usize( &(&f % &pu)), factorial_mod(i, prime));
+            for i in 2..=23 {
+                f *= BigUint::from(i);
+                assert_eq!(biguint_to_usize(&(&f % &pu)), factorial_mod(i, prime));
+            }
         }
     }
+
+    #[test]
+    fn test_modular_inverse_2()
+    {
+        let prime = 10007;
+        let inverse = compute_modular_inverse(prime);
+
+        for i in 1..prime {
+
+            assert_eq!(inverse[i], compute_modular_inverse_1(i, prime));
+        }
+    }
+
     #[test]
     fn test_modular_inverse()
     {
