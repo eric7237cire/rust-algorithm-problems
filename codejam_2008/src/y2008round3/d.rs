@@ -13,7 +13,10 @@ Change of base
 pub fn solve_all_cases()
 {
     run_cases(
-        &["D-small-practice", "D-large-practice"],
+        &[
+            "D-small-practice",
+            //    "D-large-practice"
+        ],
         "y2008round3",
         |reader, buffer| {
             let t = reader.read_int();
@@ -23,13 +26,13 @@ pub fn solve_all_cases()
 
                 let rocks: Vec<Vector2d<isize>> = (0..n_rocks)
                     .map(|_| {
-                        let (r, c):(isize,isize) = reader.read_tuple_2();
+                        let (r, c): (isize, isize) = reader.read_tuple_2();
                         Vector2d::with_val(r - 1, c - 1)
                     })
                     .collect();
 
-                if case_no != 3 {
-                    //continue;
+                if case_no != 4 {
+                    continue;
                 }
                 println!("Solving case {}", case_no);
 
@@ -49,6 +52,8 @@ fn solve(rocks_orig: &[Vector2d<isize>], n_rows: isize, n_cols: isize) -> isize
 {
     let target = change_basis(&Vector2d::with_val(n_rows - 1, n_cols - 1));
 
+    debug!("N rows {} cols {} target {:?}", n_rows, n_cols, target);
+
     if target.is_none() {
         return 0;
     }
@@ -60,6 +65,10 @@ fn solve(rocks_orig: &[Vector2d<isize>], n_rows: isize, n_cols: isize) -> isize
 
     for r in rocks_orig.iter() {
         if let Some(rock) = change_basis(r) {
+            //exceeds destination
+            if rock.r() >= n_rows as usize || rock.c() >= n_cols as usize {
+                continue;
+            }
             rocks.push(rock);
         }
     }
@@ -81,18 +90,21 @@ fn solve(rocks_orig: &[Vector2d<isize>], n_rows: isize, n_cols: isize) -> isize
 
         rocks_subset.sort_by(|a, b| a.c().cmp(&b.c()).then_with(|| b.r().cmp(&a.r())));
 
-        let ways:usize = rocks_subset.windows(2).map(|win| {
-            if win[0].r() > win[1].r() {
-                return 0;
-            }
-            let m = win[1].r() - win[0].r();
-            let n = win[1].c() - win[0].c();
-            n_choose_k_mod(m+n,n,10007)
-        }).sum();
+        let ways: usize = rocks_subset
+            .windows(2)
+            .map(|win| {
+                if win[0].r() > win[1].r() {
+                    return 0;
+                }
+                let m = win[1].r() - win[0].r();
+                let n = win[1].c() - win[0].c();
+                n_choose_k_mod(m + n, n, 10007)
+            })
+            .fold(1, |acc, w| (acc * w) % 10007);
 
-        ans = sign * ways as isize;
+        ans += 10007 + sign * ways as isize;
     }
-    ans
+    ans % 10007
 }
 
 fn n_choose_k_mod(n: usize, k: usize, p: usize) -> usize
