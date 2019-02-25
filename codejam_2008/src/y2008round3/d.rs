@@ -15,7 +15,7 @@ pub fn solve_all_cases()
     run_cases(
         &[
             "D-small-practice",
-            //    "D-large-practice"
+                "D-large-practice"
         ],
         "y2008round3",
         |reader, buffer| {
@@ -31,8 +31,8 @@ pub fn solve_all_cases()
                     })
                     .collect();
 
-                if case_no != 21 {
-                   // continue;
+                if case_no != 40 {
+                    //continue;
                 }
                 println!("Solving case {}", case_no);
 
@@ -88,7 +88,8 @@ fn solve(rocks_orig: &[Vector2d<isize>], n_rows: isize, n_cols: isize) -> isize
         //rocks_subset.push(start);
         //rocks_subset.push(target);
 
-        rocks_subset.sort_by(|a, b| a.c().cmp(&b.c()).then_with(|| b.r().cmp(&a.r())));
+        rocks_subset.sort_by(|a, b|
+            a.c().cmp(&b.c()).then_with(|| a.r().cmp(&b.r())));
 
         rocks_subset.insert(0, start);
         rocks_subset.push(target);
