@@ -20,9 +20,7 @@ pub fn solve_all_cases()
     let inv = compute_modular_inverse(MODULUS);
 
     run_cases(
-        &["D-small-practice",
-            "D-large-practice"
-        ],
+        &["D-small-practice", "D-large-practice"],
         "y2008round3",
         |reader, buffer| {
             let t = reader.read_int();
@@ -38,7 +36,7 @@ pub fn solve_all_cases()
                     .collect();
 
                 if case_no != 21 {
-                   // continue;
+                    // continue;
                 }
                 println!("Solving case {}", case_no);
 
@@ -110,9 +108,14 @@ fn solve(
                     return 0;
                 }
                 assert!(cur != last);
-                assert!(rocks[cur].c() >= rocks[last].c(),
-                        "cur {} last {} {:?} {:?}", cur, last, rocks[cur],
-                rocks[last]);
+                assert!(
+                    rocks[cur].c() >= rocks[last].c(),
+                    "cur {} last {} {:?} {:?}",
+                    cur,
+                    last,
+                    rocks[cur],
+                    rocks[last]
+                );
 
                 let m = rocks[cur].r() - rocks[last].r();
                 let n = rocks[cur].c() - rocks[last].c();
@@ -121,20 +124,20 @@ fn solve(
             })
             .fold(1, |acc, w| (acc * w) % MODULUS);
 
-        debug!("Rocks {:0>width$b} ways {} sign {}", bs.data, ways, sign, width=rocks.len());
+        debug!(
+            "Rocks {:0>width$b} ways {} sign {}",
+            bs.data,
+            ways,
+            sign,
+            width = rocks.len()
+        );
         ans += 10007 + sign * ways as isize;
     }
     ans % 10007
 }
 
 //Uses lucas theorum and modular inversese
-fn n_choose_k_mod(
-    n: usize,
-    k: usize,
-    p: usize,
-    fac: &[usize],
-    inv: &[usize]
-) -> usize
+fn n_choose_k_mod(n: usize, k: usize, p: usize, fac: &[usize], inv: &[usize]) -> usize
 {
     let mut n = n;
     let mut k = k;
@@ -143,23 +146,20 @@ fn n_choose_k_mod(
     while k > 0 {
         let key = (n % p, k % p);
 
-
         if key.1 > key.0 {
             product *= 0;
-        }
-        else if key.1 == 0 || key.0 == key.1 {
+        } else if key.1 == 0 || key.0 == key.1 {
             product *= 1;
-        }
-        else {
+        } else {
             //n! / (k! * (n-k)!)
             let n_fact = fac[n % p];
             let k_fact = inv[fac[k % p]];
-            let n_sub_k_fact = inv[fac[neg_mod(n,k,p)]];
+            let n_sub_k_fact = inv[fac[neg_mod(n, k, p)]];
 
             let pp = (n_fact * k_fact * n_sub_k_fact) % p;
             product *= pp;
 
-/*
+            /*
             let b = biguint_to_usize(
                 &(binomial(BigUint::from(key.0), BigUint::from(key.1)) % BigUint::from(p)),
             );
@@ -220,9 +220,9 @@ fn biguint_to_usize(bu: &BigUint) -> usize
 fn compute_modular_inverse(m: usize) -> Vec<usize>
 {
     //https://cp-algorithms.com/algebra/module-inverse.html
-    let mut inv = vec![0; m ];
+    let mut inv = vec![0; m];
 
-   // inv[0] = 1;
+    // inv[0] = 1;
     inv[1] = 1;
     for i in 2..m {
         inv[i] = (m - (m / i) * inv[m % i] % m) % m;
@@ -311,7 +311,7 @@ mod test_endless_knight
     #[test]
     fn test_n_choose_k()
     {
-        let modulus = 79 ; //1033; //10007;
+        let modulus = 79; //1033; //10007;
         let fac = compute_modular_factorial(modulus);
         let inv = compute_modular_inverse(modulus);
         let p = BigUint::from(modulus);
@@ -319,19 +319,24 @@ mod test_endless_knight
         //let check_fac
 
         for n in 1..modulus {
-
             for k in 2..n {
-                println!("N= {} K={}", n,k);
-                let check = biguint_to_usize(&(binomial(BigUint::from(n),
-                                                        BigUint::from(k)) % &p));
+                println!("N= {} K={}", n, k);
+                let check = biguint_to_usize(&(binomial(BigUint::from(n), BigUint::from(k)) % &p));
 
-                let n_fact = fac[n ];
-                let k_fact = inv[ fac[k] ];
-                let n_sub_k_fact = inv[ fac[n - k] ];
+                let n_fact = fac[n];
+                let k_fact = inv[fac[k]];
+                let n_sub_k_fact = inv[fac[n - k]];
 
                 assert_eq!(n_fact, factorial_mod(n, modulus));
-                assert_eq!(k_fact, compute_modular_inverse_1(factorial_mod(k, modulus),modulus ), "k_fact wrong");
-                assert_eq!(n_sub_k_fact, compute_modular_inverse_1(factorial_mod(n-k, modulus),modulus ));
+                assert_eq!(
+                    k_fact,
+                    compute_modular_inverse_1(factorial_mod(k, modulus), modulus),
+                    "k_fact wrong"
+                );
+                assert_eq!(
+                    n_sub_k_fact,
+                    compute_modular_inverse_1(factorial_mod(n - k, modulus), modulus)
+                );
 
                 assert_eq!((n_fact * k_fact * n_sub_k_fact) % modulus, check);
             }
@@ -359,7 +364,6 @@ mod test_endless_knight
         let inverse = compute_modular_inverse(prime);
 
         for i in 1..prime {
-
             assert_eq!(inverse[i], compute_modular_inverse_1(i, prime));
         }
     }

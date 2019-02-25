@@ -84,6 +84,14 @@ pub fn run_y2008_round3()
     y2008round3::d::solve_all_cases();
 }
 
+pub fn run_y2008_round_apac()
+{
+    y2008round_apac::a::solve_all_cases();
+    y2008round_apac::b::solve_all_cases();
+    y2008round_apac::c::solve_all_cases();
+    y2008round_apac::d::solve_all_cases();
+}
+
 fn main()
 {
     init_log();
