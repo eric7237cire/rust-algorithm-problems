@@ -9,14 +9,15 @@ use std::io::Write;
 
 /*
 Grid
-Dijkstras / priority queue (using negative to make it a min queue)
+Simulation
+Brute force
 
 */
 pub fn solve_all_cases()
 {
     run_cases(
         &["B-small-practice",
-        //    "B-large-practice"
+            "B-large-practice"
         ],
         "y2008round_apac",
         |reader, buffer| {
@@ -36,8 +37,8 @@ pub fn solve_all_cases()
                     }
                 }
 
-                if case_no != 1 {
-                     continue;
+                if case_no != 4 {
+                     //continue;
                 }
                 println!("Solving case {}", case_no);
 
@@ -46,7 +47,7 @@ pub fn solve_all_cases()
                     "Case #{}: {}",
                     case_no,
                     if let Some(ans) = solve(my_loc.convert(), &grid) {
-                        ans.to_string()
+                        ans.to_string() + " day(s)"
                     } else {
                         "forever".to_string()
                     }
@@ -88,11 +89,12 @@ fn do_turn(
             }
 
             let strongest_neighbor = DIRECTIONS
-                .iter()
-                .filter_map(|dir| {
+                .iter().enumerate()
+                .filter_map(|(idx, dir)| {
                     let sq = cur_loc + dir;
                     if let Some(power) = grid.get_value(&sq) {
-                       Some( (*power, sq) )
+                        //-idx is to break ties by DIRECTIONS index
+                       Some( (*power, 5-idx, sq) )
                     } else {
                         None
                     }
@@ -101,7 +103,7 @@ fn do_turn(
 
             ret = ret || strongest_neighbor.0 > 0;
 
-            diffs[&strongest_neighbor.1] -= strongest_neighbor.0;
+            diffs[&strongest_neighbor.2] -= grid[&cur_loc];
         }
     }
 
@@ -155,6 +157,7 @@ fn solve(me_location: Vector2d<isize>, grid: &Grid<isize>) -> Option<isize>
             << " turns: " << item.first
             << " Attacking: " << *adj_it);*/
             let did_move = do_turn(me_location, Some(*attack_dir), &mut new_grid);
+            debug!("After attacking in dir {:?} grid \n{:#.3?} Alive: {}", attack_dir, new_grid, item.0);
             q.push_back((item.0 + 1, new_grid));
             if !did_move {
                 return None;
@@ -165,7 +168,7 @@ fn solve(me_location: Vector2d<isize>, grid: &Grid<isize>) -> Option<isize>
 
         //LOG_STR("Before doing nothing: " << *newGrid);
         let did_move = do_turn(me_location,None,&mut new_grid);
-        debug!("After doing nothing: \n{:#.3?}", new_grid);
+        debug!("After doing nothing: \n{:#.3?}\nAlive {}", new_grid, item.0);
         q.push_back( (item.0 + 1, new_grid));
         //LOG_OFF();
         //LOG_STR();
