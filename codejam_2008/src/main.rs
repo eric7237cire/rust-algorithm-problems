@@ -96,7 +96,7 @@ fn main()
 {
     init_log();
 
-    y2008round_apac::b::solve_all_cases();
+    y2008round_apac::c::solve_all_cases();
 
     /*   run_y2008_round_qual();
     run_y2008_round_practice();

@@ -1,8 +1,7 @@
-use bit_vec::BitVec;
 use codejam::util::codejam::run_cases;
-use codejam::util::vector_2d::Vector2d;
 use std::io::Write;
 use std::usize;
+use std::cmp::Ordering::Less;
 
 /*
 TODO
@@ -11,21 +10,15 @@ pub fn solve_all_cases()
 {
     run_cases(
         &["C-small-practice", "C-large-practice"],
-        "y2008round3",
+        "y2008round_apac",
         |reader, buffer| {
             let t = reader.read_int();
 
             for case_no in 1..=t {
-                let (n_rows, n_cols) = reader.read_tuple_2();
-
-                let mut chairs = BitVec::from_elem(n_cols * n_rows, false);
-
-                for r in 0..n_rows {
-                    for (c, ch) in reader.read_chars(n_cols).into_iter().enumerate() {
-                        let idx = r * n_cols + c;
-                        chairs.set(idx, ch == '.');
-                    }
-                }
+                let in_str = reader.read_string_line();
+                let m : usize = in_str[0].parse().unwrap();
+                let p : f64 = in_str[1].parse().unwrap();
+                let x : usize = in_str[2].parse().unwrap();
 
                 if case_no != 3 {
                     //continue;
@@ -34,9 +27,9 @@ pub fn solve_all_cases()
 
                 writeln!(
                     buffer,
-                    "Case #{}: {}",
+                    "Case #{}: {:.7}",
                     case_no,
-                    solve(&chairs, n_rows, n_cols)
+                    solve(m,p,x)
                 )
                 .unwrap();
             }
@@ -44,22 +37,40 @@ pub fn solve_all_cases()
     );
 }
 
-const INVALID: usize = usize::MAX;
+fn solve(num_rounds: usize, p: f64, x: usize) -> f64
+{
+    let mut round_prob = vec![ vec![0.0; 1 << (num_rounds+1)]; num_rounds+1];
 
-fn index_to_vec(idx: usize, n_cols: usize) -> Vector2d<isize>
-{
-    Vector2d::with_val((idx / n_cols) as isize, (idx % n_cols) as isize)
-}
-fn vec_to_index(v: &Vector2d<isize>, n_cols: usize) -> usize
-{
-    v.r() as usize * n_cols + v.c() as usize
-}
-fn vec_comp_to_index(r: isize, c: isize, n_cols: usize) -> usize
-{
-    r as usize * n_cols + c as usize
+    round_prob[0][1] = 1.;
+    round_prob[0][0] = 0.;
+
+  for m in 1..=num_rounds
+  {
+	  let last_round_max = (1 << m-1) + 1;
+	  //Combine rounds
+	  for high_index in 0..last_round_max
+	  {
+		  //Copy over rounds
+		  round_prob[m][high_index * 2] = fmax(round_prob[m][high_index * 2], round_prob[m-1][high_index]);
+
+		  for low_index in 0..high_index
+		  {
+			  let this_round_idx = high_index + low_index;
+			  round_prob[m][this_round_idx] = fmax(round_prob[m][this_round_idx], p * round_prob[m-1][high_index] + (1.-p) * round_prob[m-1][low_index]);
+		  }
+	  }	  
+  }
+      
+  round_prob[num_rounds][(x as f64 / (1000000.0 / (1 << num_rounds) as f64)) as usize]
+  
 }
 
-fn solve(chairs: &BitVec, n_rows: usize, n_cols: usize) -> usize
+
+fn fmax(a: f64, b: f64) -> f64
 {
-    3
+    if a.partial_cmp(&b).unwrap() == Less {
+        b
+    } else {
+        a
+    }
 }

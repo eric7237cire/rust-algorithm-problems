@@ -18,6 +18,16 @@ pub fn solve_all_cases()
 
             for case_no in 1..=t {
 
+let n = reader.read_int();
+                let prereq: Vec<usize> = reader.read_num_line();
+                assert_eq!(n, prereq.len());
+
+                let course_chars = reader.read_chars(n);
+
+                let m = reader.read_int();
+
+                let words: Vec<String> = (0..m).map( |_| reader.read_string() ).collect();
+
 
                 if case_no > 3 {
                     // continue;
@@ -29,7 +39,7 @@ pub fn solve_all_cases()
                     buffer,
                     "Case #{}: {}",
                     case_no,
-                    solve() //solve_brute_force(K, &prob)
+                    solve(&prereq, &course_chars, &words)
                 )
                 .unwrap();
             }
@@ -37,7 +47,7 @@ pub fn solve_all_cases()
     );
 }
 
-fn solve() -> i32
+fn solve(prereq: &[usize], course_chars: &[char], words: &[String]) -> i32
 {
     3
 }
