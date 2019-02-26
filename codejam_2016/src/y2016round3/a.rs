@@ -51,5 +51,5 @@ fn solve(s: &str) -> usize
 
     }
 
-    score + 5 * stack.len() / 2
+    score + 5 * (stack.len() / 2)
 }
