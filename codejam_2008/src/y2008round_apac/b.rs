@@ -15,7 +15,9 @@ Dijkstras / priority queue (using negative to make it a min queue)
 pub fn solve_all_cases()
 {
     run_cases(
-        &["B-small-practice", "B-large-practice"],
+        &["B-small-practice",
+        //    "B-large-practice"
+        ],
         "y2008round_apac",
         |reader, buffer| {
             let t = reader.read_int();
@@ -35,7 +37,7 @@ pub fn solve_all_cases()
                 }
 
                 if case_no != 1 {
-                    // continue;
+                     continue;
                 }
                 println!("Solving case {}", case_no);
 
@@ -133,7 +135,11 @@ fn solve(me_location: Vector2d<isize>, grid: &Grid<isize>) -> Option<isize>
             continue;
         }
 
-        debug!("Grid off stack: Turns: {}", item.0);
+        debug!("Grid off stack: \n{:#.3?}\nTurns: {} my loc: {:?}",
+               item.1,
+               item.0,
+            me_location
+        );
         max_t = cmp::max(max_t, item.0);
 
         for attack_dir in DIRECTIONS.iter() {
@@ -159,9 +165,11 @@ fn solve(me_location: Vector2d<isize>, grid: &Grid<isize>) -> Option<isize>
 
         //LOG_STR("Before doing nothing: " << *newGrid);
         let did_move = do_turn(me_location,None,&mut new_grid);
+        debug!("After doing nothing: \n{:#.3?}", new_grid);
         q.push_back( (item.0 + 1, new_grid));
         //LOG_OFF();
-        //LOG_STR("After doing nothing: " << *newGrid);
+        //LOG_STR();
+
         //LOG(item.first + 1);
         //return;
         if !did_move {
