@@ -6,6 +6,7 @@ use crate::util::vector_2d::Vector2d;
 use num_integer::Integer;
 use num_traits::NumCast;
 
+#[derive(Clone)]
 pub struct Grid<T>
 {
     pub data: Vec<T>,
@@ -223,6 +224,13 @@ impl<T> IndexMut<&Vector2d<i64>> for Grid<T>
     fn index_mut<'a>(&'a mut self, row_col_index: &Vector2d<i64>) -> &'a mut T
     {
         &mut self.data[ (row_col_index.data[0] * self.C as i64 + row_col_index.data[1] ) as usize ]
+    }
+}
+impl<T> IndexMut<&Vector2d<isize>> for Grid<T>
+{
+    fn index_mut<'a>(&'a mut self, row_col_index: &Vector2d<isize>) -> &'a mut T
+    {
+        &mut self.data[ (row_col_index.data[0] * self.C as isize + row_col_index.data[1] ) as usize ]
     }
 }
 impl<T> IndexMut<&Vector2d<usize>> for Grid<T>

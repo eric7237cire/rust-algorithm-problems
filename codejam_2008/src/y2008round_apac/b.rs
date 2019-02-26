@@ -1,12 +1,11 @@
-use bit_set::BitSet;
 use codejam::util::codejam::run_cases;
 use codejam::util::grid::constants::*;
 use codejam::util::grid::Grid;
 use codejam::util::vector_2d::Vector2d;
-use std::cmp::min;
-use std::collections::BinaryHeap;
+//use itertools::max;
+use std::cmp;
+use std::collections::VecDeque;
 use std::io::Write;
-use std::usize;
 
 /*
 Grid
@@ -25,10 +24,9 @@ pub fn solve_all_cases()
                 let nums = reader.read_num_line();
                 let n_cols = nums[0];
                 let n_rows = nums[1];
-                let my_loc = Vector2d::with_val(nums[2], nums[3]);
+                let my_loc = Vector2d::with_val(nums[3]-1, nums[2]-1);
 
                 let mut grid = Grid::new(n_rows, n_cols);
-
 
                 for r in 0..n_rows {
                     for (c, power) in reader.read_num_line().into_iter().enumerate() {
@@ -45,10 +43,10 @@ pub fn solve_all_cases()
                     buffer,
                     "Case #{}: {}",
                     case_no,
-                    if let Some(ans) = solve(&grid, &start, &stop) {
+                    if let Some(ans) = solve(my_loc.convert(), &grid) {
                         ans.to_string()
                     } else {
-                        "THE CAKE IS A LIE".to_string()
+                        "forever".to_string()
                     }
                 )
                 .unwrap();
@@ -57,104 +55,119 @@ pub fn solve_all_cases()
     );
 }
 
-const DIRECTIONS: [Vector2d<isize>; 4] = [NORTH, EAST, SOUTH, WEST];
-
-const CLOSEST_WALL_INDEX: usize = 4;
-
-fn solve(grid: &Grid<char>, start: &Vector2d<isize>, stop: &Vector2d<isize>) -> Option<isize>
+fn do_turn(
+    me_location: Vector2d<isize>,
+    attack_dir: Option<Vector2d<isize>>,
+    grid: &mut Grid<isize>,
+) -> bool
 {
-    debug!("Grid\n{:#.4?}\n", grid);
+    let mut diffs: Grid<isize> = Grid::new(grid.R, grid.C);
+    let mut ret = false;
 
-    //precompute 5 values, closest wall in 4 directions, then closest wall absolutely
-    let mut nearest_dir: Grid<[usize; 5]> = Grid::new(grid.R, grid.C);
+    let mut cur_loc = Vector2d::with_val(0isize, 0);
 
-    for c in nearest_dir.data.iter_mut() {
-        c[4] = usize::MAX;
-    }
+    for r in 0..grid.R as isize {
+        cur_loc.data[0] = r;
+        for c in 0..grid.C as isize {
+            cur_loc.data[1] = c;
 
-    for rr in 0..grid.R {
-        for cc in 0..grid.C {
-            //start from top/left corner or bottom/right corner.
-            for &(r, c, dir_start) in [(rr, grid.C - 1 - cc, 0), (grid.R - 1 - rr, cc, 2)].iter() {
-                let coord = Vector2d::with_val(r as isize, c as isize);
-                for (dir_idx, dir) in DIRECTIONS.iter().enumerate().skip(dir_start).take(2) {
-                    for &dd_idx in [dir_idx, CLOSEST_WALL_INDEX].iter() {
-                        let val = if grid[&coord] == '#' {
-                            0
-                        } else if let Some(d) = nearest_dir.get_value(&(coord + dir)) {
-                            1 + d[dd_idx]
-                        } else {
-                            1
-                        };
-                        let m_val = nearest_dir.data[r * grid.C + c].get_mut(dd_idx).unwrap();
-                        if dd_idx == CLOSEST_WALL_INDEX {
-                            *m_val = min(*m_val, val);
-                        } else {
-                            *m_val = val;
-                        }
+            if cur_loc == me_location {
+                if attack_dir.is_some() {
+                    let adj_loc = cur_loc + attack_dir.unwrap();
+                    if let Some(_attack_square) = grid.get_value(&adj_loc) {
+                        diffs[&adj_loc] -= grid[&me_location];
                     }
                 }
+                continue;
             }
+
+            if grid[&cur_loc] <= 0 {
+                continue;
+            }
+
+            let strongest_neighbor = DIRECTIONS
+                .iter()
+                .filter_map(|dir| {
+                    let sq = cur_loc + dir;
+                    if let Some(power) = grid.get_value(&sq) {
+                       Some( (*power, sq) )
+                    } else {
+                        None
+                    }
+                })
+                .max().unwrap();
+
+            ret = ret || strongest_neighbor.0 > 0;
+
+            diffs[&strongest_neighbor.1] -= strongest_neighbor.0;
         }
     }
 
-    for r in 0..grid.R {
-        for c in 0..grid.C {
-            debug!(
-                "For r {} c {} --> NESW near {:?}",
-                r,
-                c,
-                nearest_dir[(r, c)]
-            );
+    //cout << "Diffs\n" << diffs;
+
+    for r in 0..grid.R as isize{
+        cur_loc.data[0] = r;
+        for c in 0..grid.C as isize {
+            cur_loc.data[1] = c;
+            grid[&cur_loc] = cmp::max(0, grid[&cur_loc] + diffs[&cur_loc]);
         }
     }
 
-    let mut pq: BinaryHeap<(isize, Vector2d<isize>)> = BinaryHeap::new();
-    let mut visited = BitSet::new();
-    pq.push((0, start.clone()));
+    ret
+}
 
-    while let Some(node) = pq.pop() {
-        let cur = node.1;
-        let idx = cur.r() as usize * grid.C + cur.c() as usize;
-        debug!("Cur is {:?} idx is {}", cur, idx);
+const DIRECTIONS: [Vector2d<isize>; 4] = [NORTH, WEST, EAST, SOUTH];
 
-        let cost = node.0;
-        if visited.contains(idx) {
+
+fn solve(me_location: Vector2d<isize>, grid: &Grid<isize>) -> Option<isize>
+{
+    let mut q: VecDeque< (isize, Grid<isize>) > = VecDeque::new();
+    q.push_back((0, grid.clone()));
+    let mut max_t = 0;
+
+    while let Some(item) = q.pop_front() {
+        let item_grid: &Grid<isize> = &item.1;
+
+        //we are dead
+        if item_grid[&me_location] <= 0 {
             continue;
         }
-        if &cur == stop {
-            return Some(-cost);
+
+        debug!("Grid off stack: Turns: {}", item.0);
+        max_t = cmp::max(max_t, item.0);
+
+        for attack_dir in DIRECTIONS.iter() {
+            if let Some(attack_val) = item_grid.get_value(&(me_location + attack_dir)) {
+                if *attack_val <= 0 {
+                    continue;
+                }
+            } else {
+                continue;
+            }
+            let mut new_grid: Grid<isize> = item_grid.clone();
+            /*LOG_STR("Grid before: " << *newGrid
+            << " turns: " << item.first
+            << " Attacking: " << *adj_it);*/
+            let did_move = do_turn(me_location, Some(*attack_dir), &mut new_grid);
+            q.push_back((item.0 + 1, new_grid));
+            if !did_move {
+                return None;
+            }
         }
-        visited.insert(idx);
 
-        for (dir_idx, dir) in DIRECTIONS.iter().enumerate() {
-            let d = nearest_dir[idx][dir_idx];
-            //either we walk
-            if d > 0 && grid.get_value(&(cur + dir)).is_some() {
-                debug!(
-                    "Walking Cur is {:?} adding {:?} for dir {}",
-                    cur,
-                    cur + dir,
-                    dir_idx
-                );
+        let mut new_grid: Grid<isize> = item_grid.clone();
 
-                pq.push((cost - 1, cur + dir));
-            }
-            //or shoot a portal and go to the closest wall to teleport to it
-            if d > 1 {
-                debug!(
-                    "Cur is {:?} adding {:?} for dir {}",
-                    cur,
-                    cur + &(dir * (d - 1) as isize),
-                    dir_idx
-                );
-                pq.push((
-                    cost - nearest_dir[idx][CLOSEST_WALL_INDEX] as isize,
-                    cur + &(dir * (d - 1) as isize),
-                ));
-            }
+        //LOG_STR("Before doing nothing: " << *newGrid);
+        let did_move = do_turn(me_location,None,&mut new_grid);
+        q.push_back( (item.0 + 1, new_grid));
+        //LOG_OFF();
+        //LOG_STR("After doing nothing: " << *newGrid);
+        //LOG(item.first + 1);
+        //return;
+        if !did_move {
+            return None;
         }
     }
 
-    None
+    Some(max_t)
 }
