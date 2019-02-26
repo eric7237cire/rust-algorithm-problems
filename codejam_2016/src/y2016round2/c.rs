@@ -101,8 +101,8 @@ fn next_dir_loc(loc: &GardenLocation, is_forward_slash: bool) -> GardenLocation
 struct Lover
 {
     number: usize,
-    location: Vector2d<i64>,
-    initial_direction: &'static Vector2d<i64>,
+    location: Vector2d<isize>,
+    initial_direction: &'static Vector2d<isize>,
 }
 
 #[derive(Debug)]
@@ -117,15 +117,15 @@ struct LoverPair
 #[derive(Ord, PartialOrd, PartialEq, Eq, Hash, Copy, Clone)]
 struct GardenLocation
 {
-    grid_loc: Vector2d<i64>,
-    entry_dir: Vector2d<i64>,
+    grid_loc: Vector2d<isize>,
+    entry_dir: Vector2d<isize>,
 }
 
 #[derive(Eq, PartialEq, Copy, Clone)]
 struct HeapNode
 {
     distance_to_filled_edge: usize,
-    distance_to_lmid: i64,
+    distance_to_lmid: isize,
     loc: GardenLocation,
 }
 
@@ -171,7 +171,7 @@ fn compute_distance_grid(R: usize, C: usize, grid: &Grid<String>) -> Grid<usize>
             if grid[(r, c)] == "\\" || grid[(r, c)] == "/" {
                 grid_edge_dist[(r, c)] = 0;
             } else {
-                let loc = Vector2d::with_val(r as i64, c as i64);
+                let loc = Vector2d::with_val(r as isize, c as isize);
                 grid_edge_dist[&loc] = usize::MAX;
                 for dir in DIRECTIONS.iter() {
                     grid_edge_dist[&loc] =
@@ -182,7 +182,7 @@ fn compute_distance_grid(R: usize, C: usize, grid: &Grid<String>) -> Grid<usize>
     }
     for r in (1..=R ).rev() {
         for c in (1..=C ).rev() {
-            let loc = Vector2d::with_val(r as i64, c as i64);
+            let loc = Vector2d::with_val(r as isize, c as isize);
 
             for dir in DIRECTIONS.iter() {
                 grid_edge_dist[&loc] = min(grid_edge_dist[&loc], 1 + grid_edge_dist[&(loc + dir)]);
@@ -204,7 +204,7 @@ fn get_lovers(R: usize, C: usize, grid: &mut Grid<String> ) -> Vec<Lover>
 
         lovers.push(Lover {
             number: label + 1,
-            location: Vector2d::with_val(r as i64, c as i64),
+            location: Vector2d::with_val(r as isize, c as isize),
             initial_direction: initial_dir,
         });
     };
@@ -258,7 +258,7 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
         let L1 = lovers.iter().find(|lov| lov.number == L1_num).unwrap();
         let L2 = lovers.iter().find(|lov| lov.number == L2_num).unwrap();
 
-        let diff = (L1_num as i64 - L2_num as i64).abs() as usize;
+        let diff = (L1_num as isize - L2_num as isize).abs() as usize;
         let clock_dist = min(diff, 2 * (R + C) - diff);
 
         let Lmid_num = if clock_dist == diff {
@@ -341,9 +341,9 @@ fn solve(R: usize, C: usize, lover_pairings: &[usize]) -> String
             }
 
             if heap_node.loc.grid_loc.r() == 0
-                || heap_node.loc.grid_loc.r() == R as i64 + 1
+                || heap_node.loc.grid_loc.r() == R as isize + 1
                 || heap_node.loc.grid_loc.c() == 0
-                || heap_node.loc.grid_loc.c() == C as i64 + 1
+                || heap_node.loc.grid_loc.c() == C as isize + 1
             {
                 //we are out of bounds in the arms of another lover
                 continue;
