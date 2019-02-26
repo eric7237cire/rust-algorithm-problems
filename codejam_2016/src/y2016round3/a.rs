@@ -41,6 +41,7 @@ fn solve(s: &str) -> usize
     let mut score = 0;
     for ch in s.chars() {
         if let Some(top) = stack.last() {
+            //always beneficial to greedily make 10 points
             if *top == ch {
                 score += 10;
                 stack.pop();

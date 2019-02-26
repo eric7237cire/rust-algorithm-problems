@@ -90,7 +90,6 @@ mod test_2016_qual_d
 {
     use super::*;
     use std::mem;
-
     fn generate_sequence(C: u8, initial_seq: &[char]) -> Vec<char>
     {
         let K = initial_seq.len();
