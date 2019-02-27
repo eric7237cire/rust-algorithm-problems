@@ -16,9 +16,7 @@ Brute force
 pub fn solve_all_cases()
 {
     run_cases(
-        &["B-small-practice",
-            "B-large-practice"
-        ],
+        &["B-small-practice", "B-large-practice"],
         "y2008round_apac",
         |reader, buffer| {
             let t = reader.read_int();
@@ -27,7 +25,7 @@ pub fn solve_all_cases()
                 let nums = reader.read_num_line();
                 let n_cols = nums[0];
                 let n_rows = nums[1];
-                let my_loc = Vector2d::with_val(nums[3]-1, nums[2]-1);
+                let my_loc = Vector2d::with_val(nums[3] - 1, nums[2] - 1);
 
                 let mut grid = Grid::new(n_rows, n_cols);
 
@@ -38,7 +36,7 @@ pub fn solve_all_cases()
                 }
 
                 if case_no != 4 {
-                     //continue;
+                    //continue;
                 }
                 println!("Solving case {}", case_no);
 
@@ -89,17 +87,19 @@ fn do_turn(
             }
 
             let strongest_neighbor = DIRECTIONS
-                .iter().enumerate()
+                .iter()
+                .enumerate()
                 .filter_map(|(idx, dir)| {
                     let sq = cur_loc + dir;
                     if let Some(power) = grid.get_value(&sq) {
                         //-idx is to break ties by DIRECTIONS index
-                       Some( (*power, 5-idx, sq) )
+                        Some((*power, 5 - idx, sq))
                     } else {
                         None
                     }
                 })
-                .max().unwrap();
+                .max()
+                .unwrap();
 
             ret = ret || strongest_neighbor.0 > 0;
 
@@ -109,7 +109,7 @@ fn do_turn(
 
     //cout << "Diffs\n" << diffs;
 
-    for r in 0..grid.R as isize{
+    for r in 0..grid.R as isize {
         cur_loc.data[0] = r;
         for c in 0..grid.C as isize {
             cur_loc.data[1] = c;
@@ -122,10 +122,9 @@ fn do_turn(
 
 const DIRECTIONS: [Vector2d<isize>; 4] = [NORTH, WEST, EAST, SOUTH];
 
-
 fn solve(me_location: Vector2d<isize>, grid: &Grid<isize>) -> Option<isize>
 {
-    let mut q: VecDeque< (isize, Grid<isize>) > = VecDeque::new();
+    let mut q: VecDeque<(isize, Grid<isize>)> = VecDeque::new();
     q.push_back((0, grid.clone()));
     let mut max_t = 0;
 
@@ -137,10 +136,9 @@ fn solve(me_location: Vector2d<isize>, grid: &Grid<isize>) -> Option<isize>
             continue;
         }
 
-        debug!("Grid off stack: \n{:#.3?}\nTurns: {} my loc: {:?}",
-               item.1,
-               item.0,
-            me_location
+        debug!(
+            "Grid off stack: \n{:#.3?}\nTurns: {} my loc: {:?}",
+            item.1, item.0, me_location
         );
         max_t = cmp::max(max_t, item.0);
 
@@ -157,7 +155,10 @@ fn solve(me_location: Vector2d<isize>, grid: &Grid<isize>) -> Option<isize>
             << " turns: " << item.first
             << " Attacking: " << *adj_it);*/
             let did_move = do_turn(me_location, Some(*attack_dir), &mut new_grid);
-            debug!("After attacking in dir {:?} grid \n{:#.3?} Alive: {}", attack_dir, new_grid, item.0);
+            debug!(
+                "After attacking in dir {:?} grid \n{:#.3?} Alive: {}",
+                attack_dir, new_grid, item.0
+            );
             q.push_back((item.0 + 1, new_grid));
             if !did_move {
                 return None;
@@ -167,9 +168,9 @@ fn solve(me_location: Vector2d<isize>, grid: &Grid<isize>) -> Option<isize>
         let mut new_grid: Grid<isize> = item_grid.clone();
 
         //LOG_STR("Before doing nothing: " << *newGrid);
-        let did_move = do_turn(me_location,None,&mut new_grid);
+        let did_move = do_turn(me_location, None, &mut new_grid);
         debug!("After doing nothing: \n{:#.3?}\nAlive {}", new_grid, item.0);
-        q.push_back( (item.0 + 1, new_grid));
+        q.push_back((item.0 + 1, new_grid));
         //LOG_OFF();
         //LOG_STR();
 

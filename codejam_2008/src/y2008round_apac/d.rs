@@ -13,26 +13,18 @@ pub fn solve_all_cases()
             let t = reader.read_int();
 
             for case_no in 1..=t {
-
                 if case_no != 21 {
                     // continue;
                 }
                 println!("Solving case {}", case_no);
 
-                writeln!(
-                    buffer,
-                    "Case #{}: {}",
-                    case_no,
-                    solve()
-                )
-                .unwrap();
+                writeln!(buffer, "Case #{}: {}", case_no, solve()).unwrap();
             }
         },
     );
 }
 
-fn solve(
-) -> isize
+fn solve() -> isize
 {
-3
+    3
 }
