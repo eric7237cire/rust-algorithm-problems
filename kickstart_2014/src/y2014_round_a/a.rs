@@ -53,7 +53,7 @@ fn solve(seq: &[usize]) -> String
     let mut found_broken = 0;
     let mut next_idx = 0;
 
-    for start in 0..SEQ_0_9.len() {
+'outer_loop:    for start in 0..SEQ_0_9.len() {
         for broken_seg in 0..1 << 7 {
             let mut digit_ok = true;
 
@@ -80,7 +80,7 @@ fn solve(seq: &[usize]) -> String
             if digit_ok && found {
                 //must be unique
                 found = false;
-                break;
+                break 'outer_loop;
             }
             if digit_ok && !found {
                 found = true;
