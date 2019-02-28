@@ -7,14 +7,13 @@ extern crate log;
 
 use codejam::util::log::init_log;
 
-pub fn run_y2008_round_qual()
+pub fn run_y2014_round_a()
 {
-    y2008qual::a::solve_all_cases();
-    y2008qual::b::solve_all_cases();
-    y2008qual::c::solve_all_cases();
+    y2014_round_a::a::solve_all_cases();
 }
 
-fn main() {
-    println!("Hello, world!");
+fn main()
+{
+    init_log();
+    y2014_round_a::a::solve_all_cases();
 }
-
