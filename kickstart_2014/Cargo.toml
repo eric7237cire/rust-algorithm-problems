@@ -1,0 +1,10 @@
+[package]
+name = "kickstart_2014"
+version = "0.1.0"
+authors = ["eric7237cire <eric7237cire@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+rust-algorithm-problems = { path = "../codejam" }
+log = {version = "*", features = ["max_level_debug", "release_max_level_warn"] }
+itertools = "*"
