@@ -11,9 +11,7 @@ use std::usize;
 pub fn solve_all_cases()
 {
     run_cases(
-        &[
-            "A-sample",     "A-small-practice", "A-large-practice"
-        ],
+        &["A-sample", "A-small-practice", "A-large-practice"],
         "y2014_round_a",
         |reader, buffer| {
             let t = reader.read_int();
@@ -31,7 +29,7 @@ pub fn solve_all_cases()
                 assert_eq!(n, seq.len());
 
                 if case_no != 1 {
-                     //continue;
+                    //continue;
                 }
 
                 //println!("Solving case {}", case_no);
@@ -52,16 +50,15 @@ fn solve(seq: &[usize]) -> String
     let mut found = false;
     let mut found_next = 0;
 
-'outer_loop:    for start in 0..SEQ_0_9.len() {
-    debug!("Starting at {}", start);
-       // for broken_seg in 0..1 << 7 {
-     for broken_seg in 0..1 << 7 {
+    'outer_loop: for start in 0..SEQ_0_9.len() {
+        debug!("Starting at {}", start);
+
+        for broken_seg in 0..1 << 7 {
             debug!("Broken segment {:0>7b}", broken_seg);
             let mut digit_ok = true;
 
-            for ((idx, &check_digit), &test_seq_digit) in SEQ_0_9
+            for ( &check_digit, &test_seq_digit) in SEQ_0_9
                 .iter()
-                .enumerate()
                 .rev()
                 .cycle()
                 .skip(start)
@@ -70,8 +67,8 @@ fn solve(seq: &[usize]) -> String
             {
                 debug!(
                     "Looking at check digit {:0>7b} test digit {:0>7b} \
-                    with broken {:0>7b} idx {}",
-                    check_digit, test_seq_digit, broken_seg, idx
+                     with broken {:0>7b} ",
+                    check_digit, test_seq_digit, broken_seg
                 );
                 if check_digit & !broken_seg != test_seq_digit {
                     debug!("No match");
@@ -83,11 +80,9 @@ fn solve(seq: &[usize]) -> String
                     digit_ok = false;
                     break;
                 }
-
             }
 
-            if digit_ok  {
-                //found = true;
+            if digit_ok {
                 let next_idx = (100 * SEQ_0_9.len() - start - seq.len() - 1) % SEQ_0_9.len();
                 debug!(
                     "Found match.  start={} next={} seq len {}",
@@ -104,7 +99,6 @@ fn solve(seq: &[usize]) -> String
                     found = false;
                     break 'outer_loop;
                 }
-
             }
         }
     }
