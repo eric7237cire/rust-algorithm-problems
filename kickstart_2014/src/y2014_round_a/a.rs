@@ -6,7 +6,9 @@ use std::io::Write;
 use std::usize;
 
 /*
-
+Binary (endian-ness)
+Reverse cycle iterator
+subtraction mod arithmetic
 */
 pub fn solve_all_cases()
 {
@@ -83,7 +85,8 @@ fn solve(seq: &[usize]) -> String
             }
 
             if digit_ok {
-                let next_idx = (100 * SEQ_0_9.len() - start - seq.len() - 1) % SEQ_0_9.len();
+                //becuase its usize, can't go negative
+                let next_idx = (100*SEQ_0_9.len() - start - seq.len() - 1) % SEQ_0_9.len() ;
                 debug!(
                     "Found match.  start={} next={} seq len {}",
                     start,
