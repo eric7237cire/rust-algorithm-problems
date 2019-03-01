@@ -249,6 +249,16 @@ impl<T> Index<(usize, usize)> for Grid<T>
         &self.data[row_col_index.0 * self.C + row_col_index.1]
     }
 }
+impl<T> Index<(isize, isize)> for Grid<T>
+{
+    type Output = T;
+
+    fn index(&'_ self, row_col_index: (isize, isize)) -> &'_ T
+    {
+        &self.data[ (row_col_index.0 * self.C as isize + row_col_index.1) as usize]
+    }
+}
+
 //set a cell
 impl<T> IndexMut<(usize, usize)> for Grid<T>
 {

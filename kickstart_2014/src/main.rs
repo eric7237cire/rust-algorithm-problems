@@ -18,5 +18,5 @@ pub fn run_y2014_round_a()
 fn main()
 {
     init_log();
-    y2014_round_a::a::solve_all_cases();
+    y2014_round_a::b::solve_all_cases();
 }
